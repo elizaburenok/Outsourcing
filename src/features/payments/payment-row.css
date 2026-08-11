@@ -1,0 +1,56 @@
+/* Общие стили строки операции (иконка-категория, заголовок, подпись, сумма).
+   Используются везде, где показываем платежи: Главная (август) и История. */
+
+.pay-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: 50%;
+}
+
+.pay-icon--brand {
+  background: var(--color-bg-brand-1);
+  color: var(--color-primitive-brand);
+}
+
+.pay-icon--error {
+  background: var(--color-bg-error-2);
+  color: var(--color-primitive-error);
+}
+
+.pay-icon--success {
+  background: var(--color-bg-success-2);
+  color: var(--color-badge-text-success);
+}
+
+.pay-icon--neutral {
+  background: var(--color-bg-neutral-1);
+  color: var(--color-primitive-secondary);
+}
+
+.pay-title {
+  font-weight: var(--font-weight-medium);
+}
+
+.pay-note {
+  color: var(--color-primitive-secondary);
+}
+
+.pay-note--overdue {
+  color: var(--color-primitive-error);
+}
+
+.pay-amount {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+}
+
+.pay-amount--done {
+  color: var(--color-primitive-neutral-4);
+  font-weight: var(--font-weight-medium);
+}

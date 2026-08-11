@@ -1,0 +1,155 @@
+.tcd__body {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3-5x);
+  padding: var(--space-3-5x) var(--space-5x) var(--space-7-5x);
+}
+
+/* Заголовок налога + инфо-иконка */
+.tcd__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3-5x);
+}
+
+.tcd__heading-title {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__heading-info {
+  color: var(--color-primitive-neutral-4);
+  flex: none;
+}
+
+/* Разбор расчёта — карточка с обводкой */
+.tcd__summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3-5x);
+  padding: var(--space-4x) var(--space-5x) var(--space-5x);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-4-5x);
+}
+
+.tcd__hint {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__accent {
+  color: var(--color-primitive-brand);
+  font-weight: var(--font-weight-medium);
+}
+
+.tcd__line {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-25x);
+}
+
+.tcd__line-label {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__line-value {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__divider {
+  height: 1px;
+  background: var(--color-border-default);
+}
+
+/* Доход по контрагентам */
+.tcd__income-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-3x);
+  padding-top: var(--space-3-5x);
+}
+
+.tcd__income-title {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__income-total {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+}
+
+.tcd__list {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tcd__row {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+  padding: var(--space-2-5x) 0;
+}
+
+.tcd__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--space-8-5x);
+  height: var(--space-8-5x);
+  border-radius: 50%;
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-default-fixed);
+}
+
+.tcd__row-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5x);
+  flex: 1;
+  min-width: 0;
+}
+
+.tcd__row-name {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__row-ops {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+.tcd__row-amount {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+}

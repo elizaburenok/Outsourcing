@@ -1,0 +1,49 @@
+/*
+ * Глобальные стили прототипа.
+ * Все значения — токены из @ds/tokens/css-variables.css.
+ * Собственных цветов/размеров/шрифтов здесь быть не должно.
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-page-secondary);
+  color: var(--color-primitive-primary);
+  font-family: var(--font-family-primary);
+  font-size: var(--text-m-size);
+  line-height: var(--text-m-line);
+  letter-spacing: var(--text-m-tracking);
+  font-weight: var(--font-weight-regular);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+h1,
+h2,
+h3,
+h4,
+p,
+figure {
+  margin: 0;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}

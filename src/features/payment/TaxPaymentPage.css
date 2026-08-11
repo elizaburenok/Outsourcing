@@ -1,0 +1,161 @@
+.tpp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6x);
+  max-width: 40rem;
+  padding-bottom: var(--space-18x);
+}
+
+/* ---------- Сумма и срок ---------- */
+.tpp__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+}
+
+.tpp__amount {
+  font-size: var(--font-size-6xl);
+  line-height: var(--line-height-6xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  letter-spacing: var(--letter-spacing-m);
+}
+
+.tpp__due {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+/* ---------- Чип «Изменить сумму» ---------- */
+.tpp__edit {
+  align-self: flex-start;
+}
+
+.tpp__edit-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  color: var(--color-primitive-brand);
+}
+
+/* ---------- Навигаторы ---------- */
+.tpp__navigators {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3-5x);
+}
+
+.tpp-tile {
+  padding: var(--space-3x) var(--space-5x);
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.tpp-tile:hover {
+  background: var(--color-bg-neutral-1);
+}
+
+.tpp-tile__title {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.tpp-tile__desc {
+  color: var(--color-primitive-secondary);
+}
+
+.tpp-tile__icon {
+  display: inline-flex;
+  color: var(--color-primitive-secondary);
+  flex: none;
+}
+
+/* ---------- Счёт списания ---------- */
+.tpp__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4x);
+  width: 100%;
+  padding: var(--space-3x) var(--space-5x);
+  border: none;
+  border-radius: var(--radius-3x, var(--rounding-3x));
+  background: var(--color-container-transparent-1);
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+}
+
+.tpp__account-text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+  flex: 1;
+  min-width: 0;
+}
+
+.tpp__account-label {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.tpp__account-value {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+}
+
+.tpp__account-chevron {
+  color: var(--color-primitive-secondary);
+  flex: none;
+}
+
+/* ---------- Футер с кнопками — закреплён внизу окна, как в макете ---------- */
+.tpp__footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+  display: flex;
+  gap: var(--space-3-5x);
+  justify-content: center;
+  padding: var(--space-5x) 0;
+  background: var(--color-page-secondary);
+}
+
+.tpp__footer-btn {
+  min-width: 15rem;
+}
+
+/* ---------- Тост ---------- */
+.tpp__toast {
+  position: fixed;
+  left: 50%;
+  bottom: var(--space-8x);
+  transform: translateX(-50%);
+  z-index: 2100;
+  padding: var(--space-3x) var(--space-5x);
+  border-radius: var(--radius-2-5x);
+  background: var(--color-bg-inverse);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  box-shadow: var(--shadow-card);
+  animation: tpp-toast 0.15s ease;
+}
+
+@keyframes tpp-toast {
+  from {
+    opacity: 0;
+    transform: translate(-50%, var(--space-2x));
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

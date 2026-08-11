@@ -1,0 +1,216 @@
+.av {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6x);
+}
+
+/* ---------- Тумблер-снимок (служебный контрол прототипа, не часть продукта) ---------- */
+.av__snapshot {
+  position: fixed;
+  left: var(--space-4x);
+  bottom: var(--space-4x);
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+  padding: var(--space-2x);
+  border: 1px dashed var(--color-bg-neutral-2);
+  border-radius: var(--radius-4x);
+  background: var(--color-container-default);
+  opacity: 0.55;
+  transition: opacity 0.12s ease;
+}
+
+.av__snapshot:hover {
+  opacity: 1;
+}
+
+.av__snapshot-label {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-m);
+}
+
+.av__snapshot-tabs {
+  display: flex;
+  gap: var(--space-2x);
+}
+
+/* ---------- Хедер ---------- */
+.av__header {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+}
+
+.av__amount {
+  font-size: var(--font-size-6xl);
+  line-height: var(--line-height-6xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  letter-spacing: var(--letter-spacing-m);
+}
+
+.av__amount-label {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+/* ---------- Вкладки ---------- */
+/* Раскладку и типографику задаёт компонент Tabs (@ds/components/Tabs). */
+
+/* ---------- Список платежей ---------- */
+.av__list {
+  padding: var(--space-2x) 0;
+}
+
+/* Строки навигатора разделены только отступом (gap строки Cell), без линий-разделителей —
+   как в макете. Класс используется в других списках платежей (напр. дровер просроченных). */
+.av__divider {
+  height: 1px;
+  background: var(--color-bg-neutral-2);
+}
+
+/* Квартальный аванс УСН — форвардный платёж (срок 28 октября), вне «в августе». */
+.av__row--quarter .pay-note {
+  color: var(--color-primitive-secondary);
+}
+
+/* Строка «просрочено» — кликабельный триггер на всю ширину (открывает дровер). */
+.av__overdue-head {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.av__empty {
+  padding: var(--space-4x) 0;
+  font-size: var(--font-size-s);
+  color: var(--color-primitive-secondary);
+}
+
+/* иконка-категория */
+.pay-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: 50%;
+}
+
+.pay-icon--error {
+  background: var(--color-bg-error-2);
+  color: var(--color-primitive-error);
+}
+
+/* Лого-иконка категории платежа (@ds/src/logo) — сама содержит фон и знак. */
+.pay-logo {
+  display: block;
+  width: var(--spacing-12x);
+  height: var(--spacing-12x);
+  flex-shrink: 0;
+}
+
+.pay-logo--muted {
+  opacity: 0.5;
+  filter: grayscale(1);
+}
+
+.pay-title {
+  font-weight: var(--font-weight-medium);
+}
+
+.pay-note {
+  color: var(--color-primitive-secondary);
+}
+
+.pay-note--overdue {
+  color: var(--color-primitive-error);
+}
+
+.pay-amount {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+}
+
+.pay-amount--done {
+  color: var(--color-primitive-neutral-4);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Кликабельная строка платежа (ведёт на страницу уплаты). */
+.pay-row-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* ---------- Плитки разделов ---------- */
+.av__cards {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4x);
+}
+
+.section-card {
+  padding: var(--space-4x);
+  min-height: var(--space-18x);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6x);
+}
+
+.section-card--clickable {
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.section-card--clickable:hover {
+  background: var(--color-bg-neutral-1);
+}
+
+.section-card__icon {
+  color: var(--color-primitive-primary);
+  display: inline-flex;
+}
+
+.section-card__title {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.section-card__note {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+  margin-top: var(--space-0-5x);
+}
+
+/* ---------- Ссылки ---------- */
+.av__links {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6x);
+}

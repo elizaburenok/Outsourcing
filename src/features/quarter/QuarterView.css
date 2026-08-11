@@ -1,0 +1,195 @@
+.qv {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8x);
+}
+
+/* ---------- Свод по кварталу ---------- */
+.qv__summary {
+  padding: var(--space-6x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5x);
+}
+
+.qv__summary-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3x);
+}
+
+.qv__summary-title {
+  font-size: var(--font-size-title-xl);
+  line-height: var(--line-height-title-xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.qv__summary-range {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+  margin-top: var(--space-0-5x);
+}
+
+.qv__summary-amount {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+}
+
+.qv__summary-label {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+.qv__summary-big {
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-5xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  letter-spacing: var(--letter-spacing-m);
+}
+
+.qv__summary-context {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+.qv__progress {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+}
+
+.qv__progress-track {
+  height: var(--space-1-5x);
+  border-radius: var(--rounding-10x);
+  background: var(--color-bg-neutral-2);
+  overflow: hidden;
+}
+
+.qv__progress-fill {
+  height: 100%;
+  border-radius: var(--rounding-10x);
+  background: var(--color-primitive-brand);
+}
+
+.qv__progress-label {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-secondary);
+}
+
+.qv__next {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3x);
+  padding: var(--space-3x) var(--space-4x);
+  border-radius: var(--rounding-3x);
+  background: var(--color-bg-brand-1);
+}
+
+.qv__next-label {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-badge-text-purple-bright);
+}
+
+.qv__next-amount {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.qv__summary-note {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-neutral-4);
+}
+
+/* ---------- Месяц ---------- */
+.qv__month {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3x);
+}
+
+.qv__month-name {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  padding-left: var(--space-1x);
+}
+
+.qv__moments {
+  padding: var(--space-2x) var(--space-4x);
+}
+
+.qv__divider {
+  height: 1px;
+  background: var(--color-bg-neutral-2);
+}
+
+/* ---------- «Что делаем мы» ---------- */
+.qv__wedo {
+  padding: var(--space-1x) var(--space-2x) 0;
+}
+
+.qv__wedo-title {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-neutral-4);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-m);
+  margin-bottom: var(--space-2x);
+}
+
+.qv__wedo-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+}
+
+.qv__wedo-item {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-2x);
+}
+
+.dot {
+  flex: none;
+  width: var(--space-1-5x);
+  height: var(--space-1-5x);
+  border-radius: 50%;
+  transform: translateY(-1px);
+}
+
+.dot--done {
+  background: var(--color-primitive-success);
+}
+
+.dot--progress {
+  background: var(--color-primitive-neutral-3);
+}
+
+.qv__wedo-text {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+.qv__wedo-note {
+  color: var(--color-primitive-neutral-4);
+}

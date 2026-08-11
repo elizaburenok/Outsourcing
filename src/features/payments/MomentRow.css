@@ -1,0 +1,153 @@
+/* Строка платёжного момента — общая для «Квартала» и «Месяца». */
+.moment__head {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: 0;
+  padding: 0;
+}
+
+.moment__head[data-static='true'] {
+  cursor: default;
+}
+
+.moment--done {
+  opacity: 0.72;
+}
+
+.moment__title {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5x);
+  font-weight: var(--font-weight-medium);
+}
+
+.moment__sub {
+  color: var(--color-primitive-secondary);
+}
+
+.sfr-tag {
+  color: var(--color-primitive-neutral-4);
+}
+
+.caret {
+  font-size: var(--font-size-m);
+  color: var(--color-primitive-neutral-4);
+  transition: transform 0.15s ease;
+}
+
+.caret--open {
+  transform: rotate(180deg);
+}
+
+/* Медальон даты */
+.medallion {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-11x);
+  height: var(--space-11x);
+  border-radius: var(--rounding-3x);
+  line-height: 1;
+}
+
+.medallion__day {
+  font-size: var(--font-size-l);
+  font-weight: var(--font-weight-demi-bold);
+}
+
+.medallion__month {
+  font-size: var(--font-size-xs);
+  margin-top: var(--space-0-5x);
+}
+
+.medallion--future {
+  background: var(--color-bg-neutral-1);
+  color: var(--color-primitive-secondary);
+}
+
+.medallion--soon {
+  background: var(--color-bg-brand-1);
+  color: var(--color-badge-text-purple-bright);
+}
+
+.medallion--done {
+  background: var(--color-bg-neutral-1);
+  color: var(--color-primitive-neutral-4);
+}
+
+.medallion--overdue {
+  background: var(--color-bg-error-2);
+  color: var(--color-primitive-error);
+}
+
+.medallion--pending {
+  background: var(--color-bg-neutral-1);
+  color: var(--color-primitive-neutral-3);
+}
+
+/* Правый блок момента */
+.moment-right {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-1x);
+}
+
+.amount {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-demi-bold);
+  white-space: nowrap;
+}
+
+.amount--strong {
+  color: var(--color-primitive-primary);
+}
+
+.amount--soft {
+  color: var(--color-primitive-secondary);
+  font-weight: var(--font-weight-medium);
+}
+
+.amount--done {
+  color: var(--color-primitive-neutral-4);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Раскрытые платежи бандла */
+.moment__items {
+  list-style: none;
+  margin: 0;
+  padding: 0 0 var(--space-3x) var(--space-14x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+}
+
+.moment__item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4x);
+}
+
+.moment__item-name {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-primary);
+}
+
+.moment__item-basis {
+  color: var(--color-primitive-secondary);
+}
+
+.moment__item-amount {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+}

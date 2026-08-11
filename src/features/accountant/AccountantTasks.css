@@ -1,0 +1,142 @@
+/* ---------- Плитка-вход (в сетке разделов) ---------- */
+.acc-tile {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--space-6x);
+  padding: var(--space-4x);
+  min-height: var(--space-18x);
+  text-align: left;
+  cursor: pointer;
+  border: none;
+  background: var(--color-container-default);
+  border-radius: var(--radius-4x);
+  box-shadow: var(--shadow-card);
+  transition: transform 0.12s ease;
+}
+
+.acc-tile:hover {
+  transform: translateY(-1px);
+}
+
+.acc-tile__avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: 50%;
+  background: var(--color-primitive-brand);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  font-weight: var(--font-weight-medium);
+}
+
+.acc-tile__online {
+  position: absolute;
+  right: -1px;
+  bottom: -1px;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--color-primitive-success);
+  border: 2px solid var(--color-container-default);
+}
+
+.acc-tile__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5x);
+}
+
+.acc-tile__title {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.acc-tile__note {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+/* ---------- Тело шторки ---------- */
+.acc-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: var(--space-4x) 0 var(--space-2x);
+}
+
+.acc-group + .acc-group {
+  margin-top: var(--space-5x);
+}
+
+.acc-group__label {
+  padding: 0 var(--space-5x);
+  margin-bottom: var(--space-1x);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-m);
+}
+
+.acc-group__list {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ---------- Строка задачи ---------- */
+.acc-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-top: var(--space-1x);
+}
+
+.acc-dot--inProgress {
+  background: var(--color-primitive-brand);
+}
+
+.acc-dot--waitingYou {
+  background: var(--color-primitive-warning);
+}
+
+.acc-dot--done {
+  background: var(--color-primitive-success);
+}
+
+.acc-row-btn {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+/* «Ждём вас» — подсветка строки, требующей клиента */
+.acc-row--wait {
+  background: var(--color-bg-brand-1);
+  border-radius: var(--radius-2-5x);
+}
+
+.acc-row--done {
+  opacity: 0.75;
+}
+
+.acc-action {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-brand);
+  white-space: nowrap;
+}
