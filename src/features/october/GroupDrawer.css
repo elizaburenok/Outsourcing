@@ -1,0 +1,82 @@
+/* Дровер группы налогов — на базе OverdueDrawer.css, на токенах DS. */
+.gd-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  background: var(--color-overlay-popup);
+  display: flex;
+  justify-content: flex-end;
+  animation: gd-fade 0.15s ease;
+}
+
+@keyframes gd-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.gd {
+  width: min(92vw, 30rem);
+  height: 100%;
+  background: var(--color-page-primary);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  animation: gd-slide 0.2s ease;
+}
+
+@keyframes gd-slide {
+  from {
+    transform: translateX(var(--space-6x));
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.gd__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4x);
+  padding: var(--space-2x) var(--space-6x) var(--space-6x);
+}
+
+.gd__note {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+.gd__note--error {
+  color: var(--color-primitive-error);
+}
+
+.gd__list {
+  display: flex;
+  flex-direction: column;
+}
+
+.gd__total {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding-top: var(--space-4x);
+  border-top: 1px solid var(--color-bg-neutral-2);
+}
+
+.gd__total-label {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.gd__total-amount {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+}

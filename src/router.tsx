@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from './layouts/RootLayout'
 import HomePage from './pages/HomePage'
 import HistoryPage from './pages/HistoryPage'
+import ReportsPage from './pages/ReportsPage'
 import ChatPage from './pages/ChatPage'
 import TaxPaymentPage from './features/payment/TaxPaymentPage'
 import { ROUTES } from './routes'
@@ -17,6 +18,7 @@ export const router = createBrowserRouter([
       { path: 'home', element: <HomePage /> },
       { path: 'chat', element: <ChatPage /> },
       { path: 'history', element: <HistoryPage /> },
+      { path: 'reports', element: <ReportsPage /> },
       { path: 'pay/:id', element: <TaxPaymentPage /> },
       { path: '*', element: <Navigate to={ROUTES.home} replace /> },
     ],
