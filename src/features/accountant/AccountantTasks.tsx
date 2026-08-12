@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Drawer, { DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
 import { Cell } from '@ds/components/Cell'
+import { useOnboarding } from '@/state/OnboardingProvider'
 import {
   ACCOUNTANT,
   ACCOUNTANT_TASKS,
@@ -48,7 +49,10 @@ function TaskRow({ task }: { task: AccountantTask }) {
 
 /** Вход-плитка «Бухгалтер» в сетке разделов + шторка «Задачи бухгалтера». */
 export default function AccountantTasks() {
-  const [open, setOpen] = useState(false)
+  const { tasksDrawerForced } = useOnboarding()
+  const [localOpen, setLocalOpen] = useState(false)
+  // Коуч на последнем шаге сам открывает шторку, чтобы показать «Добавить задачу».
+  const open = localOpen || tasksDrawerForced
   const s = summarizeTasks(ACCOUNTANT_TASKS)
 
   const noteParts: string[] = []
@@ -57,7 +61,7 @@ export default function AccountantTasks() {
 
   return (
     <>
-      <button className="acc-tile" type="button" onClick={() => setOpen(true)}>
+      <button className="acc-tile" type="button" data-coach="tasks" onClick={() => setLocalOpen(true)}>
         <span className="acc-tile__avatar" aria-hidden>
           {ACCOUNTANT.initials}
           {ACCOUNTANT.online && <span className="acc-tile__online" />}
@@ -68,8 +72,8 @@ export default function AccountantTasks() {
         </span>
       </button>
 
-      <Drawer open={open} onClose={() => setOpen(false)} aria-label="Задачи бухгалтера">
-        <DrawerHeader onClose={() => setOpen(false)}>Задачи бухгалтера</DrawerHeader>
+      <Drawer open={open} onClose={() => setLocalOpen(false)} aria-label="Задачи бухгалтера">
+        <DrawerHeader onClose={() => setLocalOpen(false)}>Задачи бухгалтера</DrawerHeader>
 
         <div className="acc-body">
           {GROUPS.map(({ status, label }) => {
@@ -88,10 +92,13 @@ export default function AccountantTasks() {
           })}
         </div>
 
-        <DrawerFooter
-          type="1 Button"
-          primaryAction={{ label: 'Добавить задачу', onClick: () => {} }}
-        />
+        {/* Якорь коуча «создать задачу» — обёртка, т.к. DrawerFooter не пробрасывает data-* */}
+        <div data-coach="add-task">
+          <DrawerFooter
+            type="1 Button"
+            primaryAction={{ label: 'Добавить задачу', onClick: () => {} }}
+          />
+        </div>
       </Drawer>
     </>
   )

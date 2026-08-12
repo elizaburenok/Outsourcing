@@ -1,5 +1,5 @@
+import { Clock } from 'lucide-react'
 import { Cell } from '@ds/components/Cell'
-import Badge from '@/components/ui/Badge'
 import { formatMoney } from '@/lib/format'
 import type { AugustPayment, PayCategory } from '@/data/august'
 import contributionsLogo from '@ds/src/logo/Contributions.png'
@@ -26,11 +26,26 @@ export function PayIcon({ category, muted = false }: { category: PayCategory; mu
   )
 }
 
+/**
+ * Лого-иконка платежа с бейджем-часами (для состояния «ещё считается»). Часы у аватара
+ * сигналят: сумма пока не финальна, платёж впереди. Цвет бейджа — Category/Flamingo (DS).
+ */
+export function PayIconPending({ category }: { category: PayCategory }) {
+  return (
+    <span className="pay-logo-wrap">
+      <img className="pay-logo" src={CATEGORY[category]} alt="" />
+      <span className="pay-badge" aria-hidden="true">
+        <Clock size={10} strokeWidth={2.5} />
+      </span>
+    </span>
+  )
+}
+
 export function paymentNote(p: AugustPayment) {
   const sfr = !p.viaEnp && p.category === 'travma' ? ' · в СФР, мимо ЕНП' : ''
   if (p.state === 'paid') return <span className="pay-note">Оплачено {p.paidLabel}</span>
   if (p.state === 'process')
-    return <span className="pay-note">Считаем нарастающим итогом — итог к {p.dueLabel}</span>
+    return <span className="pay-note">Рассчитаем до {p.dueLabel}</span>
   if (p.state === 'overdue')
     return (
       <span className="pay-note pay-note--overdue">
@@ -62,11 +77,15 @@ export default function PaymentRow({
       verticalSpacing="compact"
       title={<span className="pay-title">{payment.title}</span>}
       description={paymentNote(payment)}
-      leftAccessory={<PayIcon category={payment.category} muted={isProcess} />}
-      rightAccessory={
+      leftAccessory={
         isProcess ? (
-          <Badge tone="neutral">В процессе</Badge>
+          <PayIconPending category={payment.category} />
         ) : (
+          <PayIcon category={payment.category} />
+        )
+      }
+      rightAccessory={
+        isProcess ? undefined : (
           <span className={`pay-amount ${payment.state === 'paid' ? 'pay-amount--done' : ''}`}>
             {formatMoney(payment.amount)}
           </span>

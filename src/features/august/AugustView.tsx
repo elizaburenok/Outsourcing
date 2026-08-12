@@ -157,19 +157,22 @@ export default function AugustView() {
         onChange={(id) => setTab(id as Tab)}
         items={[
           { id: 'topay', label: 'К уплате' },
-          { id: 'done', label: 'Готово' },
+          { id: 'done', label: 'Выполнено' },
         ]}
       />
 
-      {/* Единый список платежей — без разбивки по месяцам */}
-      <Card className="av__list">
-        {rows.map((r) => (
-          <div key={r.key} className={`av__row ${r.quarter ? 'av__row--quarter' : ''}`}>
-            {r.node}
-          </div>
-        ))}
-        {rows.length === 0 && <p className="av__empty">Пока ничего нет.</p>}
-      </Card>
+      {/* Единый список платежей — без разбивки по месяцам. Якорь коуча «уплата налога»
+          (обёртка div, т.к. коуч ищет data-coach на «сыром» элементе). */}
+      <div data-coach="pay">
+        <Card className="av__list">
+          {rows.map((r) => (
+            <div key={r.key} className={`av__row ${r.quarter ? 'av__row--quarter' : ''}`}>
+              {r.node}
+            </div>
+          ))}
+          {rows.length === 0 && <p className="av__empty">Пока ничего нет.</p>}
+        </Card>
+      </div>
 
       {/* Переход к истории — все операции за прошлые месяцы. Показываем во вкладке «Готово». */}
       {tab === 'done' && (
@@ -196,11 +199,13 @@ export default function AugustView() {
           description="УСН «Доходы» — 6%"
           iconLeft={<Landmark size={20} strokeWidth={1.75} />}
         />
-        <PageAction
-          title="Электронная подпись"
-          description="Действует до 01.08.2028"
-          iconLeft={<PenLine size={20} strokeWidth={1.75} />}
-        />
+        <div data-coach="sign">
+          <PageAction
+            title="Электронная подпись"
+            description="Действует до 01.08.2028"
+            iconLeft={<PenLine size={20} strokeWidth={1.75} />}
+          />
+        </div>
         <PageAction
           title="Маркетплейсы"
           description="Wildberries, Ozon, Яндекс Маркет"

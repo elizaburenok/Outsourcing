@@ -6,6 +6,8 @@
 export const ROUTES = {
   home: '/home',
   history: '/history',
+  /** Чат с бухгалтером — канал этапа 1 онбординга нового ЛК. */
+  chat: '/chat',
   /** Страница уплаты конкретного налога/платежа. */
   pay: '/pay/:id',
 } as const

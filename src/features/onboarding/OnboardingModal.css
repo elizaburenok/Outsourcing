@@ -1,0 +1,129 @@
+.obm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2200;
+  background: var(--color-overlay-popup);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5x);
+  animation: obm-fade 0.15s ease;
+}
+
+@keyframes obm-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.obm {
+  width: min(92vw, 27rem);
+  background: var(--color-popup-primary);
+  border-radius: var(--radius-4-5x);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-card);
+  animation: obm-pop 0.2s ease;
+}
+
+@keyframes obm-pop {
+  from {
+    transform: translateY(var(--space-4x));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Верхняя «картинка» — иллюстративный блок на брендовом фоне. */
+.obm__media {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-8x) 0;
+  color: var(--color-primitive-primary-on-inverse);
+}
+
+.obm__media--brand {
+  background: var(--color-bg-brand-5);
+}
+
+.obm__media--success {
+  background: var(--color-bg-success-2);
+  color: var(--color-primitive-success);
+}
+
+.obm__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5x);
+  padding: var(--space-6x) var(--space-6x) var(--space-4x);
+}
+
+.obm__title {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-2xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.obm__text {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.obm__bullets {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3x);
+}
+
+.obm__bullet {
+  position: relative;
+  padding-left: var(--space-7x);
+  color: var(--color-primitive-primary);
+}
+
+.obm__bullet::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 2px;
+  width: var(--space-5x);
+  height: var(--space-5x);
+  border-radius: 50%;
+  background: var(--color-bg-brand-1);
+}
+
+.obm__bullet::after {
+  content: '';
+  position: absolute;
+  left: var(--space-1-75x);
+  top: var(--space-2x);
+  width: var(--space-1-5x);
+  height: var(--space-2-5x);
+  border-right: 2px solid var(--color-primitive-brand);
+  border-bottom: 2px solid var(--color-primitive-brand);
+  transform: rotate(45deg);
+}
+
+.obm__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+  padding: var(--space-2x) var(--space-6x) var(--space-6x);
+}
+
+.obm__btn {
+  width: 100%;
+}

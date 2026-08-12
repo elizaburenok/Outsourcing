@@ -1,0 +1,180 @@
+.cm-root {
+  position: fixed;
+  inset: 0;
+  z-index: 2100;
+}
+
+/* Ловит клики по остальному экрану, чтобы во время обзора ничего не срабатывало. */
+.cm-catch {
+  position: fixed;
+  inset: 0;
+}
+
+/* Спотлайт: прозрачное «окно» вокруг объекта; затемнение даёт огромная тень. */
+.cm-hole {
+  position: fixed;
+  z-index: 1;
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-4x);
+  background: transparent;
+  box-shadow: 0 0 0 100vmax var(--color-overlay-popup);
+  outline: 2px solid var(--color-primitive-brand);
+  outline-offset: 0;
+  cursor: pointer;
+  animation: cm-pulse 1.6s ease-in-out infinite;
+}
+
+@keyframes cm-pulse {
+  0%,
+  100% {
+    outline-color: var(--color-primitive-brand);
+  }
+  50% {
+    outline-color: var(--color-bg-brand-3);
+  }
+}
+
+/* Тултип-карточка рядом с объектом. */
+.cm-tip {
+  position: fixed;
+  z-index: 2;
+  width: min(88vw, 20rem);
+  background: var(--color-popup-primary);
+  border-radius: var(--radius-4x);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4x);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5x);
+  animation: cm-appear 0.16s ease;
+}
+
+.cm-tip--hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+@keyframes cm-appear {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cm-tip__head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+}
+
+.cm-tip__avatar {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-9-5x);
+  height: var(--space-9-5x);
+  flex: none;
+  border-radius: 50%;
+  background: var(--color-primitive-brand);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--font-size-s);
+  font-weight: var(--font-weight-medium);
+}
+
+.cm-tip__online {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--space-2-5x);
+  height: var(--space-2-5x);
+  border-radius: 50%;
+  background: var(--color-primitive-success);
+  border: 2px solid var(--color-popup-primary);
+}
+
+.cm-tip__who {
+  display: flex;
+  flex-direction: column;
+}
+
+.cm-tip__name {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.cm-tip__step {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-secondary);
+}
+
+.cm-tip__title {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.cm-tip__text {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.cm-tip__dots {
+  display: flex;
+  gap: var(--space-1-5x);
+}
+
+.cm-tip__dot {
+  width: var(--space-2x);
+  height: var(--space-2x);
+  border-radius: 50%;
+  background: var(--color-bg-neutral-2);
+  transition: background 0.15s ease, width 0.15s ease;
+}
+
+.cm-tip__dot.is-done {
+  background: var(--color-bg-brand-3);
+}
+
+.cm-tip__dot.is-active {
+  width: var(--space-5x);
+  border-radius: var(--radius-2-5x);
+  background: var(--color-primitive-brand);
+}
+
+.cm-tip__foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3x);
+  margin-top: var(--space-1x);
+}
+
+.cm-tip__hint {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-brand);
+}
+
+.cm-tip__skip {
+  border: 0;
+  background: transparent;
+  padding: var(--space-1x) var(--space-2x);
+  font-size: var(--font-size-s);
+  color: var(--color-primitive-secondary);
+}
+
+.cm-tip__skip:hover {
+  color: var(--color-primitive-primary);
+}
