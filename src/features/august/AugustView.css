@@ -108,18 +108,21 @@
   min-height: var(--space-10x);
 }
 
-/* иконка-категория — тот же размер, что у лого платежа (pay-logo), для единой сетки строк. */
-.pay-icon {
+/* иконка-категория — тот же размер (32×32), что у лого платежа (pay-logo), для единой сетки
+   строк; форма — superellipse (squircle), как у DS-логотипов, а не круг. Скоуп `.av` нужен,
+   чтобы перебить глобальный `.pay-icon` из payment-row.css (40px, круг). */
+.av .pay-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: var(--spacing-8x);
   height: var(--spacing-8x);
   border-radius: 50%;
+  corner-shape: squircle;
 }
 
-.pay-icon--error {
-  background: var(--color-bg-error-2);
+.av .pay-icon--error {
+  background: var(--color-bg-warning-1);
   color: var(--color-primitive-error);
 }
 
@@ -204,6 +207,15 @@
   gap: var(--space-4x);
 }
 
+/* Обёртка-якорь коуча вокруг плитки: тянется как обычная ячейка сетки. */
+.av__card-cell {
+  display: flex;
+}
+
+.av__card-cell > .section-card {
+  flex: 1;
+}
+
 .section-card {
   padding: var(--space-4x);
   min-height: var(--space-18x);
@@ -222,9 +234,33 @@
   background: var(--color-bg-neutral-1);
 }
 
+.section-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-2x);
+  width: 100%;
+}
+
 .section-card__icon {
   color: var(--color-primitive-primary);
   display: inline-flex;
+}
+
+/* Счётчик-бейдж (напр. отчёты, ждущие ответа). Токены — из DS. */
+.section-card__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--space-4x);
+  height: var(--space-4x);
+  padding: 0 var(--space-1x);
+  border-radius: var(--radius-2-5x);
+  background: var(--color-primitive-neutral-4);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: var(--font-weight-demi-bold);
 }
 
 .section-card__title {
