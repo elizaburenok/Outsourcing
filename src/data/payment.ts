@@ -9,6 +9,7 @@
  */
 
 import { AUGUST_PAYMENTS, USN_ADVANCE, type AugustPayment, type PayCategory } from './august'
+import { OCTOBER_PAYMENTS } from './october'
 
 /** Счёт списания (номинальный, для показа). */
 export const PAYMENT_ACCOUNT = '2 480 310,55 ₽ — Расчётный, ···7742'
@@ -60,7 +61,7 @@ function toPayable(p: AugustPayment | typeof USN_ADVANCE, subtitle: string): Pay
 /** Собрать вью-модель платежа по id (из общего списка августа или квартального аванса УСН). */
 export function getPayableById(id: string): Payable | undefined {
   if (id === USN_ADVANCE.id) return toPayable(USN_ADVANCE, 'Аванс за 9 месяцев 2026')
-  const p = AUGUST_PAYMENTS.find((x) => x.id === id)
+  const p = AUGUST_PAYMENTS.find((x) => x.id === id) ?? OCTOBER_PAYMENTS.find((x) => x.id === id)
   if (!p) return undefined
   return toPayable(p, p.title)
 }
@@ -86,6 +87,10 @@ const CALC_BASE: Record<string, number> = {
   'vznos-jul': 65_000,
   'travma-jun': 40_000,
   'travma-jul': 40_000,
+  // Октябрьский сценарий (10 октября) — базы для налогов/взносов к уплате.
+  'o-travma-sep': 40_000,
+  'o-vznos-sep': 65_000,
+  'o-ndfl-oct-1': 70_000,
 }
 
 export type CalcBreakdown =

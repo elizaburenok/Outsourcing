@@ -1,0 +1,58 @@
+.chat-banner {
+  position: relative;
+  display: flex;
+  gap: var(--space-3x);
+  padding: var(--space-4x);
+  border-radius: var(--radius-4x);
+  background: var(--color-bg-brand-1);
+  border: 1px solid var(--color-bg-brand-2);
+}
+
+.chat-banner__close {
+  position: absolute;
+  top: var(--space-2x);
+  right: var(--space-2x);
+  display: inline-flex;
+  padding: var(--space-1x);
+  border: 0;
+  background: transparent;
+  color: var(--color-primitive-secondary);
+  border-radius: var(--radius-2-5x);
+}
+
+.chat-banner__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--space-11x);
+  height: var(--space-11x);
+  border-radius: 50%;
+  background: var(--color-primitive-brand);
+  color: var(--color-primitive-primary-on-inverse);
+}
+
+.chat-banner__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+  padding-right: var(--space-5x);
+}
+
+.chat-banner__title {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.chat-banner__text {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.chat-banner__cta {
+  align-self: flex-start;
+  margin-top: var(--space-1x);
+}

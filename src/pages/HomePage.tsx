@@ -1,11 +1,12 @@
 import NavigationBar from '@ds/components/NavigationBar'
 import PageShell from '@/components/PageShell/PageShell'
-import AugustView from '@/features/august/AugustView'
+import OctoberView from '@/features/october/OctoberView'
 
 /**
- * Раздел «Онлайн-бухгалтерия» — сценарий «Уплата налогов в августе» по драфту.
- * Единый список платежей (без разбивки по месяцам), вкладки «К уплате / Готово».
- * Правило: показываем только твёрдые суммы к уплате, без прогнозов.
+ * Раздел «Онлайн-бухгалтерия» — сценарий «Уплата налогов, 10 октября».
+ * Квартал закрыт (30 сентября) → аванс по УСН за 9 месяцев посчитан и стоит твёрдой
+ * суммой к уплате (до 28 октября). Единый список платежей, вкладки «К уплате / Готово».
+ * Августовский сценарий (середина квартала) остаётся в @/features/august для сравнения.
  */
 export default function HomePage() {
   return (
@@ -19,7 +20,7 @@ export default function HomePage() {
         />
       }
     >
-      <AugustView />
+      <OctoberView />
     </PageShell>
   )
 }

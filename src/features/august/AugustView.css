@@ -98,13 +98,23 @@
   color: var(--color-primitive-secondary);
 }
 
-/* иконка-категория */
+/* Кнопка «Показать все» — последняя строка внутри карточки списка. */
+.av__show-all {
+  padding: var(--space-2x) var(--space-5x) var(--space-5x);
+}
+
+.av__show-all-btn {
+  max-width: none;
+  min-height: var(--space-10x);
+}
+
+/* иконка-категория — тот же размер, что у лого платежа (pay-logo), для единой сетки строк. */
 .pay-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--space-10x);
-  height: var(--space-10x);
+  width: var(--spacing-8x);
+  height: var(--spacing-8x);
   border-radius: 50%;
 }
 
@@ -116,14 +126,37 @@
 /* Лого-иконка категории платежа (@ds/src/logo) — сама содержит фон и знак. */
 .pay-logo {
   display: block;
-  width: var(--spacing-12x);
-  height: var(--spacing-12x);
+  width: var(--spacing-8x);
+  height: var(--spacing-8x);
   flex-shrink: 0;
 }
 
 .pay-logo--muted {
   opacity: 0.5;
   filter: grayscale(1);
+}
+
+/* Лого с бейджем-часами — платёж «ещё считается» (напр. налог по УСН до расчёта). */
+.pay-logo-wrap {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.pay-badge {
+  position: absolute;
+  top: calc(-1 * var(--space-0-5x));
+  right: calc(-1 * var(--space-0-5x));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-4x);
+  height: var(--space-4x);
+  border-radius: 50%;
+  background: var(--color-category-flamingo);
+  color: var(--color-primitive-default-fixed);
+  border: 2px solid var(--color-container-default);
+  box-sizing: border-box;
 }
 
 .pay-title {

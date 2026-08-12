@@ -1,0 +1,24 @@
+/* Служебная кнопка прототипа — тихая, в углу, не читается как элемент продукта. */
+.onb-reset {
+  position: fixed;
+  left: var(--space-4x);
+  bottom: var(--space-4x);
+  z-index: 40;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  padding: var(--space-2x) var(--space-3x);
+  border: 1px solid var(--color-bg-neutral-2);
+  border-radius: var(--radius-10x);
+  background: var(--color-container-default);
+  color: var(--color-primitive-secondary);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  box-shadow: var(--shadow-card);
+  opacity: 0.7;
+  transition: opacity 0.12s ease;
+}
+
+.onb-reset:hover {
+  opacity: 1;
+}
