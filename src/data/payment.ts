@@ -24,6 +24,16 @@ const CATEGORY_TITLE: Record<PayCategory, string> = {
   salary: 'Зарплата директору',
 }
 
+/** Заголовок модалки результата оплаты («Флоу-результат») — с учётом рода/числа категории. */
+const CATEGORY_PAID_TITLE: Record<PayCategory, string> = {
+  usn: 'Налог по УСН уплачен!',
+  nds: 'Налог по НДС уплачен!',
+  ndfl: 'НДФЛ уплачен!',
+  vznos: 'Страховые взносы уплачены!',
+  travma: 'Взносы на травматизм уплачены!',
+  salary: 'Зарплата директору уплачена!',
+}
+
 export type Payable = {
   id: string
   category: PayCategory
@@ -33,6 +43,8 @@ export type Payable = {
   subtitle: string
   /** Полное название платежа (для модалки результата). */
   fullTitle: string
+  /** Заголовок модалки «Успех» после уплаты. */
+  paidTitle: string
   amount: number
   /** «до 28 октября» / «до 28 августа». */
   dueLabel: string
@@ -51,6 +63,7 @@ function toPayable(p: AugustPayment | typeof USN_ADVANCE, subtitle: string): Pay
     title: CATEGORY_TITLE[p.category],
     subtitle,
     fullTitle: p.title,
+    paidTitle: CATEGORY_PAID_TITLE[p.category],
     amount: p.amount,
     dueLabel: p.dueLabel ?? '',
     requisites,

@@ -157,12 +157,8 @@ export default function TaxPaymentPage() {
       )}
 
       {showResult && (
-        <PaymentResultModal
-          title={payable.category === 'usn' ? 'Налог по УСН уплачен!' : 'Платёж отправлен!'}
-          onDone={goHome}
-        >
+        <PaymentResultModal title={payable.paidTitle} onDone={goHome}>
           <p>Отправили платёж {formatMoney(payable.amount)}.</p>
-          <p>{payable.fullTitle} — полностью уплачен.</p>
           <p>Информация по платежу появится в ленте событий в течение 5 минут.</p>
         </PaymentResultModal>
       )}

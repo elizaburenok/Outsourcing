@@ -20,13 +20,12 @@
 }
 
 .prm {
-  width: min(92vw, 26rem);
+  width: min(92vw, 30rem);
   background: var(--color-popup-primary);
   border-radius: var(--radius-4-5x);
-  padding: var(--space-7-5x) var(--space-6x) var(--space-5x);
   display: flex;
   flex-direction: column;
-  gap: var(--space-7-5x);
+  overflow: hidden;
   box-shadow: var(--shadow-card);
   animation: prm-pop 0.2s ease;
 }
@@ -42,12 +41,18 @@
   }
 }
 
+.prm__header {
+  height: var(--space-7-5x);
+  flex-shrink: 0;
+}
+
 .prm__body {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  gap: var(--space-5x);
-  text-align: center;
+  align-items: flex-start;
+  gap: var(--space-10x);
+  text-align: left;
+  padding: var(--space-5x) var(--space-10x) var(--space-7-5x);
 }
 
 .prm__badge {
@@ -64,12 +69,16 @@
 .prm__content {
   display: flex;
   flex-direction: column;
-  gap: var(--space-2-5x);
+  gap: var(--space-7-5x);
+  width: 100%;
 }
 
 .prm__title {
-  font-size: var(--font-size-2xl);
-  line-height: var(--line-height-2xl);
+  /* TODO(DS): в Figma этот заголовок — стиль «TTN 600/4XL» (36px / 40px, DemiBold),
+     которого нет в css-variables.css (есть только 5xl 32/36 и 6xl 40/46). Пока —
+     ближайший существующий токен (5xl), ждём добавления 4xl в DS. */
+  font-size: var(--font-size-5xl);
+  line-height: var(--line-height-5xl);
   font-weight: var(--font-weight-demi-bold);
   color: var(--color-primitive-primary);
 }
@@ -77,12 +86,18 @@
 .prm__text {
   display: flex;
   flex-direction: column;
-  gap: var(--space-1-5x);
+  gap: var(--space-2-5x);
   font-size: var(--font-size-m);
   line-height: var(--line-height-m);
-  color: var(--color-primitive-secondary);
+  letter-spacing: var(--letter-spacing-m);
+  color: var(--color-primitive-primary);
 }
 
-.prm__btn {
+.prm__footer {
+  padding: var(--space-5x);
+}
+
+.prm__footer .prm__btn {
   width: 100%;
+  max-width: none;
 }

@@ -33,6 +33,7 @@ export default function PaymentResultModal({
   return (
     <div className="prm-overlay">
       <div className="prm" role="dialog" aria-modal="true" aria-label={title}>
+        <div className="prm__header" aria-hidden />
         <div className="prm__body">
           <span className="prm__badge" aria-hidden>
             <Check size={24} strokeWidth={2} />
@@ -42,9 +43,11 @@ export default function PaymentResultModal({
             <div className="prm__text">{children}</div>
           </div>
         </div>
-        <Button className="prm__btn" visualVariant="Primary" onClick={onDone}>
-          {buttonLabel}
-        </Button>
+        <div className="prm__footer">
+          <Button className="prm__btn" visualVariant="Primary" onClick={onDone}>
+            {buttonLabel}
+          </Button>
+        </div>
       </div>
     </div>
   )
