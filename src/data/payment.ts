@@ -17,6 +17,7 @@ export const PAYMENT_ACCOUNT = '2 480 310,55 ₽ — Расчётный, ···7
 /** Короткое название налога для левой панели (NavigationBar). */
 const CATEGORY_TITLE: Record<PayCategory, string> = {
   usn: 'Налог по УСН',
+  nds: 'Налог по НДС',
   ndfl: 'НДФЛ',
   vznos: 'Страховые взносы',
   travma: 'Взносы на травматизм',
@@ -71,6 +72,7 @@ const CALC_RATE: Partial<Record<PayCategory, number>> = {
   ndfl: 13,
   vznos: 30,
   travma: 0.5,
+  nds: 5,
 }
 
 /**
@@ -85,8 +87,14 @@ const CALC_BASE: Record<string, number> = {
   'ndfl-aug-1': 70_000,
   'vznos-jun': 65_000,
   'vznos-jul': 65_000,
+  'vznos-aug': 65_000,
   'travma-jun': 40_000,
   'travma-jul': 40_000,
+  'travma-aug': 40_000,
+  'ndfl-aug-2': 30_000,
+  // НДС на УСН, 5% без вычета — база это выручка за расчётный месяц квартала.
+  'nds-q2-1': 640_000,
+  'nds-q2-2': 640_000,
   // Октябрьский сценарий (10 октября) — базы для налогов/взносов к уплате.
   'o-travma-sep': 40_000,
   'o-vznos-sep': 65_000,

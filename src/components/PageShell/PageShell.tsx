@@ -5,12 +5,15 @@ import './PageShell.css'
 export default function PageShell({
   aside,
   children,
+  background,
 }: {
   aside?: ReactNode
   children: ReactNode
+  /** Фон на всю страницу вместо стандартного `--color-page-secondary` (напр. для Истории). */
+  background?: 'primary'
 }) {
   return (
-    <div className="shell">
+    <div className={background === 'primary' ? 'shell shell--primary' : 'shell'}>
       {aside && <aside className="shell__aside">{aside}</aside>}
       <div className="shell__main">
         <div className="shell__main-inner">{children}</div>

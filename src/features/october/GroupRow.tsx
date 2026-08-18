@@ -2,11 +2,11 @@ import type { ReactNode } from 'react'
 import { AlertTriangle } from 'lucide-react'
 import { Cell } from '@ds/components/Cell'
 import { formatMoney } from '@/lib/format'
-import { PayIcon, PayIconPending } from '@/features/august/PaymentRow'
+import { pluralPayments } from '@/data/august'
+import { PayIcon } from '@/features/august/PaymentRow'
 import { nearestDue, pluralTaxes, type PayGroup } from './groups'
 
-/** Иконка группы: просрочка — треугольник-ошибка; УСН — лого налога (с часами, если считается);
- *  сотрудники — аватар. */
+/** Иконка группы: просрочка — треугольник-ошибка; УСН/НДС — лого налога; сотрудники — аватар. */
 function GroupIcon({ group }: { group: PayGroup }) {
   if (group.key === 'overdue')
     return (
@@ -14,10 +14,8 @@ function GroupIcon({ group }: { group: PayGroup }) {
         <AlertTriangle size={20} strokeWidth={2} />
       </span>
     )
-  if (group.key === 'usn') {
-    const usn = group.items[0]
-    return usn.state === 'process' ? <PayIconPending category="usn" /> : <PayIcon category="usn" />
-  }
+  if (group.key === 'usn') return <PayIcon category="usn" />
+  if (group.key === 'nds') return <PayIcon category="nds" />
   // Сотрудники — единый аватар вне зависимости от состава.
   return <PayIcon category="salary" />
 }
@@ -25,11 +23,7 @@ function GroupIcon({ group }: { group: PayGroup }) {
 /** Подпись группы. */
 function groupNote(group: PayGroup): ReactNode {
   if (group.key === 'overdue')
-    return (
-      <span className="pay-note pay-note--overdue">
-        Уплатите как можно скорее — начисляются пени
-      </span>
-    )
+    return <span className="pay-note pay-note--overdue">Закройте задолженности</span>
   if (group.key === 'usn') {
     const usn = group.items[0]
     return (
@@ -38,11 +32,18 @@ function groupNote(group: PayGroup): ReactNode {
       </span>
     )
   }
+  if (group.key === 'nds') {
+    const due = nearestDue(group.items)
+    return <span className="pay-note">{due ? `до ${due}` : ''}</span>
+  }
   const due = nearestDue(group.items)
+  // «Сотрудники»: если в группе есть зарплата (не налог) — считаем «платежи», не «налоги».
+  const hasSalary = group.items.some((p) => p.category === 'salary')
+  const count = hasSalary ? pluralPayments(group.items.length) : pluralTaxes(group.items.length)
   return (
     <span className="pay-note">
-      {pluralTaxes(group.items.length)}
-      {due ? ` · до ${due}` : ''}
+      {count}
+      {due ? ` с ${due}` : ''}
     </span>
   )
 }
@@ -67,7 +68,11 @@ export default function GroupRow({
       description={groupNote(group)}
       leftAccessory={<GroupIcon group={group} />}
       rightAccessory={
-        showAmount ? <span className="pay-amount">{formatMoney(group.total)}</span> : undefined
+        showAmount ? (
+          <span className="pay-amount">{formatMoney(group.total)}</span>
+        ) : (
+          <span className="pay-amount pay-amount--done">В процессе</span>
+        )
       }
     />
   )

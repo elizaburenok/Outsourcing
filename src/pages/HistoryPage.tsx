@@ -12,12 +12,15 @@ export default function HistoryPage() {
   const navigate = useNavigate()
   return (
     <PageShell
+      background="primary"
       aside={
         <NavigationBar
           hasBackButton
           hasTextBlock
-          title="История платежей"
-          subtitle="Все операции за прошлые месяцы"
+          hasRootLink
+          rootLinkText="Онлайн-бухгалтерия"
+          onRootLinkClick={() => navigate(ROUTES.home)}
+          title="История операций"
           onBackClick={() => navigate(ROUTES.home)}
         />
       }
