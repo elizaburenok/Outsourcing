@@ -27,7 +27,14 @@
   color: var(--color-primitive-secondary);
 }
 
-/* ---------- Чип «Изменить сумму» ---------- */
+/* .tpp гарантирует --space-6x (24px) между секциями; добавляем --space-2x (8px)
+   сверху и снизу, чтобы получить целевые --space-8x (32px) по Figma. */
+.tpp__change-amount-btn {
+  align-self: flex-start;
+  margin-top: var(--space-2x);
+  margin-bottom: var(--space-2x);
+}
+
 /* ---------- Навигаторы ---------- */
 .tpp__navigators {
   display: flex;

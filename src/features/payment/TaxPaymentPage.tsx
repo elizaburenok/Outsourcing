@@ -1,8 +1,9 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ClipboardList, ChevronDown, Calculator } from 'lucide-react'
+import { ClipboardList, ChevronDown, Calculator, Pencil } from 'lucide-react'
 import NavigationBar from '@ds/components/NavigationBar'
 import { Button } from '@ds/components/Button'
+import { HeaderButton } from '@ds/components/HeaderButton'
 import { Cell } from '@ds/components/Cell'
 import PageShell from '@/components/PageShell/PageShell'
 import Card from '@/components/ui/Card'
@@ -43,7 +44,7 @@ function NavTile({
  * по клику на налог с Главной. Кнопка «Уплатить» помечает платёж оплаченным и
  * показывает результат флоу; после «Готово» платёж уходит во вкладку «Готово».
  * «Расчёт налогов» (дровер) — для всех налогов и взносов, кроме зарплаты директора
- * (это не налог). Кнопка «Оспорить» — заглушка.
+ * (это не налог). Кнопки «Уже сдано» и «Изменить сумму» — заглушки.
  */
 export default function TaxPaymentPage() {
   const { id = '' } = useParams()
@@ -99,6 +100,15 @@ export default function TaxPaymentPage() {
           {payable.dueLabel && <p className="tpp__due">до {payable.dueLabel}</p>}
         </header>
 
+        <HeaderButton
+          className="tpp__change-amount-btn"
+          visualVariant="Secondary"
+          icon={<Pencil size={20} strokeWidth={1.75} />}
+          onClick={() => setToast('Изменение суммы появится позже')}
+        >
+          Изменить сумму
+        </HeaderButton>
+
         <div className="tpp__navigators">
           {payable.hasCalc && (
             <NavTile
@@ -133,9 +143,9 @@ export default function TaxPaymentPage() {
         <Button
           className="tpp__footer-btn"
           visualVariant="Secondary"
-          onClick={() => setToast('Оспаривание появится позже')}
+          onClick={() => setToast('Отметить сданным появится позже')}
         >
-          Оспорить
+          Уже сдано
         </Button>
         <Button className="tpp__footer-btn" visualVariant="Primary" onClick={pay}>
           Уплатить
