@@ -60,11 +60,15 @@
 }
 
 /* ---------- Вкладки ---------- */
-/* Раскладку и типографику задаёт компонент Tabs (@ds/components/Tabs). */
+/* Раскладку и типографику задаёт компонент Tabs (@ds/components/Tabs);
+   здесь только отступы, т.к. вкладки теперь лежат внутри карточки списка (см. макет). */
+.av__tabs {
+  padding: var(--space-4x) var(--space-5x) var(--space-3x);
+}
 
 /* ---------- Список платежей ---------- */
 .av__list {
-  padding: var(--space-2x) 0;
+  padding-bottom: var(--space-2x);
 }
 
 /* Строки навигатора разделены только отступом (gap строки Cell), без линий-разделителей —
@@ -108,15 +112,15 @@
   min-height: var(--space-10x);
 }
 
-/* иконка-категория — тот же размер (32×32), что у лого платежа (pay-logo), для единой сетки
+/* иконка-категория — тот же размер (40×40), что у лого платежа (pay-logo), для единой сетки
    строк; форма — superellipse (squircle), как у DS-логотипов, а не круг. Скоуп `.av` нужен,
-   чтобы перебить глобальный `.pay-icon` из payment-row.css (40px, круг). */
+   чтобы перебить глобальный `.pay-icon` из payment-row.css (круг). */
 .av .pay-icon {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: var(--spacing-8x);
-  height: var(--spacing-8x);
+  width: var(--space-10x);
+  height: var(--space-10x);
   border-radius: 50%;
   corner-shape: squircle;
 }
@@ -129,8 +133,8 @@
 /* Лого-иконка категории платежа (@ds/src/logo) — сама содержит фон и знак. */
 .pay-logo {
   display: block;
-  width: var(--spacing-8x);
-  height: var(--spacing-8x);
+  width: var(--space-10x);
+  height: var(--space-10x);
   flex-shrink: 0;
 }
 

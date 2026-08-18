@@ -1,9 +1,8 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { PenLine, ClipboardList, ChevronDown, Calculator } from 'lucide-react'
+import { ClipboardList, ChevronDown, Calculator } from 'lucide-react'
 import NavigationBar from '@ds/components/NavigationBar'
 import { Button } from '@ds/components/Button'
-import { Chip } from '@ds/components/Chip'
 import { Cell } from '@ds/components/Cell'
 import PageShell from '@/components/PageShell/PageShell'
 import Card from '@/components/ui/Card'
@@ -99,17 +98,6 @@ export default function TaxPaymentPage() {
           <p className="tpp__amount">{formatMoney(payable.amount)}</p>
           {payable.dueLabel && <p className="tpp__due">до {payable.dueLabel}</p>}
         </header>
-
-        <Chip
-          className="tpp__edit"
-          chipType="Chip"
-          onClick={() => setToast('Изменение суммы недоступно в прототипе')}
-        >
-          <span className="tpp__edit-inner">
-            <PenLine size={16} strokeWidth={2} />
-            Изменить сумму
-          </span>
-        </Chip>
 
         <div className="tpp__navigators">
           {payable.hasCalc && (
