@@ -1,33 +1,51 @@
 import { useState } from 'react'
 import { Cell } from '@ds/components/Cell'
 import { Tabs } from '@ds/components/Tabs'
-import Card from '@/components/ui/Card'
+import declarationLogo from '@ds/src/logo/Declaration.png'
+import taxDocumentLogo from '@ds/src/logo/Tax Document.svg'
+import taxReportsLogo from '@ds/src/logo/Tax Reports.svg'
+import documentLogo from '@ds/src/logo/Document.png'
+import mailLogo from '@ds/src/logo/Mail.svg'
+import reportLogo from '@ds/src/logo/Report.svg'
 import {
   REPORTS,
-  REPORT_GROUPS,
   countWaiting,
   filterReports,
-  pluralWaiting,
   type Report,
   type ReportStatus,
-  type ReportFilter,
+  type ReportLogoKind,
 } from '@/data/reports'
 import './ReportsView.css'
 
-function StatusDot({ status }: { status: ReportStatus }) {
-  return <span className={`rep-dot rep-dot--${status}`} aria-hidden />
+const REPORT_LOGO: Record<ReportLogoKind, string> = {
+  declaration: declarationLogo,
+  'tax-document': taxDocumentLogo,
+  'tax-reports': taxReportsLogo,
+  document: documentLogo,
+  mail: mailLogo,
+  report: reportLogo,
+}
+
+function ReportLogoIcon({ kind }: { kind: ReportLogoKind }) {
+  return <img className="rep-logo" src={REPORT_LOGO[kind]} alt="" />
+}
+
+const EMPTY_TEXT: Record<ReportStatus, string> = {
+  waiting: 'Сейчас ответа не ждём — бухгалтер всё ведёт сам.',
+  preparing: 'Сейчас ничего не готовим.',
+  submitted: 'Пока ничего не сдано.',
 }
 
 function ReportRow({ report }: { report: Report }) {
   const isWaiting = report.status === 'waiting'
   const cell = (
     <Cell
-      className={`rep-row${isWaiting ? ' rep-row--wait' : ''}${report.status === 'submitted' ? ' rep-row--done' : ''}`}
       textScale="M"
-      verticalSpacing="compact"
+      verticalSpacing="none"
+      edgePadding="off"
       title={report.title}
       description={report.note}
-      leftAccessory={<StatusDot status={report.status} />}
+      leftAccessory={<ReportLogoIcon kind={report.logo} />}
       rightAccessory={
         isWaiting && report.action ? <span className="rep-action">{report.action} ›</span> : undefined
       }
@@ -46,56 +64,44 @@ function ReportRow({ report }: { report: Report }) {
 }
 
 /**
- * Страница «Отчётность». Фильтр «Все» / «Ждём ответа»: во «Все» отчёты сгруппированы
- * по статусу (ждём ответа → готовим → сдано), «Ждём ответа» оставляет только то, что
- * требует действия клиента. Пустых групп не рисуем.
+ * Страница «Отчётность». Три таба по статусу — «Ждём ответа» (единственное, что
+ * требует действия клиента), «В работе» (бухгалтер готовит) и «Сдано». У каждой
+ * строки — лого предмета отчёта (декларация/документ/уведомление) вместо статус-точки:
+ * статус теперь читается по табу, а не по цвету индикатора.
  */
 export default function ReportsView() {
-  const [filter, setFilter] = useState<ReportFilter>('all')
+  const [filter, setFilter] = useState<ReportStatus>('waiting')
   const waiting = countWaiting(REPORTS)
   const shown = filterReports(REPORTS, filter)
 
-  const groups = REPORT_GROUPS.map((g) => ({
-    ...g,
-    items: shown.filter((r) => r.status === g.status),
-  })).filter((g) => g.items.length > 0)
-
   return (
     <div className="rep">
-      <header className="rep__header">
-        <p className="rep__lead">{waiting > 0 ? pluralWaiting(waiting) : 'Всё под контролем'}</p>
-        <p className="rep__lead-note">Остальное бухгалтер готовит и сдаёт сам</p>
-      </header>
-
       <Tabs
         className="rep__tabs"
         value={filter}
-        onChange={(id) => setFilter(id as ReportFilter)}
+        onChange={(id) => setFilter(id as ReportStatus)}
         items={[
-          { id: 'all', label: 'Все' },
           {
             id: 'waiting',
-            label: waiting > 0 ? `Ждём ответа · ${waiting}` : 'Ждём ответа',
+            label:
+              waiting > 0 ? (
+                <span className="rep-tab-label">
+                  Ждём ответа
+                  <span className="rep-tab-counter">{waiting}</span>
+                </span>
+              ) : (
+                'Ждём ответа'
+              ),
           },
+          { id: 'preparing', label: 'В работе' },
+          { id: 'submitted', label: 'Сдано' },
         ]}
       />
 
-      {groups.length > 0 ? (
-        groups.map((g) => (
-          <section className="rep__group" key={g.status}>
-            <p className="rep__group-label">{g.label}</p>
-            <Card className="rep__list">
-              {g.items.map((r, i) => (
-                <div key={r.id} className="rep__row">
-                  {i > 0 && <div className="rep__divider" />}
-                  <ReportRow report={r} />
-                </div>
-              ))}
-            </Card>
-          </section>
-        ))
+      {shown.length > 0 ? (
+        shown.map((r) => <ReportRow key={r.id} report={r} />)
       ) : (
-        <p className="rep__empty">Сейчас ответа не ждём — бухгалтер всё ведёт сам.</p>
+        <p className="rep__empty">{EMPTY_TEXT[filter]}</p>
       )}
     </div>
   )

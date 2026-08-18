@@ -1,13 +1,15 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { ClipboardCheck } from 'lucide-react'
 import { ROUTES, payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
 import { Tabs } from '@ds/components/Tabs'
-import { Chip } from '@ds/components/Chip'
 import PageAction from '@ds/components/PageAction'
 import { Button } from '@ds/components/Button'
 import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/components/icons'
 import Card from '@/components/ui/Card'
+import SectionCard from '@/features/october/SectionCard'
+import { countWaiting } from '@/data/reports'
 import { formatMoney } from '@/lib/format'
 import {
   AUGUST_PAYMENTS,
@@ -40,7 +42,7 @@ export default function AugustGroupsView() {
   const { isPaid } = usePayments()
   const [tab, setTab] = useState<Tab>('topay')
   const [openGroup, setOpenGroup] = useState<PayGroup | null>(null)
-  const [snapshot, setSnapshot] = useState<Snapshot>('mid')
+  const snapshot: Snapshot = 'mid'
   const usn = usnPayment(snapshot)
   const usnDone = isPaid(usn.id)
 
@@ -130,6 +132,18 @@ export default function AugustGroupsView() {
         </Card>
       </div>
 
+      <div className="av__cards">
+        <div data-coach="tasks" className="av__card-cell">
+          <SectionCard
+            icon={ClipboardCheck}
+            title="Отчётность"
+            note="Под контролем у бухгалтера"
+            badge={countWaiting()}
+            onClick={() => navigate(ROUTES.reports)}
+          />
+        </div>
+      </div>
+
       <div className="av__links">
         <PageAction
           title="Налогообложение и патенты"
@@ -158,22 +172,6 @@ export default function AugustGroupsView() {
       {drawerProps && (
         <GroupDrawer open onClose={() => setOpenGroup(null)} {...drawerProps} />
       )}
-
-      {/* Служебный тумблер прототипа (не элемент продукта) — переключает снимок квартала:
-          середина квартала (аванс УСН считается) / квартал закрыт (посчитан), чтобы показать
-          строку «Налог по УСН» в обоих состояниях. Вынесен в угол, чтобы не читаться как
-          часть интерфейса. */}
-      <div className="av__snapshot">
-        <span className="av__snapshot-label">Снимок квартала (УСН)</span>
-        <div className="av__snapshot-tabs">
-          <Chip chipType="Tab" isSelected={snapshot === 'mid'} onClick={() => setSnapshot('mid')}>
-            Середина квартала
-          </Chip>
-          <Chip chipType="Tab" isSelected={snapshot === 'closed'} onClick={() => setSnapshot('closed')}>
-            Квартал закрыт
-          </Chip>
-        </div>
-      </div>
     </div>
   )
 }

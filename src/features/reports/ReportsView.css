@@ -4,50 +4,27 @@
   gap: var(--space-6x);
 }
 
-/* ---------- Хедер ---------- */
-.rep__header {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1x);
+/* ---------- Таб «Ждём ответа» ---------- */
+.rep-tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1-5x);
 }
 
-.rep__lead {
-  font-size: var(--font-size-title-l);
-  line-height: var(--line-height-title-l);
-  font-weight: var(--font-weight-demi-bold);
-  color: var(--color-primitive-primary);
-}
-
-.rep__lead-note {
-  font-size: var(--font-size-s);
-  line-height: var(--line-height-s);
-  color: var(--color-primitive-secondary);
-}
-
-/* ---------- Группа статуса ---------- */
-.rep__group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-2x);
-}
-
-.rep__group-label {
-  padding: 0 var(--space-1x);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
-  color: var(--color-primitive-secondary);
-  text-transform: uppercase;
-  letter-spacing: var(--letter-spacing-m);
-}
-
-/* ---------- Список ---------- */
-.rep__list {
-  padding: var(--space-2x) var(--space-4x);
-}
-
-.rep__divider {
-  height: 1px;
-  background: var(--color-bg-neutral-2);
+/* Пилюля-счётчик — те же токены, что у Chip .counter (DS). */
+.rep-tab-counter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 25px;
+  height: 18px;
+  padding: 1.5px var(--space-2x);
+  border-radius: var(--radius-2-5x);
+  background: var(--color-primitive-neutral-4);
+  color: var(--color-primitive-default-fixed);
+  font-size: var(--text-counter-size);
+  line-height: var(--text-counter-line);
+  font-weight: var(--text-counter-weight);
 }
 
 .rep__empty {
@@ -58,24 +35,12 @@
 }
 
 /* ---------- Строка отчёта ---------- */
-.rep-dot {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  margin-top: var(--space-1x);
-}
-
-.rep-dot--waiting {
-  background: var(--color-primitive-warning);
-}
-
-.rep-dot--preparing {
-  background: var(--color-primitive-brand);
-}
-
-.rep-dot--submitted {
-  background: var(--color-primitive-success);
+/* Лого предмета отчёта (@ds/src/logo) — тот же размер, что у лого платежа (pay-logo). */
+.rep-logo {
+  display: block;
+  width: var(--space-10x);
+  height: var(--space-10x);
+  flex-shrink: 0;
 }
 
 .rep-row-btn {
@@ -88,16 +53,6 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
-}
-
-/* «Ждём ответа» — подсветка строки, требующей клиента */
-.rep-row--wait {
-  background: var(--color-bg-brand-1);
-  border-radius: var(--radius-2-5x);
-}
-
-.rep-row--done {
-  opacity: 0.75;
 }
 
 .rep-action {
