@@ -1,65 +1,31 @@
 .hist {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6x);
+  gap: var(--space-8x);
 }
 
-/* ---------- Хедер ---------- */
-.hist__header {
+/* ---------- Фильтры ---------- */
+.hist__filters {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-1x);
-}
-
-.hist__amount {
-  font-size: var(--font-size-6xl);
-  line-height: var(--line-height-6xl);
-  font-weight: var(--font-weight-demi-bold);
-  color: var(--color-primitive-primary);
-  letter-spacing: var(--letter-spacing-m);
-}
-
-.hist__amount-label {
-  font-size: var(--font-size-s);
-  line-height: var(--line-height-s);
-  color: var(--color-primitive-secondary);
+  gap: var(--space-2x);
+  align-items: center;
 }
 
 /* ---------- Группа месяца ---------- */
 .hist__group {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3x);
+  gap: var(--space-6x);
+  width: 100%;
 }
 
 .hist__month {
   display: flex;
   align-items: baseline;
-  justify-content: space-between;
-  gap: var(--space-4x);
-  padding: 0 var(--space-1x);
 }
 
+/* Подзаголовок месяца — та же типографика, что у заголовка строки (Cell textScale="M"),
+   просто приглушённого (secondary) цвета — так задано в Figma (287:49505). */
 .hist__month-label {
-  font-size: var(--font-size-title-l);
-  line-height: var(--line-height-title-l);
-  font-weight: var(--font-weight-demi-bold);
-  color: var(--color-primitive-primary);
-}
-
-.hist__month-total {
-  font-size: var(--font-size-s);
-  line-height: var(--line-height-s);
   color: var(--color-primitive-secondary);
-  white-space: nowrap;
-}
-
-/* ---------- Список ---------- */
-.hist__list {
-  padding: var(--space-2x) var(--space-4x);
-}
-
-.hist__divider {
-  height: 1px;
-  background: var(--color-bg-neutral-2);
 }

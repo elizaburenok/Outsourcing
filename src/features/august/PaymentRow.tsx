@@ -5,6 +5,7 @@ import type { AugustPayment, PayCategory } from '@/data/august'
 import contributionsLogo from '@ds/src/logo/Contributions.png'
 import taxesLogo from '@ds/src/logo/Taxes.png'
 import avatarLogo from '@ds/src/logo/Avatar.png'
+import '@/features/payments/payment-row.css'
 import './AugustView.css'
 
 /** Лого-иконка категории (из DS `src/logo`). Общий словарь для строки платежа во всех местах. */
@@ -14,6 +15,7 @@ export const CATEGORY: Record<PayCategory, string> = {
   salary: avatarLogo,
   vznos: contributionsLogo,
   usn: taxesLogo,
+  nds: taxesLogo,
 }
 
 export function PayIcon({ category, muted = false }: { category: PayCategory; muted?: boolean }) {
