@@ -1,7 +1,7 @@
 .av {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6x);
+  gap: var(--space-8x);
 }
 
 /* ---------- Тумблер-снимок (служебный контрол прототипа, не часть продукта) ---------- */
