@@ -2,13 +2,14 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 
 /**
  * Лёгкий контекст оплаченных платежей (аналог RiskStateContext из «Пульса»).
- * Держит множество id уже уплаченных платежей, чтобы состояние переживало переход
- * между Главной и страницей уплаты (`/pay/:id`). После уплаты строка уходит во
- * вкладку «Готово».
+ * Держит id уже уплаченных в текущей сессии платежей, чтобы состояние переживало
+ * переход между Главной и страницей уплаты (`/pay/:id`). После уплаты строка уходит
+ * во вкладку «Готово» — самым новым платежам первыми, поэтому порядок оплаты важен
+ * (`paidOrder`), а не только факт оплаты.
  */
 type PaymentsContextValue = {
-  /** id уплаченных в текущей сессии платежей. */
-  paidIds: ReadonlySet<string>
+  /** id уплаченных в этой сессии платежей, самый новый — первым (index 0). */
+  paidOrder: readonly string[]
   /** Пометить платёж уплаченным. */
   markPaid: (id: string) => void
   /** Уплачен ли платёж. */
@@ -18,22 +19,17 @@ type PaymentsContextValue = {
 const PaymentsContext = createContext<PaymentsContextValue | null>(null)
 
 export function PaymentsProvider({ children }: { children: ReactNode }) {
-  const [paidIds, setPaidIds] = useState<Set<string>>(() => new Set())
+  const [paidOrder, setPaidOrder] = useState<string[]>(() => [])
 
   const markPaid = useCallback((id: string) => {
-    setPaidIds((prev) => {
-      if (prev.has(id)) return prev
-      const next = new Set(prev)
-      next.add(id)
-      return next
-    })
+    setPaidOrder((prev) => (prev.includes(id) ? prev : [id, ...prev]))
   }, [])
 
-  const isPaid = useCallback((id: string) => paidIds.has(id), [paidIds])
+  const isPaid = useCallback((id: string) => paidOrder.includes(id), [paidOrder])
 
   const value = useMemo<PaymentsContextValue>(
-    () => ({ paidIds, markPaid, isPaid }),
-    [paidIds, markPaid, isPaid],
+    () => ({ paidOrder, markPaid, isPaid }),
+    [paidOrder, markPaid, isPaid],
   )
 
   return <PaymentsContext.Provider value={value}>{children}</PaymentsContext.Provider>
