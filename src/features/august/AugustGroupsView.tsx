@@ -39,7 +39,7 @@ type Tab = 'topay' | 'done'
  */
 export default function AugustGroupsView() {
   const navigate = useNavigate()
-  const { isPaid } = usePayments()
+  const { isPaid, paidOrder } = usePayments()
   const [tab, setTab] = useState<Tab>('topay')
   const [openGroup, setOpenGroup] = useState<PayGroup | null>(null)
   const snapshot: Snapshot = 'mid'
@@ -51,7 +51,15 @@ export default function AugustGroupsView() {
     p.state === 'paid' ? p : { ...p, state: 'paid', paidLabel: 'сегодня' }
 
   const groups = augustBlockGroups(isPaid, snapshot)
-  const done = AUGUST_PAYMENTS.filter(isDone)
+  // Уплаченные в этой сессии — первыми (самый новый выше), остальные — в исходном порядке.
+  const done = AUGUST_PAYMENTS.filter(isDone).sort((a, b) => {
+    const ai = paidOrder.indexOf(a.id)
+    const bi = paidOrder.indexOf(b.id)
+    if (ai === -1 && bi === -1) return 0
+    if (ai === -1) return 1
+    if (bi === -1) return -1
+    return ai - bi
+  })
   const heroAmount = augustHeroAmount(isPaid)
 
   // Клик по группе: один налог — сразу уплата; несколько — дровер.
