@@ -20,7 +20,7 @@
   height: 18px;
   padding: 1.5px var(--space-2x);
   border-radius: var(--radius-2-5x);
-  background: var(--color-primitive-neutral-4);
+  background: var(--color-primitive-error);
   color: var(--color-primitive-default-fixed);
   font-size: var(--text-counter-size);
   line-height: var(--text-counter-line);

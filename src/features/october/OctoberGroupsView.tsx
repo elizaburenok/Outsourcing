@@ -54,12 +54,7 @@ export default function OctoberGroupsView() {
       openGroup.key === 'overdue'
         ? `${pluralPayments(openGroup.items.length)} просрочено`
         : openGroup.title,
-    note:
-      openGroup.key === 'overdue'
-        ? 'Уплатите как можно скорее — начисляются пени'
-        : 'Зарплатные налоги и взносы к уплате',
-    noteTone: (openGroup.key === 'overdue' ? 'error' : 'neutral') as 'error' | 'neutral',
-    totalLabel: openGroup.key === 'overdue' ? 'Всего просрочено' : 'Всего к уплате',
+    totalLabel: openGroup.key === 'overdue' ? 'Уплатите как можно скорее' : 'Общая сумма',
     items: openGroup.items,
   }
 
