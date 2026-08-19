@@ -75,8 +75,7 @@ export default function AugustGroupsView() {
       openGroup.key === 'overdue'
         ? `${pluralPayments(openGroup.items.length)} просрочено`
         : openGroup.title,
-    totalLabel: openGroup.key === 'overdue' ? 'Уплатите как можно скорее' : 'Общая сумма',
-    totalLabelTone: (openGroup.key === 'overdue' ? 'error' : 'neutral') as 'error' | 'neutral',
+    totalLabel: 'Общая сумма к уплате',
     items: openGroup.items,
   }
 
