@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangle, Check } from 'lucide-react'
 import { Cell } from '@ds/components/Cell'
 import { formatMoney } from '@/lib/format'
 import { pluralPayments } from '@/data/august'
@@ -22,8 +22,10 @@ function GroupIcon({ group }: { group: PayGroup }) {
 
 /** Подпись группы. */
 function groupNote(group: PayGroup): ReactNode {
+  if (group.done)
+    return <span className="pay-note pay-note--done">Всё уплачено, ничего делать не нужно</span>
   if (group.key === 'overdue')
-    return <span className="pay-note pay-note--overdue">Закройте задолженности</span>
+    return <span className="pay-note pay-note--overdue">Уплатите как можно скорее</span>
   if (group.key === 'usn') {
     const usn = group.items[0]
     return (
@@ -59,7 +61,14 @@ export default function GroupRow({
   group: PayGroup
   onClick?: () => void
 }) {
-  const showAmount = !(group.key === 'usn' && group.items[0].state === 'process')
+  // Сумму не показываем, если группа полностью уплачена (done) или УСН ещё считается (process).
+  const rightAccessory = group.done ? (
+    <Check size={20} strokeWidth={2.25} className="pay-check" />
+  ) : group.key === 'usn' && group.items[0].state === 'process' ? (
+    <span className="pay-amount pay-amount--done">В процессе</span>
+  ) : (
+    <span className="pay-amount">{formatMoney(group.total)}</span>
+  )
   const cell = (
     <Cell
       textScale="M"
@@ -67,13 +76,7 @@ export default function GroupRow({
       title={<span className="pay-title">{group.title}</span>}
       description={groupNote(group)}
       leftAccessory={<GroupIcon group={group} />}
-      rightAccessory={
-        showAmount ? (
-          <span className="pay-amount">{formatMoney(group.total)}</span>
-        ) : (
-          <span className="pay-amount pay-amount--done">В процессе</span>
-        )
-      }
+      rightAccessory={rightAccessory}
     />
   )
 

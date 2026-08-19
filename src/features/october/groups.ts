@@ -21,13 +21,18 @@ export type PayGroup = {
   items: AugustPayment[]
   /** Сумма по группе (для УСН в `process` не показывается). */
   total: number
-  /** Есть ли что платить (false для УСН, пока сумма считается). */
+  /** Есть ли что платить (false для УСН, пока сумма считается, и для «Сотрудники», когда всё уплачено). */
   payable: boolean
+  /** «Сотрудники»: все платежи этой группы уплачены — блок остаётся, но со статусом «Оплачено». */
+  done?: boolean
 }
 
 type IsPaid = (id: string) => boolean
 
 const sum = (list: AugustPayment[]) => list.reduce((s, p) => s + p.amount, 0)
+
+/** В группе и в её дровере «Сотрудники» показываем только первые платежи — не весь список. */
+const EMPLOYEES_LIMIT = 3
 
 /**
  * Группы для варианта «Блоки» (по состоянию): просрочено → УСН → сотрудники.
@@ -35,14 +40,17 @@ const sum = (list: AugustPayment[]) => list.reduce((s, p) => s + p.amount, 0)
  */
 export function octoberBlockGroups(isPaid: IsPaid): PayGroup[] {
   const overdue = OCTOBER_PAYMENTS.filter((p) => p.state === 'overdue' && !isPaid(p.id))
-  const employees = OCTOBER_PAYMENTS.filter((p) => p.state === 'due' && !isPaid(p.id))
+  const employees = OCTOBER_PAYMENTS.filter((p) => p.state === 'due' && !isPaid(p.id)).slice(
+    0,
+    EMPLOYEES_LIMIT,
+  )
   const usn = octoberUsn()
 
   const groups: PayGroup[] = []
   if (overdue.length > 0)
     groups.push({
       key: 'overdue',
-      title: 'Срок вышел',
+      title: 'Есть задолженности',
       items: overdue,
       total: sum(overdue),
       payable: true,
@@ -91,6 +99,8 @@ export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[
   const nds = AUGUST_PAYMENTS.filter(
     (p) => p.category === 'nds' && p.state === 'due' && !isPaid(p.id),
   )
+  // Все зарплатные платежи разом (без ограничения EMPLOYEES_LIMIT): клиент закрывает блок
+  // «Сотрудники» одним действием из дровера, после чего статус блока меняется на «Всё уплачено».
   const employees = AUGUST_PAYMENTS.filter(
     (p) => p.state === 'due' && p.category !== 'nds' && !isPaid(p.id),
   )
@@ -100,7 +110,7 @@ export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[
   if (overdue.length > 0)
     groups.push({
       key: 'overdue',
-      title: 'Срок вышел',
+      title: 'Есть задолженности',
       items: overdue,
       total: sum(overdue),
       payable: true,
@@ -121,14 +131,13 @@ export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[
       total: sum(nds),
       payable: true,
     })
-  if (employees.length > 0)
-    groups.push({
-      key: 'employees',
-      title: 'Сотрудники',
-      items: employees,
-      total: sum(employees),
-      payable: true,
-    })
+  // «Сотрудники» — в отличие от остальных групп, не пропадает, когда всё уплачено:
+  // остаётся строкой со статусом «Оплачено» (см. `GroupRow`).
+  groups.push(
+    employees.length > 0
+      ? { key: 'employees', title: 'Сотрудники', items: employees, total: sum(employees), payable: true }
+      : { key: 'employees', title: 'Сотрудники', items: [], total: 0, payable: false, done: true },
+  )
   return groups
 }
 

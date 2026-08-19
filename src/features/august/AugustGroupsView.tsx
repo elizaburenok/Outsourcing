@@ -10,7 +10,6 @@ import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/comp
 import Card from '@/components/ui/Card'
 import SectionCard from '@/features/october/SectionCard'
 import { countWaiting } from '@/data/reports'
-import { formatMoney } from '@/lib/format'
 import {
   AUGUST_PAYMENTS,
   pluralPayments,
@@ -21,7 +20,7 @@ import {
 import PaymentRow from './PaymentRow'
 import GroupRow from '@/features/october/GroupRow'
 import GroupDrawer from '@/features/october/GroupDrawer'
-import { augustBlockGroups, augustHeroAmount, type PayGroup } from '@/features/october/groups'
+import { augustBlockGroups, type PayGroup } from '@/features/october/groups'
 import { MCHD_COUNT, CONNECTED_SERVICES, TARIFF_NAME, connectedServicesText } from '@/data/company'
 import '@/features/august/AugustView.css'
 
@@ -60,12 +59,13 @@ export default function AugustGroupsView() {
     if (bi === -1) return -1
     return ai - bi
   })
-  const heroAmount = augustHeroAmount(isPaid)
 
-  // Клик по группе: один налог — сразу уплата; несколько — дровер.
+  // Клик по группе: один налог — сразу уплата; несколько — дровер. «Сотрудники» всегда через
+  // дровер (даже с одним платежом) — клиент может уплатить прямо оттуда или открыть платёж
+  // подробнее.
   const onGroup = (g: PayGroup) => {
     if (!g.payable) return undefined
-    if (g.items.length === 1) return () => navigate(payTo(g.items[0].id))
+    if (g.key !== 'employees' && g.items.length === 1) return () => navigate(payTo(g.items[0].id))
     return () => setOpenGroup(g)
   }
 
@@ -75,22 +75,13 @@ export default function AugustGroupsView() {
       openGroup.key === 'overdue'
         ? `${pluralPayments(openGroup.items.length)} просрочено`
         : openGroup.title,
-    note:
-      openGroup.key === 'overdue'
-        ? 'Уплатите как можно скорее — начисляются пени'
-        : 'Зарплатные налоги и взносы к уплате',
-    noteTone: (openGroup.key === 'overdue' ? 'error' : 'neutral') as 'error' | 'neutral',
-    totalLabel: openGroup.key === 'overdue' ? 'Всего просрочено' : 'Всего к уплате',
+    totalLabel: openGroup.key === 'overdue' ? 'Уплатите как можно скорее' : 'Общая сумма',
+    totalLabelTone: (openGroup.key === 'overdue' ? 'error' : 'neutral') as 'error' | 'neutral',
     items: openGroup.items,
   }
 
   return (
     <div className="av">
-      <header className="av__header">
-        <p className="av__amount">{formatMoney(heroAmount)}</p>
-        <p className="av__amount-label">Осталось уплатить</p>
-      </header>
-
       <div data-coach="pay">
         <Card className="av__list">
           <Tabs
@@ -104,15 +95,11 @@ export default function AugustGroupsView() {
           />
 
           {tab === 'topay' ? (
-            groups.length > 0 ? (
-              groups.map((g) => (
-                <div key={g.key} className="av__row">
-                  <GroupRow group={g} onClick={onGroup(g)} />
-                </div>
-              ))
-            ) : (
-              <p className="av__empty">Всё уплачено.</p>
-            )
+            groups.map((g) => (
+              <div key={g.key} className="av__row">
+                <GroupRow group={g} onClick={onGroup(g)} />
+              </div>
+            ))
           ) : (
             <>
               {done.slice(0, 3).map((p) => (

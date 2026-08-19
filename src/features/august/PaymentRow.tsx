@@ -49,12 +49,7 @@ export function paymentNote(p: AugustPayment) {
   if (p.state === 'process')
     return <span className="pay-note">Рассчитаем до {p.dueLabel}</span>
   if (p.state === 'overdue')
-    return (
-      <span className="pay-note pay-note--overdue">
-        Просрочено с {p.dueLabel}
-        {sfr}
-      </span>
-    )
+    return <span className="pay-note pay-note--overdue">Просрочено с {p.dueLabel}</span>
   return (
     <span className="pay-note">
       до {p.dueLabel}
@@ -67,16 +62,20 @@ export function paymentNote(p: AugustPayment) {
 export default function PaymentRow({
   payment,
   onClick,
+  edgePadding = 'on',
 }: {
   payment: AugustPayment
   /** Если задан — строка кликабельна (ведёт на страницу уплаты). */
   onClick?: () => void
+  /** "off" — без бокового отступа Cell (для дроверов, где отступ задаёт сам список). */
+  edgePadding?: 'on' | 'off'
 }) {
   const isProcess = payment.state === 'process'
   const cell = (
     <Cell
       textScale="M"
       verticalSpacing="compact"
+      edgePadding={edgePadding}
       title={<span className="pay-title">{payment.title}</span>}
       description={paymentNote(payment)}
       leftAccessory={

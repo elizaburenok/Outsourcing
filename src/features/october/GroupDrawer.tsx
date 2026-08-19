@@ -1,73 +1,76 @@
-import { useEffect } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { DrawerHeader } from '@ds/components/Drawer'
+import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
 import { formatMoney } from '@/lib/format'
 import { payTo } from '@/routes'
-import type { AugustPayment } from '@/data/august'
+import { usePayments } from '@/state/PaymentsProvider'
+import { pluralPayments, type AugustPayment } from '@/data/august'
 import PaymentRow from '@/features/august/PaymentRow'
+import PaymentResultModal from '@/features/payment/PaymentResultModal'
 import './GroupDrawer.css'
 
 /**
  * Дровер группы налогов справа — обобщение OverdueDrawer. Открывается, когда в группе
- * несколько налогов к уплате. Список — кликабельные строки-платежи (ведут на уплату),
- * снизу — итог по группе. Параметризован заголовком, подписью и её тоном.
+ * несколько налогов к уплате. Собран на DS `Drawer`/`DrawerHeader`/`DrawerFooter` (как
+ * `TaxCalcDrawer`): сумма — сразу под заголовком, список — кликабельные строки-платежи
+ * (ведут на уплату), в футере — кнопка «Уплатить всё» разом.
  */
 export default function GroupDrawer({
   open,
   title,
-  note,
-  noteTone = 'neutral',
   totalLabel = 'Всего к уплате',
+  totalLabelTone = 'neutral',
+  payAllLabel = 'Уплатить всё',
   items,
   onClose,
 }: {
   open: boolean
   title: string
-  note?: string
-  noteTone?: 'error' | 'neutral'
   totalLabel?: string
+  /** "error" — для «Просрочено», где подпись предупреждает о срочности. */
+  totalLabelTone?: 'neutral' | 'error'
+  payAllLabel?: string
   items: AugustPayment[]
   onClose: () => void
 }) {
   const navigate = useNavigate()
-  // Esc закрывает; блокируем прокрутку фона, пока дровер открыт.
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onClose()
-    document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    return () => {
-      document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-    }
-  }, [open, onClose])
+  const { markPaid } = usePayments()
+  const [showResult, setShowResult] = useState(false)
 
   if (!open) return null
   const total = items.reduce((sum, p) => sum + p.amount, 0)
 
+  function payAll() {
+    items.forEach((p) => markPaid(p.id))
+    setShowResult(true)
+  }
+
+  function finishResult() {
+    setShowResult(false)
+    onClose()
+  }
+
   return (
-    <div className="gd-overlay" onClick={onClose}>
-      <aside
-        className="gd"
-        role="dialog"
-        aria-modal="true"
-        aria-label={title}
-        onClick={(e) => e.stopPropagation()}
-      >
+    <>
+      <Drawer open={open} onClose={onClose} side="right" aria-label={title}>
         <DrawerHeader onClose={onClose}>{title}</DrawerHeader>
 
         <div className="gd__body">
-          {note && (
-            <p className={`gd__note ${noteTone === 'error' ? 'gd__note--error' : ''}`}>{note}</p>
-          )}
+          <div className="gd__total">
+            <span className="gd__total-amount">{formatMoney(total)}</span>
+            <span
+              className={`gd__total-label ${totalLabelTone === 'error' ? 'gd__total-label--error' : ''}`}
+            >
+              {totalLabel}
+            </span>
+          </div>
 
           <div className="gd__list">
-            {items.map((p, i) => (
+            {items.map((p) => (
               <div key={p.id} className="gd__row">
-                {i > 0 && <div className="av__divider" />}
                 <PaymentRow
                   payment={p}
+                  edgePadding="off"
                   onClick={() => {
                     onClose()
                     navigate(payTo(p.id))
@@ -76,13 +79,19 @@ export default function GroupDrawer({
               </div>
             ))}
           </div>
-
-          <div className="gd__total">
-            <span className="gd__total-label">{totalLabel}</span>
-            <span className="gd__total-amount">{formatMoney(total)}</span>
-          </div>
         </div>
-      </aside>
-    </div>
+
+        <DrawerFooter type="1 Button" primaryAction={{ label: payAllLabel, onClick: payAll }} />
+      </Drawer>
+
+      {showResult && (
+        <PaymentResultModal title="Платежи отправлены" onDone={finishResult}>
+          <p>
+            Отправили {pluralPayments(items.length)} на {formatMoney(total)}.
+          </p>
+          <p>Информация по платежам появится в ленте событий в течение 5 минут.</p>
+        </PaymentResultModal>
+      )}
+    </>
   )
 }

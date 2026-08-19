@@ -1,7 +1,10 @@
 .av {
   display: flex;
   flex-direction: column;
-  gap: var(--space-8x);
+}
+
+.av > [data-coach='pay'] {
+  margin-bottom: var(--space-4x);
 }
 
 /* ---------- Тумблер-снимок (служебный контрол прототипа, не часть продукта) ---------- */
@@ -179,6 +182,17 @@
   font-weight: var(--font-weight-medium);
 }
 
+/* Подпись группы, полностью уплаченной (напр. «Сотрудники» после закрытия всех платежей). */
+.pay-note--done {
+  color: var(--color-primitive-success);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Галочка-статус справа у полностью уплаченной группы (вместо суммы). */
+.pay-check {
+  color: var(--color-primitive-success);
+}
+
 .pay-amount {
   font-size: var(--font-size-m);
   line-height: var(--line-height-m);
@@ -210,6 +224,7 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4x);
+  margin-bottom: var(--space-8x);
 }
 
 /* Обёртка-якорь коуча вокруг плитки: тянется как обычная ячейка сетки. */
@@ -261,7 +276,7 @@
   height: var(--space-4x);
   padding: 0 var(--space-1x);
   border-radius: var(--radius-2-5x);
-  background: var(--color-primitive-neutral-4);
+  background: var(--color-primitive-error);
   color: var(--color-primitive-primary-on-inverse);
   font-size: var(--font-size-xs);
   line-height: var(--line-height-xs);
