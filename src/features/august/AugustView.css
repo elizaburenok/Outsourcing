@@ -176,6 +176,7 @@
 
 .pay-note--overdue {
   color: var(--color-primitive-error);
+  font-weight: var(--font-weight-medium);
 }
 
 .pay-amount {
