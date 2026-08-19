@@ -99,11 +99,11 @@ export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[
   const nds = AUGUST_PAYMENTS.filter(
     (p) => p.category === 'nds' && p.state === 'due' && !isPaid(p.id),
   )
-  // Все зарплатные платежи разом (без ограничения EMPLOYEES_LIMIT): клиент закрывает блок
-  // «Сотрудники» одним действием из дровера, после чего статус блока меняется на «Всё уплачено».
+  // «Сотрудники» показываем не весь список, а первые EMPLOYEES_LIMIT (ближайшие по сроку).
+  // Блок переходит в статус «Всё уплачено», когда закрыты все зарплатные платежи.
   const employees = AUGUST_PAYMENTS.filter(
     (p) => p.state === 'due' && p.category !== 'nds' && !isPaid(p.id),
-  )
+  ).slice(0, EMPLOYEES_LIMIT)
   const usn = usnPayment(snapshot)
 
   const groups: PayGroup[] = []
