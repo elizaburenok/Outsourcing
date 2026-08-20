@@ -126,8 +126,7 @@ export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[
   if (nds.length > 0)
     groups.push({
       key: 'nds',
-      // Номер платежа переносим во вторую строку (см. `groupNote` в `GroupRow`).
-      title: nds[0].title.split(', ')[0],
+      title: nds[0].title,
       items: nds,
       total: sum(nds),
       payable: true,

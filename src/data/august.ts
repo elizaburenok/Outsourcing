@@ -100,7 +100,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'nds-q2-1',
-    title: 'НДС за II квартал, 1-й платёж',
+    title: 'НДС: 1-й платёж за II квартал',
     category: 'nds',
     amount: 32000,
     viaEnp: true,
@@ -136,7 +136,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'nds-q2-2',
-    title: 'НДС за II квартал, 2-й платёж',
+    title: 'НДС: 2-й платёж за II квартал',
     category: 'nds',
     amount: 32000,
     viaEnp: true,

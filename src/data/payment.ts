@@ -81,11 +81,8 @@ export function getPayableById(id: string): Payable | undefined {
   if (id === USN_ADVANCE.id) return toPayable(USN_ADVANCE, 'Аванс за 9 месяцев 2026')
   const p = AUGUST_PAYMENTS.find((x) => x.id === id) ?? OCTOBER_PAYMENTS.find((x) => x.id === id)
   if (!p) return undefined
-  // НДС: заголовок — квартал, номер платежа — во вторую строку (подзаголовок).
-  if (p.category === 'nds') {
-    const [base, paymentLabel] = p.title.split(', ')
-    return toPayable(p, paymentLabel ?? '', base)
-  }
+  // НДС: заголовок — полное название платежа («НДС: N-й платёж за …»), без подзаголовка.
+  if (p.category === 'nds') return toPayable(p, '', p.title)
   return toPayable(p, p.title)
 }
 
