@@ -55,12 +55,16 @@ export type Payable = {
   hasCalc: boolean
 }
 
-function toPayable(p: AugustPayment | typeof USN_ADVANCE, subtitle: string): Payable {
+function toPayable(
+  p: AugustPayment | typeof USN_ADVANCE,
+  subtitle: string,
+  title: string = CATEGORY_TITLE[p.category],
+): Payable {
   const requisites = p.viaEnp ? 'Единый налоговый счёт' : 'СФР — отдельной платёжкой'
   return {
     id: p.id,
     category: p.category,
-    title: CATEGORY_TITLE[p.category],
+    title,
     subtitle,
     fullTitle: p.title,
     paidTitle: CATEGORY_PAID_TITLE[p.category],
@@ -77,6 +81,11 @@ export function getPayableById(id: string): Payable | undefined {
   if (id === USN_ADVANCE.id) return toPayable(USN_ADVANCE, 'Аванс за 9 месяцев 2026')
   const p = AUGUST_PAYMENTS.find((x) => x.id === id) ?? OCTOBER_PAYMENTS.find((x) => x.id === id)
   if (!p) return undefined
+  // НДС: заголовок — квартал, номер платежа — во вторую строку (подзаголовок).
+  if (p.category === 'nds') {
+    const [base, paymentLabel] = p.title.split(', ')
+    return toPayable(p, paymentLabel ?? '', base)
+  }
   return toPayable(p, p.title)
 }
 
