@@ -35,15 +35,9 @@ function groupNote(group: PayGroup): ReactNode {
     )
   }
   if (group.key === 'nds') {
+    // Номер платежа теперь в заголовке группы; во второй строке — только срок.
     const due = nearestDue(group.items)
-    // Заголовок группы — только квартал; номер платежа переносим во вторую строку к сроку.
-    const paymentLabel = group.items[0]?.title.split(', ')[1]
-    return (
-      <span className="pay-note">
-        {paymentLabel}
-        {due ? `, до ${due}` : ''}
-      </span>
-    )
+    return <span className="pay-note">{due ? `до ${due}` : ''}</span>
   }
   const due = nearestDue(group.items)
   // «Сотрудники»: если в группе есть зарплата (не налог) — считаем «платежи», не «налоги».
