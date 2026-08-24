@@ -28,7 +28,6 @@ type DrawerState = {
   title: string
   items: AugustPayment[]
   history: DomainHistoryGroup[]
-  tone: 'error' | 'neutral'
 }
 
 /** Рисковые карточки всплывают наверх: overdue → attention → ok. */
@@ -68,7 +67,6 @@ export default function HomeCardsView() {
       title: CATEGORIES[id].label,
       items: paymentsByCat[id],
       history: historyByCat[id],
-      tone: levels[id] === 'overdue' ? 'error' : 'neutral',
     })
   }
 
@@ -127,7 +125,6 @@ export default function HomeCardsView() {
           onClose={() => setDrawer(null)}
           title={drawer.title}
           totalLabel="Общая сумма к уплате"
-          totalLabelTone={drawer.tone}
           items={drawer.items}
           history={drawer.history}
         />
