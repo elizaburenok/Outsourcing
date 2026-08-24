@@ -91,7 +91,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'salary-jul',
-    title: 'Зарплата директору за июль',
+    title: 'Зарплата за июль',
     category: 'salary',
     amount: 53783,
     viaEnp: true,
@@ -109,7 +109,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'salary-aug-advance',
-    title: 'Аванс сотруднику за 1–15 августа',
+    title: 'Аванс за август',
     category: 'salary',
     amount: 20000,
     viaEnp: true,
@@ -118,7 +118,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'vznos-jul',
-    title: 'Страховые взносы за июль',
+    title: 'Страховые взносы сотрудников за июль',
     category: 'vznos',
     amount: 19500,
     viaEnp: true,
@@ -127,7 +127,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'ndfl-aug-1',
-    title: 'НДФЛ с зарплаты за 1–22 августа',
+    title: 'НДФЛ за сотрудников с 1–22 августа',
     category: 'ndfl',
     amount: 9100,
     viaEnp: true,
@@ -145,7 +145,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'ndfl-aug-2',
-    title: 'НДФЛ с зарплаты за 23–31 августа',
+    title: 'НДФЛ за сотрудников с 23–31 августа',
     category: 'ndfl',
     amount: 3900,
     viaEnp: true,
@@ -163,7 +163,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'salary-aug-final',
-    title: 'Зарплата директору за август',
+    title: 'Зарплата за август',
     category: 'salary',
     amount: 33783,
     viaEnp: true,
@@ -172,7 +172,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
   },
   {
     id: 'vznos-aug',
-    title: 'Страховые взносы за август',
+    title: 'Страховые взносы сотрудников за август',
     category: 'vznos',
     amount: 19500,
     viaEnp: true,
@@ -191,7 +191,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
  */
 export const USN_ADVANCE = {
   id: 'usn-9m',
-  title: 'Аванс по УСН за 9 месяцев',
+  title: 'Налог по УСН за III кв. 2026',
   category: 'usn' as PayCategory,
   amount: 104900,
   viaEnp: true,

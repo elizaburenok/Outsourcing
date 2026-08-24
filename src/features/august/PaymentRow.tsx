@@ -49,7 +49,7 @@ export function paymentNote(p: AugustPayment) {
   if (p.state === 'process')
     return <span className="pay-note">Рассчитаем до {p.dueLabel}</span>
   if (p.state === 'overdue')
-    return <span className="pay-note pay-note--overdue">Просрочено с {p.dueLabel}</span>
+    return <span className="pay-note pay-note--overdue">Просрочено, срок вышел {p.dueLabel}</span>
   return (
     <span className="pay-note">
       до {p.dueLabel}
