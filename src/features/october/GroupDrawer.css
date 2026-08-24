@@ -27,10 +27,6 @@
   color: var(--color-primitive-secondary);
 }
 
-.gd__total-label--error {
-  color: var(--color-primitive-error);
-}
-
 .gd__tabs {
   /* Табы «К уплате / Готово» — закреплены под заголовком, вне скролла списка.
      flex-shrink:0 обязателен: DS-`Tabs` внутри flex-колонки имеет overflow-x:auto,

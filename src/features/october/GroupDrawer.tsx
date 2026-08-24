@@ -24,7 +24,6 @@ export default function GroupDrawer({
   open,
   title,
   totalLabel = 'Всего к уплате',
-  totalLabelTone = 'neutral',
   payAllLabel = 'Уплатить всё',
   items,
   history = [],
@@ -33,8 +32,6 @@ export default function GroupDrawer({
   open: boolean
   title: string
   totalLabel?: string
-  /** "error" — для «Просрочено», где подпись предупреждает о срочности. */
-  totalLabelTone?: 'neutral' | 'error'
   payAllLabel?: string
   items: AugustPayment[]
   /** Оплаченные операции домена по месяцам — под табом «Готово» (пусто → таб пустой). */
@@ -89,11 +86,7 @@ export default function GroupDrawer({
               <>
                 <div className="gd__total">
                   <span className="gd__total-amount">{formatMoney(total)}</span>
-                  <span
-                    className={`gd__total-label ${totalLabelTone === 'error' ? 'gd__total-label--error' : ''}`}
-                  >
-                    {totalLabel}
-                  </span>
+                  <span className="gd__total-label">{totalLabel}</span>
                 </div>
 
                 <div className="gd__list">
