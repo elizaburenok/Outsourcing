@@ -1,0 +1,32 @@
+/* Служебный тумблер сценария (демо, не элемент продукта) — в обычном потоке страницы,
+   не fixed: без хедера-суммы страница короче, и плавающий в углу тумблер перекрывал бы
+   карточки (см. `.av__snapshot` в AugustView.css — тот вариант рассчитан на длинную страницу). */
+.hc__scenario {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3x);
+  margin-bottom: var(--space-4x);
+}
+
+.hc__scenario-label {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-secondary);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-m);
+  white-space: nowrap;
+}
+
+.hc__scenario-tabs {
+  display: flex;
+  gap: var(--space-2x);
+}
+
+/* Сетка доменных карточек — два столбца, как плитки разделов. Нет отдельной шапки с
+   суммой — статус виден по самим карточкам. */
+.hc__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4x);
+  margin-bottom: var(--space-8x);
+}

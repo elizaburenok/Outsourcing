@@ -31,9 +31,43 @@
   color: var(--color-primitive-error);
 }
 
+.gd__tabs {
+  /* Табы «К уплате / Готово» — закреплены под заголовком, вне скролла списка.
+     flex-shrink:0 обязателен: DS-`Tabs` внутри flex-колонки имеет overflow-x:auto,
+     из-за чего его авто-min-height становится 0 и он схлопывается при длинном списке. */
+  flex-shrink: 0;
+  padding: var(--space-2x) var(--space-5x) var(--space-3x);
+}
+
 .gd__list {
   display: flex;
   flex-direction: column;
+}
+
+.gd__empty {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+  margin: var(--space-2x) 0;
+}
+
+.gd__history {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4x);
+}
+
+.gd__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+}
+
+.gd__group-label {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-secondary);
 }
 
 .gd__row .pay-row-btn {

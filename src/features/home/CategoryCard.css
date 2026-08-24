@@ -1,0 +1,83 @@
+/* Карточка домена на Главной. Форма — как у карточки Пульса, но все цвета/радиусы —
+   на токенах DS (правило проекта: без хардкода). */
+.category-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: var(--space-18x);
+  gap: var(--space-6x);
+  padding: var(--space-5x) var(--space-4x) var(--space-4x);
+  border-radius: var(--radius-4-5x);
+  text-align: left;
+  background: var(--color-bg-neutral-1);
+  border: none;
+  cursor: default;
+  transition:
+    filter 0.15s ease,
+    transform 0.05s ease;
+}
+
+.category-card__label {
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-secondary);
+}
+
+.category-card__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5x);
+}
+
+.category-card__title {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.category-card__subtitle {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+/* ── Зелёный: всё уплачено (разовое закрытие периода) ── */
+.category-card--ok {
+  background: var(--color-bg-success-2);
+}
+
+/* ── Серый: регулярный платёж (УСН/НДС), сейчас платить нечего — это не «успех»,
+   а обычный ритм; фон совпадает с базовым .category-card. ── */
+.category-card--neutral {
+  background: var(--color-bg-neutral-1);
+}
+
+/* ── Жёлтый: есть к уплате ── */
+.category-card--attention {
+  background: var(--color-bg-warning-1);
+}
+
+/* ── Красный: есть просрочка ── */
+.category-card--overdue {
+  background: var(--color-bg-error-2);
+}
+
+.category-card--overdue .category-card__subtitle {
+  color: var(--color-primitive-error);
+  font-weight: var(--font-weight-medium);
+}
+
+/* ── Интерактивность (только кликабельные карточки) ── */
+.category-card--interactive {
+  cursor: pointer;
+}
+
+.category-card--interactive:hover {
+  filter: brightness(0.98);
+}
+
+.category-card--interactive:active {
+  transform: translateY(1px);
+}
