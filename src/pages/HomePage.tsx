@@ -3,7 +3,7 @@ import PageShell from '@/components/PageShell/PageShell'
 import HomeCardsView from '@/features/home/HomeCardsView'
 
 /**
- * Раздел «Онлайн-бухгалтерия» — сценарий «20 августа»: ООО на УСН «Доходы» + НДС 5%
+ * Раздел «Онлайн-бухгалтерия» — сценарий «24 августа»: ООО на УСН «Доходы» + НДС 5%
  * (доход прошлого года превысил порог освобождения от НДС), один сотрудник (директор).
  *
  * Главная собрана на архитектуре соседнего прототипа «Пульс»: платежи сгруппированы в
@@ -15,6 +15,7 @@ import HomeCardsView from '@/features/home/HomeCardsView'
 export default function HomePage() {
   return (
     <PageShell
+      background="primary"
       aside={
         <NavigationBar
           hasBackButton

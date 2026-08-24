@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/routes'
 import PageAction from '@ds/components/PageAction'
-import { Chip } from '@ds/components/Chip'
 import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/components/icons'
 import GroupDrawer from '@/features/october/GroupDrawer'
 import { countWaiting, pluralDocs } from '@/data/reports'
@@ -10,7 +9,6 @@ import { MCHD_COUNT, CONNECTED_SERVICES, TARIFF_NAME, connectedServicesText } fr
 import type { AugustPayment } from '@/data/august'
 import CategoryCard from './CategoryCard'
 import { useHomeModel } from './useHomeModel'
-import { HOME_SCENARIOS, HOME_SCENARIO_ORDER, type HomeScenarioId } from './scenarios'
 import {
   CATEGORIES,
   CATEGORY_ORDER,
@@ -46,8 +44,7 @@ const RANK: Record<Severity, number> = { overdue: 0, attention: 1, ok: 2 }
  */
 export default function HomeCardsView() {
   const navigate = useNavigate()
-  const [scenarioId, setScenarioId] = useState<HomeScenarioId>('overdue')
-  const { levels, paymentsByCat, historyByCat } = useHomeModel(scenarioId)
+  const { levels, paymentsByCat, historyByCat } = useHomeModel()
   const [drawer, setDrawer] = useState<DrawerState | null>(null)
 
   // Промоушен: рисковые карточки выше; внутри группы — канонический порядок.
@@ -77,26 +74,6 @@ export default function HomeCardsView() {
 
   return (
     <div className="av">
-      {/* Служебный тумблер прототипа (не элемент продукта) — переключает сценарий, чтобы
-          проверить, как читаются доменные карточки: всё оплачено / есть ближайшие платежи
-          без риска / есть просрочка. В обычном потоке (не fixed): без хедера-суммы страница
-          стала короче, и плавающий в углу тумблер перекрывал бы карточки. */}
-      <div className="hc__scenario">
-        <span className="hc__scenario-label">Состояние (демо)</span>
-        <div className="hc__scenario-tabs">
-          {HOME_SCENARIO_ORDER.map((id) => (
-            <Chip
-              key={id}
-              chipType="Tab"
-              isSelected={scenarioId === id}
-              onClick={() => setScenarioId(id)}
-            >
-              {HOME_SCENARIOS[id].label}
-            </Chip>
-          ))}
-        </div>
-      </div>
-
       <div data-coach="pay" className="hc__grid">
         {ordered.map((id) => {
           const payments = paymentsByCat[id]

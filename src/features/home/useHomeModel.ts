@@ -1,7 +1,6 @@
 import { useMemo } from 'react'
 import { usePayments } from '@/state/PaymentsProvider'
-import type { AugustPayment } from '@/data/august'
-import { HOME_SCENARIOS, type HomeScenarioId } from './scenarios'
+import { AUGUST_PAYMENTS, usnPayment, type AugustPayment } from '@/data/august'
 import {
   CATEGORY_ORDER,
   categoryHistory,
@@ -20,18 +19,22 @@ export type HomeModel = {
   historyByCat: Record<DomainCategoryId, DomainHistoryGroup[]>
 }
 
+/** Аванс по УСН за 9 месяцев — карточка «УСН» регулярно показывает дату следующего
+ *  платежа независимо от того, что происходит в других доменах. */
+const USN_NEXT = usnPayment('mid')
+
 /**
  * Производные Главной над `PaymentsProvider` — аналог `levels`/`openTasks` из
  * `RiskStateContext` в Пульсе, но локально в хуке: сам провайдер не трогаем, чтобы
  * не завязывать доменную модель Главной на общий контекст (им пользуются и История,
- * и октябрьский сценарий). `scenarioId` выбирает набор платежей (служебный тумблер
- * прототипа — см. `scenarios.ts`), не элемент продукта.
+ * и октябрьский сценарий). Данные — сценарий «24 августа» (`AUGUST_PAYMENTS`).
  */
-export function useHomeModel(scenarioId: HomeScenarioId): HomeModel {
+export function useHomeModel(): HomeModel {
   const { isPaid } = usePayments()
+  const payments = AUGUST_PAYMENTS
+  const usn = USN_NEXT
 
   return useMemo(() => {
-    const { payments, usn } = HOME_SCENARIOS[scenarioId]
     const levels = computeLevels(payments, usn, isPaid)
     const paymentsByCat = CATEGORY_ORDER.reduce(
       (acc, id) => {
@@ -48,5 +51,5 @@ export function useHomeModel(scenarioId: HomeScenarioId): HomeModel {
       {} as Record<DomainCategoryId, DomainHistoryGroup[]>,
     )
     return { levels, paymentsByCat, historyByCat }
-  }, [isPaid, scenarioId])
+  }, [isPaid, payments, usn])
 }

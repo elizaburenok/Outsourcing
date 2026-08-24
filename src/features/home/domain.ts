@@ -67,10 +67,10 @@ export const CATEGORIES: Record<DomainCategoryId, DomainCategoryDef> = {
   },
 }
 
-/** УСН и НДС — регулярные, календарные платежи: даже без открытой суммы к уплате
- *  карточка остаётся серой, а не зеленеет — это не разовое «закрыли период», а
- *  постоянный ритм с известной следующей датой. Сотрудники зеленеют как обычно. */
-const NEUTRAL_WHEN_OK: DomainCategoryId[] = ['usn', 'nds']
+/** Все домены регулярные, календарные: даже без открытой суммы к уплате карточка
+ *  остаётся серой, а не зеленеет — это не разовое «закрыли период», а постоянный
+ *  ритм с известной следующей датой. */
+const NEUTRAL_WHEN_OK: DomainCategoryId[] = ['usn', 'nds', 'employees']
 
 /** Визуальный тон карточки: severity как есть, кроме `ok` у регулярных доменов — там серый. */
 export function cardTone(id: DomainCategoryId, severity: Severity): CardTone {
@@ -109,7 +109,7 @@ export interface DomainHistoryGroup {
   payments: AugustPayment[]
 }
 
-/** Метка текущего (открытого) периода прототипа — сценарий «20 августа». */
+/** Метка текущего (открытого) периода прототипа — сценарий «24 августа». */
 const CURRENT_PERIOD_LABEL = 'Август'
 
 /**

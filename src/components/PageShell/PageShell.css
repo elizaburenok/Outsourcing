@@ -9,7 +9,7 @@
 
 .shell--primary {
   background: var(--color-page-primary);
-  min-height: 100%;
+  flex: 1;
 }
 
 .shell__main {
