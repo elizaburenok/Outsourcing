@@ -23,6 +23,7 @@ function month(id: string, label: string, payments: AugustPayment[]): HistoryMon
 
 export const HISTORY: HistoryMonth[] = [
   month('2026-06', 'Июнь', [
+    { id: 'h-nds-q1-3', title: 'НДС: 3-й платёж за I квартал', category: 'nds', amount: 30000, viaEnp: true, state: 'paid', paidLabel: '30 июня' },
     { id: 'h-ndfl-jun-2', title: 'НДФЛ с зарплаты за 23–31 мая', category: 'ndfl', amount: 3900, viaEnp: true, state: 'paid', paidLabel: '5 июня' },
     { id: 'h-salary-may', title: 'Зарплата директору за май', category: 'salary', amount: 53783, viaEnp: true, state: 'paid', paidLabel: '5 июня' },
     { id: 'h-travma-may', title: 'Взносы на травматизм за май', category: 'travma', amount: 200, viaEnp: false, state: 'paid', paidLabel: '16 июня' },
@@ -30,6 +31,7 @@ export const HISTORY: HistoryMonth[] = [
     { id: 'h-ndfl-jun-1', title: 'НДФЛ с зарплаты за 1–22 июня', category: 'ndfl', amount: 8400, viaEnp: true, state: 'paid', paidLabel: '30 июня' },
   ]),
   month('2026-05', 'Май', [
+    { id: 'h-nds-q1-2', title: 'НДС: 2-й платёж за I квартал', category: 'nds', amount: 30000, viaEnp: true, state: 'paid', paidLabel: '28 мая' },
     { id: 'h-ndfl-may-2', title: 'НДФЛ с зарплаты за 23–30 апреля', category: 'ndfl', amount: 3900, viaEnp: true, state: 'paid', paidLabel: '5 мая' },
     { id: 'h-salary-apr', title: 'Зарплата директору за апрель', category: 'salary', amount: 53783, viaEnp: true, state: 'paid', paidLabel: '5 мая' },
     { id: 'h-travma-apr', title: 'Взносы на травматизм за апрель', category: 'travma', amount: 200, viaEnp: false, state: 'paid', paidLabel: '15 мая' },
@@ -37,6 +39,7 @@ export const HISTORY: HistoryMonth[] = [
     { id: 'h-ndfl-may-1', title: 'НДФЛ с зарплаты за 1–22 мая', category: 'ndfl', amount: 8400, viaEnp: true, state: 'paid', paidLabel: '28 мая' },
   ]),
   month('2026-04', 'Апрель', [
+    { id: 'h-nds-q1-1', title: 'НДС: 1-й платёж за I квартал', category: 'nds', amount: 30000, viaEnp: true, state: 'paid', paidLabel: '28 апреля' },
     { id: 'h-usn-q1', title: 'Аванс по УСН за I квартал', category: 'usn', amount: 46700, viaEnp: true, state: 'paid', paidLabel: '28 апреля' },
     { id: 'h-salary-mar', title: 'Зарплата директору за март', category: 'salary', amount: 53783, viaEnp: true, state: 'paid', paidLabel: '5 апреля' },
     { id: 'h-travma-mar', title: 'Взносы на травматизм за март', category: 'travma', amount: 200, viaEnp: false, state: 'paid', paidLabel: '15 апреля' },

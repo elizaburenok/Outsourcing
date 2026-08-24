@@ -1,19 +1,24 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
+import { Tabs } from '@ds/components/Tabs'
 import { formatMoney } from '@/lib/format'
 import { payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
 import { pluralPayments, type AugustPayment } from '@/data/august'
+import type { DomainHistoryGroup } from '@/features/home/domain'
 import PaymentRow from '@/features/august/PaymentRow'
 import PaymentResultModal from '@/features/payment/PaymentResultModal'
 import './GroupDrawer.css'
 
+type Tab = 'topay' | 'done'
+
 /**
- * Дровер группы налогов справа — обобщение OverdueDrawer. Открывается, когда в группе
- * несколько налогов к уплате. Собран на DS `Drawer`/`DrawerHeader`/`DrawerFooter` (как
- * `TaxCalcDrawer`): сумма — сразу под заголовком, список — кликабельные строки-платежи
- * (ведут на уплату), в футере — кнопка «Уплатить всё» разом.
+ * Дровер раздела справа — обобщение OverdueDrawer. Открывается по клику на доменную
+ * карточку (УСН, НДС, Сотрудники) и всегда содержит два таба: «К уплате» — открытые
+ * платежи домена (сумма под заголовком, кликабельные строки ведут на уплату, в футере
+ * «Уплатить всё»), и «Готово» — история операций домена по месяцам. Собран на DS
+ * `Drawer`/`Tabs`/`DrawerFooter`.
  */
 export default function GroupDrawer({
   open,
@@ -22,6 +27,7 @@ export default function GroupDrawer({
   totalLabelTone = 'neutral',
   payAllLabel = 'Уплатить всё',
   items,
+  history = [],
   onClose,
 }: {
   open: boolean
@@ -31,17 +37,26 @@ export default function GroupDrawer({
   totalLabelTone?: 'neutral' | 'error'
   payAllLabel?: string
   items: AugustPayment[]
+  /** Оплаченные операции домена по месяцам — под табом «Готово» (пусто → таб пустой). */
+  history?: DomainHistoryGroup[]
   onClose: () => void
 }) {
   const navigate = useNavigate()
   const { markPaid } = usePayments()
   const [showResult, setShowResult] = useState(false)
 
+  // Платёж в состоянии `process` (напр. аванс УСН, пока квартал не закрыт) показываем
+  // строкой-справкой, но платить его нельзя: из суммы и «Уплатить всё» исключаем.
+  const payable = items.filter((p) => p.state !== 'process')
+  const total = payable.reduce((sum, p) => sum + p.amount, 0)
+
+  // Если платить нечего — открываем сразу на «Готово» (истории).
+  const [tab, setTab] = useState<Tab>(items.length > 0 ? 'topay' : 'done')
+
   if (!open) return null
-  const total = items.reduce((sum, p) => sum + p.amount, 0)
 
   function payAll() {
-    items.forEach((p) => markPaid(p.id))
+    payable.forEach((p) => markPaid(p.id))
     setShowResult(true)
   }
 
@@ -55,39 +70,79 @@ export default function GroupDrawer({
       <Drawer open={open} onClose={onClose} side="right" aria-label={title}>
         <DrawerHeader onClose={onClose}>{title}</DrawerHeader>
 
-        <div className="gd__body">
-          <div className="gd__total">
-            <span className="gd__total-amount">{formatMoney(total)}</span>
-            <span
-              className={`gd__total-label ${totalLabelTone === 'error' ? 'gd__total-label--error' : ''}`}
-            >
-              {totalLabel}
-            </span>
-          </div>
+        {/* Табы вынесены из .gd__body: закреплены под заголовком и не входят в скролл
+            списка. Внутри скроллируемого flex-контейнера DS-`Tabs` (overflow-x:auto)
+            схлопывался в 0 по высоте, когда список длинный (Сотрудники). */}
+        <Tabs
+          className="gd__tabs"
+          value={tab}
+          onChange={(id) => setTab(id as Tab)}
+          items={[
+            { id: 'topay', label: 'К уплате' },
+            { id: 'done', label: 'Готово' },
+          ]}
+        />
 
-          <div className="gd__list">
-            {items.map((p) => (
-              <div key={p.id} className="gd__row">
-                <PaymentRow
-                  payment={p}
-                  edgePadding="off"
-                  onClick={() => {
-                    onClose()
-                    navigate(payTo(p.id))
-                  }}
-                />
-              </div>
-            ))}
-          </div>
+        <div className="gd__body">
+          {tab === 'topay' ? (
+            items.length > 0 ? (
+              <>
+                <div className="gd__total">
+                  <span className="gd__total-amount">{formatMoney(total)}</span>
+                  <span
+                    className={`gd__total-label ${totalLabelTone === 'error' ? 'gd__total-label--error' : ''}`}
+                  >
+                    {totalLabel}
+                  </span>
+                </div>
+
+                <div className="gd__list">
+                  {items.map((p) => (
+                    <div key={p.id} className="gd__row">
+                      <PaymentRow
+                        payment={p}
+                        edgePadding="off"
+                        onClick={() => {
+                          onClose()
+                          navigate(payTo(p.id))
+                        }}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <p className="gd__empty">Всё уплачено — открытых платежей нет.</p>
+            )
+          ) : history.length > 0 ? (
+            <div className="gd__history">
+              {history.map((group) => (
+                <section key={group.id} className="gd__group">
+                  <p className="gd__group-label">{group.label}</p>
+                  <div className="gd__list">
+                    {group.payments.map((p) => (
+                      <div key={p.id} className="gd__row">
+                        <PaymentRow payment={p} edgePadding="off" />
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
+          ) : (
+            <p className="gd__empty">Пока нет завершённых операций.</p>
+          )}
         </div>
 
-        <DrawerFooter type="1 Button" primaryAction={{ label: payAllLabel, onClick: payAll }} />
+        {tab === 'topay' && payable.length > 0 && (
+          <DrawerFooter type="1 Button" primaryAction={{ label: payAllLabel, onClick: payAll }} />
+        )}
       </Drawer>
 
       {showResult && (
         <PaymentResultModal title="Платежи отправлены" onDone={finishResult}>
           <p>
-            Отправили {pluralPayments(items.length)} на {formatMoney(total)}.
+            Отправили {pluralPayments(payable.length)} на {formatMoney(total)}.
           </p>
           <p>Информация по платежам появится в ленте событий в течение 5 минут.</p>
         </PaymentResultModal>

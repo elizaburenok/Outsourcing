@@ -1,15 +1,16 @@
 import NavigationBar from '@ds/components/NavigationBar'
 import PageShell from '@/components/PageShell/PageShell'
-import AugustGroupsView from '@/features/august/AugustGroupsView'
+import HomeCardsView from '@/features/home/HomeCardsView'
 
 /**
  * Раздел «Онлайн-бухгалтерия» — сценарий «20 августа»: ООО на УСН «Доходы» + НДС 5%
  * (доход прошлого года превысил порог освобождения от НДС), один сотрудник (директор).
- * Налоги к уплате свёрнуты в группы (просрочено / НДС / сотрудники): один налог в группе →
- * сразу уплата, несколько → дровер. Два налога просрочены к этой дате — 1-й платёж НДС
- * за II квартал (срок 28 июля) и взносы на травматизм за июль (срок 15 августа).
- * Октябрьский сценарий (`OctoberGroupsView`, «10 октября», УСН без НДС) остаётся в коде
- * для сравнения, но не подключён к роутам.
+ *
+ * Главная собрана на архитектуре соседнего прототипа «Пульс»: платежи сгруппированы в
+ * стабильные доменные карточки (Налоги, Сотрудники) через `HomeCardsView`; состояние —
+ * severity, просрочка поднимает карточку наверх. Прежний экран групп-по-состоянию
+ * (`AugustGroupsView`) и октябрьский сценарий (`OctoberGroupsView`) остаются в коде для
+ * сравнения/отката, но не подключены к роутам.
  */
 export default function HomePage() {
   return (
@@ -23,7 +24,7 @@ export default function HomePage() {
         />
       }
     >
-      <AugustGroupsView />
+      <HomeCardsView />
     </PageShell>
   )
 }
