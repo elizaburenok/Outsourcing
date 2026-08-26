@@ -49,9 +49,7 @@ export function paymentNote(p: AugustPayment) {
   if (p.state === 'process')
     return (
       <span className="pay-note">
-        {p.preliminary
-          ? `С ${p.payFromLabel} по ${p.dueLabel}. Пока платить не нужно`
-          : `Рассчитаем до ${p.dueLabel}`}
+        {p.preliminary ? `С ${p.payFromLabel} по ${p.dueLabel}` : `Рассчитаем до ${p.dueLabel}`}
       </span>
     )
   if (p.state === 'overdue')
@@ -85,7 +83,7 @@ export default function PaymentRow({
       title={<span className="pay-title">{payment.title}</span>}
       description={paymentNote(payment)}
       leftAccessory={
-        isProcess ? (
+        isProcess && !payment.preliminary ? (
           <PayIconPending category={payment.category} />
         ) : (
           <PayIcon category={payment.category} />

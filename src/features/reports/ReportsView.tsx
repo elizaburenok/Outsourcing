@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Cell } from '@ds/components/Cell'
 import { Tabs } from '@ds/components/Tabs'
 import declarationLogo from '@ds/src/logo/Declaration.png'
@@ -9,12 +9,14 @@ import mailLogo from '@ds/src/logo/Mail.svg'
 import reportLogo from '@ds/src/logo/Report.svg'
 import {
   REPORTS,
+  REPORTS_OK,
   countWaiting,
   filterReports,
   type Report,
   type ReportStatus,
   type ReportLogoKind,
 } from '@/data/reports'
+import { useScenario } from '@/state/ScenarioProvider'
 import './ReportsView.css'
 
 const REPORT_LOGO: Record<ReportLogoKind, string> = {
@@ -70,9 +72,16 @@ function ReportRow({ report }: { report: Report }) {
  * статус теперь читается по табу, а не по цвету индикатора.
  */
 export default function ReportsView() {
-  const [filter, setFilter] = useState<ReportStatus>('waiting')
-  const waiting = countWaiting(REPORTS)
-  const shown = filterReports(REPORTS, filter)
+  const { scenario } = useScenario()
+  const reports = scenario === 'ok' ? REPORTS_OK : REPORTS
+  const waiting = countWaiting(reports)
+  const [filter, setFilter] = useState<ReportStatus>(waiting > 0 ? 'waiting' : 'preparing')
+  const shown = filterReports(reports, filter)
+
+  // Нет задач на клиента — таб «Ждём ответа» скрываем совсем, фокус сразу на «В работе».
+  useEffect(() => {
+    if (waiting === 0 && filter === 'waiting') setFilter('preparing')
+  }, [waiting, filter])
 
   return (
     <div className="rep">
@@ -81,18 +90,19 @@ export default function ReportsView() {
         value={filter}
         onChange={(id) => setFilter(id as ReportStatus)}
         items={[
-          {
-            id: 'waiting',
-            label:
-              waiting > 0 ? (
-                <span className="rep-tab-label">
-                  Ждём ответа
-                  <span className="rep-tab-counter">{waiting}</span>
-                </span>
-              ) : (
-                'Ждём ответа'
-              ),
-          },
+          ...(waiting > 0
+            ? [
+                {
+                  id: 'waiting',
+                  label: (
+                    <span className="rep-tab-label">
+                      Ждём ответа
+                      <span className="rep-tab-counter">{waiting}</span>
+                    </span>
+                  ),
+                },
+              ]
+            : []),
           { id: 'preparing', label: 'В работе' },
           { id: 'submitted', label: 'Выполнено' },
         ]}

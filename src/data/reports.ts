@@ -77,9 +77,26 @@ export const REPORTS: Report[] = [
   },
 ]
 
+/**
+ * Сценарий «Всё хорошо»: клиент уже ответил на всё, что от него ждали — МЧД подписана,
+ * доходы подтверждены, «ждём ответа» пусто. Карточка на Главной показывает 2 задачи,
+ * которые остаются «в работе» (декларация и отчёты по сотрудникам, бухгалтер сдаёт сам).
+ */
+export const REPORTS_OK: Report[] = REPORTS.map((r) => {
+  if (r.id === 'mchd') return { ...r, status: 'submitted', note: 'Подписана', action: undefined }
+  if (r.id === 'usn-income-9m')
+    return { ...r, status: 'submitted', note: 'Подтверждено вами', action: undefined }
+  return r
+})
+
 /** Сколько отчётов ждут ответа клиента — число для бейджа на карточке. */
 export function countWaiting(reports: Report[] = REPORTS): number {
   return reports.filter((r) => r.status === 'waiting').length
+}
+
+/** Сколько отчётов бухгалтер сейчас готовит — для карточки, когда ответ клиента не нужен. */
+export function countPreparing(reports: Report[] = REPORTS): number {
+  return reports.filter((r) => r.status === 'preparing').length
 }
 
 /** Склонение «документ» для подписи карточки Отчётности («1 документ», «2 документа»). */
@@ -90,6 +107,18 @@ export function pluralDocs(n: number): string {
   if (mod100 < 11 || mod100 > 14) {
     if (mod10 === 1) word = 'документ'
     else if (mod10 >= 2 && mod10 <= 4) word = 'документа'
+  }
+  return `${n} ${word}`
+}
+
+/** Склонение «задача» для подписи карточки Отчётности («1 задача», «2 задачи»). */
+export function pluralTasks(n: number): string {
+  const mod100 = n % 100
+  const mod10 = n % 10
+  let word = 'задач'
+  if (mod100 < 11 || mod100 > 14) {
+    if (mod10 === 1) word = 'задача'
+    else if (mod10 >= 2 && mod10 <= 4) word = 'задачи'
   }
   return `${n} ${word}`
 }

@@ -50,6 +50,9 @@ export default function GroupDrawer({
   const total = items
     .filter((p) => p.state !== 'process' || p.preliminary)
     .reduce((sum, p) => sum + p.amount, 0)
+  // Сумма ещё не окончательная (напр. аванс УСН до закрытия квартала) — подписываем это,
+  // а не выдаём её за твёрдый «Общая сумма».
+  const hasPreliminary = items.some((p) => p.preliminary)
 
   const [tab, setTab] = useState<Tab>('topay')
 
@@ -89,7 +92,9 @@ export default function GroupDrawer({
               <>
                 <div className="gd__total">
                   <span className="gd__total-amount">{formatMoney(total)}</span>
-                  <span className="gd__total-label">{totalLabel}</span>
+                  <span className="gd__total-label">
+                    {hasPreliminary ? 'Предварительный расчёт' : totalLabel}
+                  </span>
                 </div>
 
                 <div className="gd__list">
