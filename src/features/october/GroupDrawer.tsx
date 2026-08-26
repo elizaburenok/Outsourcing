@@ -23,7 +23,7 @@ type Tab = 'topay' | 'done'
 export default function GroupDrawer({
   open,
   title,
-  totalLabel = 'Всего к уплате',
+  totalLabel = 'Общая сумма',
   payAllLabel = 'Уплатить всё',
   items,
   history = [],

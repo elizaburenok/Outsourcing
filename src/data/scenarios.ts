@@ -36,7 +36,7 @@ const USN_PRELIMINARY: AugustPayment = {
 /** Предварительный расчёт НДС за III квартал — по тому же принципу, что и УСН. */
 const NDS_PRELIMINARY: AugustPayment = {
   id: 'nds-q3-prelim',
-  title: 'НДС: 1-й платёж за III квартал',
+  title: '1-й платёж за III квартал',
   category: 'nds',
   amount: 28500,
   viaEnp: true,
@@ -61,7 +61,7 @@ export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
     id: 'overdue',
     label: 'Есть просрочка',
     payments: AUGUST_PAYMENTS,
-    usn: usnPayment('mid'),
+    usn: USN_PRELIMINARY,
   },
   // Нет просрочки · предварительный расчёт по УСН и НДС · сотрудники закрыты.
   ok: {
