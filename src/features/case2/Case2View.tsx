@@ -87,7 +87,7 @@ export default function Case2View() {
       openGroup.key === 'overdue'
         ? `${pluralPayments(openGroup.items.length)} просрочено`
         : openGroup.title,
-    totalLabel: 'Общая сумма к уплате',
+    totalLabel: 'Общая сумма',
     items: openGroup.items,
   }
 
