@@ -10,6 +10,7 @@ export default function SectionCard({
   title,
   note,
   badge,
+  tag,
   onClick,
 }: {
   icon: LucideIcon
@@ -17,6 +18,8 @@ export default function SectionCard({
   note?: string
   /** Счётчик в правом верхнем углу (напр. число отчётов, ждущих ответа). */
   badge?: number
+  /** Текстовый бейдж-пилюля в правом верхнем углу (напр. «Новое»). */
+  tag?: string
   onClick?: () => void
 }) {
   return (
@@ -30,6 +33,7 @@ export default function SectionCard({
         <span className="section-card__icon">
           <Icon size={22} strokeWidth={1.75} />
         </span>
+        {tag && <span className="section-card__tag">{tag}</span>}
         {badge != null && badge > 0 && <span className="section-card__badge">{badge}</span>}
       </div>
       <div className="section-card__text">

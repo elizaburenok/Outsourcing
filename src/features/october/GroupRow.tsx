@@ -4,7 +4,7 @@ import { Cell } from '@ds/components/Cell'
 import { formatMoney } from '@/lib/format'
 import { pluralPayments } from '@/data/august'
 import { PayIcon } from '@/features/august/PaymentRow'
-import { nearestDue, pluralTaxes, type PayGroup } from './groups'
+import { nearestDue, type PayGroup } from './groups'
 
 /** Иконка группы: просрочка — треугольник-ошибка; УСН/НДС — лого налога; сотрудники — аватар. */
 function GroupIcon({ group }: { group: PayGroup }) {
@@ -28,6 +28,7 @@ function groupNote(group: PayGroup): ReactNode {
     return <span className="pay-note pay-note--overdue">Уплатите как можно скорее</span>
   if (group.key === 'usn') {
     const usn = group.items[0]
+    if (usn.preliminary) return <span className="pay-note">Пока платить не нужно</span>
     return (
       <span className="pay-note">
         {usn.state === 'process' ? 'Рассчитаем' : 'Уплатить'} до {usn.dueLabel}
@@ -40,9 +41,9 @@ function groupNote(group: PayGroup): ReactNode {
     return <span className="pay-note">{due ? `до ${due}` : ''}</span>
   }
   const due = nearestDue(group.items)
-  // «Сотрудники»: если в группе есть зарплата (не налог) — считаем «платежи», не «налоги».
-  const hasSalary = group.items.some((p) => p.category === 'salary')
-  const count = hasSalary ? pluralPayments(group.items.length) : pluralTaxes(group.items.length)
+  // «Сотрудники» — единый блок зарплатных начислений: считаем «платежи» (взносы, НДФЛ,
+  // зарплата — всё это платежи по сотруднику), независимо от состава.
+  const count = pluralPayments(group.items.length)
   return (
     <span className="pay-note">
       {count}

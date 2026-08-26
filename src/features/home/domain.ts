@@ -119,10 +119,10 @@ export interface DomainHistoryGroup {
 const CURRENT_PERIOD_LABEL = 'Август'
 
 /**
- * История операций домена под таб «Готово»: сначала оплаченные в текущем периоде
+ * История операций домена под таб «Выполнено»: сначала оплаченные в текущем периоде
  * (изначально или в этой сессии — их помечаем «Оплачено сегодня»), затем закрытые
  * прошлые месяцы из `HISTORY`. В обеих частях берём только платежи категорий домена,
- * поэтому «Готово» у каждой карточки показывает ровно свой срез (УСН / НДС / Сотрудники).
+ * поэтому «Выполнено» у каждой карточки показывает ровно свой срез (УСН / НДС / Сотрудники).
  */
 export function categoryHistory(
   id: DomainCategoryId,
@@ -207,7 +207,10 @@ export function cardContent(
     }
   }
   if (lead.state === 'process') {
-    return { title: lead.title, subtitle: `Рассчитаем до ${date}` }
+    return {
+      title: lead.title,
+      subtitle: lead.preliminary ? 'Пока платить не нужно' : `Рассчитаем до ${date}`,
+    }
   }
   return {
     title: lead.title,
