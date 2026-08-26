@@ -4,9 +4,10 @@ import { ROUTES } from '@/routes'
 import PageAction from '@ds/components/PageAction'
 import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/components/icons'
 import GroupDrawer from '@/features/october/GroupDrawer'
-import { countWaiting, pluralDocs } from '@/data/reports'
+import { REPORTS, REPORTS_OK, countWaiting, countPreparing, pluralDocs, pluralTasks } from '@/data/reports'
 import { MCHD_COUNT, CONNECTED_SERVICES, TARIFF_NAME, connectedServicesText } from '@/data/company'
 import type { AugustPayment } from '@/data/august'
+import { useScenario } from '@/state/ScenarioProvider'
 import CategoryCard from './CategoryCard'
 import { useHomeModel } from './useHomeModel'
 import {
@@ -44,6 +45,7 @@ const RANK: Record<Severity, number> = { overdue: 0, attention: 1, ok: 2 }
 export default function HomeCardsView() {
   const navigate = useNavigate()
   const { levels, paymentsByCat, historyByCat } = useHomeModel()
+  const { scenario } = useScenario()
   const [drawer, setDrawer] = useState<DrawerState | null>(null)
 
   // Промоушен: рисковые карточки выше; внутри группы — канонический порядок.
@@ -51,13 +53,18 @@ export default function HomeCardsView() {
 
   // «Отчётность» — такая же доменная карточка, но её ведёт бухгалтер. Жёлтый тон
   // (attention), когда есть незакрытые задачи клиента (подписать/подтвердить), иначе
-  // нейтральный «всё под контролем». Число ждущих ответа — в заголовок, вместо бейджа.
-  const waitingReports = countWaiting()
+  // нейтральный. В сценарии «Всё хорошо» клиент уже ответил на всё — вместо бейджа с
+  // числом ждущих ответа показываем, сколько задач бухгалтер сейчас готовит.
+  const reports = scenario === 'ok' ? REPORTS_OK : REPORTS
+  const waitingReports = countWaiting(reports)
+  const preparingReports = countPreparing(reports)
   const reportsTone: CardTone = waitingReports > 0 ? 'attention' : 'neutral'
   const reportsContent: CardContent =
     waitingReports > 0
       ? { title: pluralDocs(waitingReports), subtitle: 'Ждём вашего ответа' }
-      : { title: 'Всё под контролем', subtitle: 'Бухгалтер ведёт сам' }
+      : preparingReports > 0
+        ? { title: pluralTasks(preparingReports), subtitle: 'В работе у бухгалтера' }
+        : { title: 'Всё под контролем', subtitle: 'Бухгалтер ведёт сам' }
 
   // Карточка всегда открывает дровер раздела с табами «К уплате / Выполнено» — даже когда
   // платить нечего: под «Выполнено» доступна история операций домена. Снимок списка/истории
