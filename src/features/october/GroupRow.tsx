@@ -63,10 +63,17 @@ export default function GroupRow({
   group: PayGroup
   onClick?: () => void
 }) {
-  // Сумму не показываем, если группа полностью уплачена (done) или УСН ещё считается (process).
+  // Сумму не показываем, если группа полностью уплачена (done) или УСН ещё считается (process) —
+  // кроме кейса 2, где даже в `process` показываем предварительную сумму с подписью снизу.
+  const usnProcessing = group.key === 'usn' && group.items[0].state === 'process'
   const rightAccessory = group.done ? (
     <Check size={20} strokeWidth={2.25} className="pay-check" />
-  ) : group.key === 'usn' && group.items[0].state === 'process' ? (
+  ) : usnProcessing && group.items[0].preliminary ? (
+    <span className="pay-amount-col">
+      <span className="pay-amount">{formatMoney(group.total)}</span>
+      <span className="pay-amount-caption">Предварительно</span>
+    </span>
+  ) : usnProcessing ? (
     <span className="pay-amount pay-amount--done">В процессе</span>
   ) : (
     <span className="pay-amount">{formatMoney(group.total)}</span>
