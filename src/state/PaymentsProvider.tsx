@@ -4,7 +4,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
  * Лёгкий контекст оплаченных платежей (аналог RiskStateContext из «Пульса»).
  * Держит id уже уплаченных в текущей сессии платежей, чтобы состояние переживало
  * переход между Главной и страницей уплаты (`/pay/:id`). После уплаты строка уходит
- * во вкладку «Готово» — самым новым платежам первыми, поэтому порядок оплаты важен
+ * во вкладку «Выполнено» — самым новым платежам первыми, поэтому порядок оплаты важен
  * (`paidOrder`), а не только факт оплаты.
  */
 type PaymentsContextValue = {
@@ -14,6 +14,8 @@ type PaymentsContextValue = {
   markPaid: (id: string) => void
   /** Уплачен ли платёж. */
   isPaid: (id: string) => boolean
+  /** Сбросить все уплаты сессии (для служебного сброса сценария прототипа). */
+  reset: () => void
 }
 
 const PaymentsContext = createContext<PaymentsContextValue | null>(null)
@@ -27,9 +29,11 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
 
   const isPaid = useCallback((id: string) => paidOrder.includes(id), [paidOrder])
 
+  const reset = useCallback(() => setPaidOrder([]), [])
+
   const value = useMemo<PaymentsContextValue>(
-    () => ({ paidOrder, markPaid, isPaid }),
-    [paidOrder, markPaid, isPaid],
+    () => ({ paidOrder, markPaid, isPaid, reset }),
+    [paidOrder, markPaid, isPaid, reset],
   )
 
   return <PaymentsContext.Provider value={value}>{children}</PaymentsContext.Provider>

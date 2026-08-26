@@ -17,7 +17,7 @@ type Tab = 'topay' | 'done'
  * Дровер раздела справа — обобщение OverdueDrawer. Открывается по клику на доменную
  * карточку (УСН, НДС, Сотрудники) и всегда содержит два таба: «К уплате» — открытые
  * платежи домена (сумма под заголовком, кликабельные строки ведут на уплату, в футере
- * «Уплатить всё»), и «Готово» — история операций домена по месяцам. Собран на DS
+ * «Уплатить всё»), и «Выполнено» — история операций домена по месяцам. Собран на DS
  * `Drawer`/`Tabs`/`DrawerFooter`.
  */
 export default function GroupDrawer({
@@ -34,7 +34,7 @@ export default function GroupDrawer({
   totalLabel?: string
   payAllLabel?: string
   items: AugustPayment[]
-  /** Оплаченные операции домена по месяцам — под табом «Готово» (пусто → таб пустой). */
+  /** Оплаченные операции домена по месяцам — под табом «Выполнено» (пусто → таб пустой). */
   history?: DomainHistoryGroup[]
   onClose: () => void
 }) {
@@ -43,12 +43,15 @@ export default function GroupDrawer({
   const [showResult, setShowResult] = useState(false)
 
   // Платёж в состоянии `process` (напр. аванс УСН, пока квартал не закрыт) показываем
-  // строкой-справкой, но платить его нельзя: из суммы и «Уплатить всё» исключаем.
+  // строкой-справкой, но платить его нельзя: из «Уплатить всё» исключаем. Предварительный
+  // расчёт (`preliminary`) при этом попадает в общую сумму сверху — цифра уже есть, просто
+  // платить рано; обычный `process` без суммы в total не идёт.
   const payable = items.filter((p) => p.state !== 'process')
-  const total = payable.reduce((sum, p) => sum + p.amount, 0)
+  const total = items
+    .filter((p) => p.state !== 'process' || p.preliminary)
+    .reduce((sum, p) => sum + p.amount, 0)
 
-  // Если платить нечего — открываем сразу на «Готово» (истории).
-  const [tab, setTab] = useState<Tab>(items.length > 0 ? 'topay' : 'done')
+  const [tab, setTab] = useState<Tab>('topay')
 
   if (!open) return null
 
@@ -76,7 +79,7 @@ export default function GroupDrawer({
           onChange={(id) => setTab(id as Tab)}
           items={[
             { id: 'topay', label: 'К уплате' },
-            { id: 'done', label: 'Готово' },
+            { id: 'done', label: 'Выполнено' },
           ]}
         />
 

@@ -283,6 +283,21 @@
   font-weight: var(--font-weight-demi-bold);
 }
 
+/* Текстовый бейдж-пилюля (напр. «Новое») — нейтральный тон из токенов DS. */
+.section-card__tag {
+  display: inline-flex;
+  align-items: center;
+  height: var(--space-5x);
+  padding: 0 var(--space-2x);
+  border-radius: var(--radius-10x);
+  background: var(--color-bg-neutral-2);
+  color: var(--color-primitive-secondary);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
 .section-card__title {
   font-size: var(--font-size-m);
   line-height: var(--line-height-m);

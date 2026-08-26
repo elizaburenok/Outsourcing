@@ -90,11 +90,15 @@ export function octoberHeroAmount(isPaid: IsPaid): number {
  * НДС → сотрудники. Налог по УСН — отдельная строка всегда (не только когда наступил
  * срок): в середине квартала это состояние «считается» (`process`, некликабельно), после
  * закрытия квартала — твёрдая сумма к уплате. НДС на УСН платится тремя платежами (28-е
- * число трёх месяцев после квартала); 1-й платёж за II квартал просрочен (в группе
- * «Просрочено»), 2-й — в группе «НДС» вместе со сроком 28 августа. Пустые группы (кроме
- * УСН) не возвращаем.
+ * число трёх месяцев после квартала); 1-й платёж за II квартал — в группе «НДС» со
+ * сроком 28 августа. Пустые группы (кроме УСН) не возвращаем.
  */
-export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[] {
+export function augustBlockGroups(
+  isPaid: IsPaid,
+  snapshot: Snapshot,
+  /** Кейс 2: сумма ещё не считается и окно оплаты не открыто — подпись «Пока платить не нужно». */
+  usnPreliminary?: boolean,
+): PayGroup[] {
   const overdue = AUGUST_PAYMENTS.filter((p) => p.state === 'overdue' && !isPaid(p.id))
   const nds = AUGUST_PAYMENTS.filter(
     (p) => p.category === 'nds' && p.state === 'due' && !isPaid(p.id),
@@ -104,7 +108,7 @@ export function augustBlockGroups(isPaid: IsPaid, snapshot: Snapshot): PayGroup[
   const employees = AUGUST_PAYMENTS.filter(
     (p) => p.state === 'due' && p.category !== 'nds' && !isPaid(p.id),
   ).slice(0, EMPLOYEES_LIMIT)
-  const usn = usnPayment(snapshot)
+  const usn = usnPreliminary ? { ...usnPayment(snapshot), preliminary: true } : usnPayment(snapshot)
 
   const groups: PayGroup[] = []
   if (overdue.length > 0)

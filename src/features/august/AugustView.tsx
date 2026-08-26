@@ -150,7 +150,7 @@ export default function AugustView() {
         <p className="av__amount-label">{heroLabel}</p>
       </header>
 
-      {/* Вкладки: К уплате / Готово (Tabs Carousel) */}
+      {/* Вкладки: К уплате / Выполнено (Tabs Carousel) */}
       <Tabs
         className="av__tabs"
         value={tab}
@@ -174,7 +174,7 @@ export default function AugustView() {
         </Card>
       </div>
 
-      {/* Переход к истории — все операции за прошлые месяцы. Показываем во вкладке «Готово». */}
+      {/* Переход к истории — все операции за прошлые месяцы. Показываем во вкладке «Выполнено». */}
       {tab === 'done' && (
         <PageAction
           title="Все операции за прошлые месяцы"

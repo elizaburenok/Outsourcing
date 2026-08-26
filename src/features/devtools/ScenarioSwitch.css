@@ -1,0 +1,29 @@
+/* Плавающий служебный тумблер сценариев — левый нижний угол, поверх контента.
+   Не элемент продукта: помечен нейтральным «Демо-сценарий». */
+.scn {
+  position: fixed;
+  left: var(--spacing-6x);
+  bottom: var(--spacing-6x);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2x, 8px);
+  padding: var(--spacing-4x, 16px);
+  background: var(--color-bg-default);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounding-4-5x);
+  box-shadow: var(--shadow-surface-card);
+}
+
+.scn__label {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-primitive-secondary);
+}
+
+.scn__tabs {
+  display: flex;
+  gap: var(--spacing-1x);
+}

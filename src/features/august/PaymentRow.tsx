@@ -47,7 +47,13 @@ export function paymentNote(p: AugustPayment) {
   const sfr = !p.viaEnp && p.category === 'travma' ? ' · в СФР, мимо ЕНП' : ''
   if (p.state === 'paid') return <span className="pay-note">Оплачено {p.paidLabel}</span>
   if (p.state === 'process')
-    return <span className="pay-note">Рассчитаем до {p.dueLabel}</span>
+    return (
+      <span className="pay-note">
+        {p.preliminary
+          ? `С ${p.payFromLabel} по ${p.dueLabel}. Пока платить не нужно`
+          : `Рассчитаем до ${p.dueLabel}`}
+      </span>
+    )
   if (p.state === 'overdue')
     return <span className="pay-note pay-note--overdue">Просрочено, срок вышел {p.dueLabel}</span>
   return (
@@ -86,7 +92,7 @@ export default function PaymentRow({
         )
       }
       rightAccessory={
-        isProcess ? undefined : (
+        isProcess && !payment.preliminary ? undefined : (
           <span className={`pay-amount ${payment.state === 'paid' ? 'pay-amount--done' : ''}`}>
             {formatMoney(payment.amount)}
           </span>
