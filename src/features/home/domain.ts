@@ -49,7 +49,7 @@ export const CATEGORY_ORDER: DomainCategoryId[] = ['usn', 'nds', 'employees']
 export const CATEGORIES: Record<DomainCategoryId, DomainCategoryDef> = {
   usn: {
     id: 'usn',
-    label: 'УСН',
+    label: 'Налог',
     members: ['usn'],
     emptyContent: { title: 'Всё уплачено', subtitle: 'УСН в порядке' },
   },
