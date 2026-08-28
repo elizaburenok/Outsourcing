@@ -19,6 +19,7 @@ import {
   type PayState,
 } from '@/data/august'
 import { HISTORY } from '@/data/history'
+import { formatMoney } from '@/lib/format'
 
 export type Severity = 'ok' | 'attention' | 'overdue'
 export type DomainCategoryId = 'usn' | 'nds' | 'employees'
@@ -49,7 +50,7 @@ export const CATEGORY_ORDER: DomainCategoryId[] = ['usn', 'nds', 'employees']
 export const CATEGORIES: Record<DomainCategoryId, DomainCategoryDef> = {
   usn: {
     id: 'usn',
-    label: 'Налог',
+    label: 'Налог по УСН',
     members: ['usn'],
     emptyContent: { title: 'Всё уплачено', subtitle: 'УСН в порядке' },
   },
@@ -189,9 +190,9 @@ export function computeLevels(
  * Контент карточки домена. Если открытых платежей больше одного — карточка не называет
  * конкретный, а показывает их число + ближайший срок; если ровно один — называет его
  * (для платежа в `process` — «Рассчитаем до …», в т.ч. когда это единственное, что есть
- * у регулярного домена в состоянии «всё хорошо» — так видна дата следующего платежа);
- * если платежей нет вовсе — статичный текст из справочника. Ср. `cardContent` в
- * `riskContent.ts`.
+ * у регулярного домена в состоянии «всё хорошо» — так видна дата следующего платежа; для
+ * `preliminary` — сумма предварительного расчёта вместо названия платежа); если платежей
+ * нет вовсе — статичный текст из справочника. Ср. `cardContent` в `riskContent.ts`.
  */
 export function cardContent(
   def: DomainCategoryDef,
@@ -208,10 +209,9 @@ export function cardContent(
     }
   }
   if (lead.state === 'process') {
-    return {
-      title: lead.title,
-      subtitle: lead.preliminary ? 'Пока платить не нужно' : `Рассчитаем до ${date}`,
-    }
+    return lead.preliminary
+      ? { title: formatMoney(lead.amount), subtitle: 'Предварительно, платить рано' }
+      : { title: lead.title, subtitle: `Рассчитаем до ${date}` }
   }
   return {
     title: lead.title,
