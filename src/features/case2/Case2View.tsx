@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ClipboardCheck, Receipt, Users } from 'lucide-react'
+import { ClipboardCheck, Users } from 'lucide-react'
 import { ROUTES, payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
 import { Tabs } from '@ds/components/Tabs'
@@ -30,8 +30,7 @@ type Tab = 'topay' | 'done'
  * Тот же паттерн «Блоки», что и `AugustGroupsView`, но под режим без НДС:
  *  - в виджете «К уплате» нет строки НДС; «Сотрудники» — два ближайших зарплатных платежа
  *    со сроком 28 августа (страховые взносы + НДФЛ, 28 600 ₽);
- *  - сетка карточек разделов: Отчётность («Ведёт бухгалтер»), ЕНС («Не подключён» + «Новое»),
- *    Сотрудники («1 сотрудник»);
+ *  - сетка карточек разделов: Отчётность («Ведёт бухгалтер»), Сотрудники («1 сотрудник»);
  *  - НДС скрыт и во вкладке «Выполнено».
  * Экран самодостаточный: данные берёт из `AUGUST_PAYMENTS`, показывается через демо-тумблер
  * (сценарий `case2`), не привязан к доменной модели Пульса.
@@ -147,7 +146,6 @@ export default function Case2View() {
             onClick={() => navigate(ROUTES.reports)}
           />
         </div>
-        <SectionCard icon={Receipt} title="ЕНС" note="Не подключён" tag="Новое" />
         <SectionCard icon={Users} title="Сотрудники" note="1 сотрудник" />
       </div>
 

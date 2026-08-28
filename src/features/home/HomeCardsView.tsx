@@ -19,7 +19,6 @@ import {
   type CardTone,
   type DomainCategoryId,
   type DomainHistoryGroup,
-  type Severity,
 } from './domain'
 import '@/features/august/AugustView.css'
 import './HomeCardsView.css'
@@ -31,8 +30,9 @@ type DrawerState = {
   history: DomainHistoryGroup[]
 }
 
-/** Рисковые карточки всплывают наверх: overdue → attention → ok. */
-const RANK: Record<Severity, number> = { overdue: 0, attention: 1, ok: 2 }
+/** Рисковые карточки всплывают наверх по цвету: красные → жёлтые → серые. Единая шкала
+ *  для всех карточек Главной (доменных и «Отчётности»), не только для трёх доменов. */
+const TONE_RANK: Record<CardTone, number> = { overdue: 0, attention: 1, ok: 2, neutral: 2 }
 
 /**
  * Главная на архитектуре «Пульс»: платежи собраны в стабильные доменные карточки
@@ -47,9 +47,6 @@ export default function HomeCardsView() {
   const { levels, paymentsByCat, historyByCat } = useHomeModel()
   const { scenario } = useScenario()
   const [drawer, setDrawer] = useState<DrawerState | null>(null)
-
-  // Промоушен: рисковые карточки выше; внутри группы — канонический порядок.
-  const ordered = [...CATEGORY_ORDER].sort((a, b) => RANK[levels[a]] - RANK[levels[b]])
 
   // «Отчётность» — такая же доменная карточка, но её ведёт бухгалтер. Жёлтый тон
   // (attention), когда есть незакрытые задачи клиента (подписать/подтвердить), иначе
@@ -77,32 +74,51 @@ export default function HomeCardsView() {
     })
   }
 
+  // Единый список карточек Главной — доменные (в каноническом порядке) + «Отчётность»
+  // последней — и общая сортировка по цвету: красные → жёлтые → серые. Сортировка
+  // стабильна, поэтому внутри одного цвета порядок остаётся как в исходном списке.
+  const cards: {
+    key: string
+    label: string
+    tone: CardTone
+    content: CardContent
+    coach?: string
+    onClick: () => void
+  }[] = [
+    ...CATEGORY_ORDER.map((id) => {
+      const severity = levels[id]
+      return {
+        key: id,
+        label: CATEGORIES[id].label,
+        tone: cardTone(id, severity),
+        content: cardContent(CATEGORIES[id], severity, paymentsByCat[id]),
+        onClick: () => handleCard(id),
+      }
+    }),
+    {
+      key: 'reports',
+      label: 'Отчётность',
+      tone: reportsTone,
+      content: reportsContent,
+      coach: 'tasks',
+      onClick: () => navigate(ROUTES.reports),
+    },
+  ].sort((a, b) => TONE_RANK[a.tone] - TONE_RANK[b.tone])
+
   return (
     <div className="av">
       <div data-coach="pay" className="hc__grid">
-        {ordered.map((id) => {
-          const payments = paymentsByCat[id]
-          const severity = levels[id]
-          return (
-            <CategoryCard
-              key={id}
-              label={CATEGORIES[id].label}
-              tone={cardTone(id, severity)}
-              content={cardContent(CATEGORIES[id], severity, payments)}
-              interactive
-              onClick={() => handleCard(id)}
-            />
-          )
-        })}
-
-        <CategoryCard
-          label="Отчётность"
-          tone={reportsTone}
-          content={reportsContent}
-          interactive
-          coach="tasks"
-          onClick={() => navigate(ROUTES.reports)}
-        />
+        {cards.map((card) => (
+          <CategoryCard
+            key={card.key}
+            label={card.label}
+            tone={card.tone}
+            content={card.content}
+            interactive
+            coach={card.coach}
+            onClick={card.onClick}
+          />
+        ))}
       </div>
 
       <div className="av__links">

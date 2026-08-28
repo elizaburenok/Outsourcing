@@ -36,6 +36,10 @@ export type AugustPayment = {
   preliminary?: boolean
   /** Для `preliminary`: с какой даты платёж можно уплатить (начало окна оплаты). */
   payFromLabel?: string
+  /** Срок — уже в следующем платёжном цикле (сентябрь), а не в текущем (до 28 августа).
+   *  Домен «Сотрудники» на Главной не показывает и не закрывает такие платежи вместе с
+   *  текущими — иначе «Уплатить всё» тянет за собой обязательства на три недели вперёд. */
+  nextCycle?: boolean
 }
 
 export const AUGUST_PAYMENTS: AugustPayment[] = [
@@ -146,6 +150,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
     viaEnp: true,
     state: 'due',
     dueLabel: '5 сентября',
+    nextCycle: true,
   },
   {
     id: 'travma-aug',
@@ -155,6 +160,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
     viaEnp: false,
     state: 'due',
     dueLabel: '15 сентября',
+    nextCycle: true,
   },
   {
     id: 'salary-aug-final',
@@ -164,6 +170,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
     viaEnp: true,
     state: 'due',
     dueLabel: '15 сентября',
+    nextCycle: true,
   },
   {
     id: 'vznos-aug',
@@ -173,6 +180,7 @@ export const AUGUST_PAYMENTS: AugustPayment[] = [
     viaEnp: true,
     state: 'due',
     dueLabel: '28 сентября',
+    nextCycle: true,
   },
 ]
 
