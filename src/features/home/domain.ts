@@ -82,16 +82,16 @@ type IsPaid = (id: string) => boolean
 /** Порядок сортировки платежей внутри домена: сначала самые срочные. */
 const STATE_RANK: Record<PayState, number> = { overdue: 0, due: 1, process: 2, paid: 3 }
 
-/** «Сотрудники»: показываем только первые платежи (ближайшие по сроку), не весь список —
- *  иначе в карточку и дровер попадают платежи следующего месяца (НДФЛ/взносы/зарплата
- *  за 23–31 августа и далее), хотя до них ещё три недели. Тот же лимит — в `october/groups.ts`. */
-const EMPLOYEES_LIMIT = 3
-
 /**
  * Открытые (не уплаченные) платежи домена, отсортированные по срочности
  * (overdue → due → process). Для `usn` вкладывается синтетический аванс
  * (`usn`-параметр), если он есть — `null` означает, что домен ничего не показывает
- * (напр. гипотетический сценарий без предстоящего аванса).
+ * (напр. гипотетический сценарий без предстоящего аванса). Платежи следующего платёжного
+ * цикла (`nextCycle`, см. `AugustPayment`) в домен не попадают вовсе — не как усечение
+ * произвольным числом (это резало пополам платежи с одним и тем же сроком), а как
+ * явный признак у данных: «это уже следующий месяц, а не то, что нужно платить сейчас».
+ * Всё остальное (просроченное и текущее) домен показывает и закрывает по «Уплатить всё»
+ * целиком, без остатка.
  */
 export function categoryPayments(
   id: DomainCategoryId,
@@ -101,10 +101,11 @@ export function categoryPayments(
 ): AugustPayment[] {
   const { members } = CATEGORIES[id]
   const base = id === 'usn' && usn ? [usn, ...list] : list
-  const filtered = base
-    .filter((p) => members.includes(p.category) && p.state !== 'paid' && !isPaid(p.id))
+  return base
+    .filter(
+      (p) => members.includes(p.category) && p.state !== 'paid' && !isPaid(p.id) && !p.nextCycle,
+    )
     .sort((a, b) => STATE_RANK[a.state] - STATE_RANK[b.state])
-  return id === 'employees' ? filtered.slice(0, EMPLOYEES_LIMIT) : filtered
 }
 
 /** Группа операций домена в истории — «Август» (текущий период) и прошлые месяцы. */
