@@ -5,13 +5,31 @@ import { Chip } from '@ds/components/Chip'
 import { formatMoney } from '@/lib/format'
 import { payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
-import { pluralPayments, type AugustPayment } from '@/data/august'
+import { pluralPayments, type AugustPayment, type PayCategory } from '@/data/august'
 import type { DomainHistoryGroup } from '@/features/home/domain'
 import PaymentRow from '@/features/august/PaymentRow'
 import PaymentResultModal from '@/features/payment/PaymentResultModal'
 import './GroupDrawer.css'
 
 type Tab = 'topay' | 'done'
+
+/** Короткое имя раздела для шапки дровера — вместо полного названия платежа. */
+const DOMAIN_LABEL: Record<PayCategory, string> = {
+  usn: 'Налог по УСН',
+  nds: 'НДС',
+  ndfl: 'Сотрудники',
+  travma: 'Сотрудники',
+  salary: 'Сотрудники',
+  vznos: 'Сотрудники',
+}
+
+/** Если все платежи из одного раздела — его короткое имя, иначе (смешанная группа,
+ *  напр. «N просрочено») undefined и в шапке остаётся переданный `title`. */
+function singleDomainLabel(items: AugustPayment[]): string | undefined {
+  if (items.length === 0) return undefined
+  const first = DOMAIN_LABEL[items[0].category]
+  return items.every((p) => DOMAIN_LABEL[p.category] === first) ? first : undefined
+}
 
 /**
  * Дровер раздела справа — обобщение OverdueDrawer. Открывается по клику на доменную
@@ -56,6 +74,13 @@ export default function GroupDrawer({
 
   const [tab, setTab] = useState<Tab>('topay')
 
+  // В шапке — короткое имя раздела (Налог по УСН / НДС / Сотрудники), а не полное
+  // название платежа. Для смешанных групп («N просрочено») остаётся переданный title.
+  const header = singleDomainLabel(items) ?? title
+  // Платить ещё нечего (всё в расчёте, суммы предварительные) — вместо «Осталось
+  // уплатить» подписываем, что это прикидка и время платить не пришло.
+  const notReady = items.length > 0 && payable.length === 0
+
   if (!open) return null
 
   function payAll() {
@@ -71,12 +96,14 @@ export default function GroupDrawer({
   return (
     <>
       <Drawer open={open} onClose={onClose} side="right" aria-label={title}>
-        <DrawerHeader onClose={onClose}>{title}</DrawerHeader>
+        <DrawerHeader onClose={onClose}>{header}</DrawerHeader>
 
         {items.length > 0 && (
           <div className="gd__total">
             <span className="gd__total-amount">{formatMoney(total)}</span>
-            <span className="gd__total-label">Осталось уплатить</span>
+            <span className="gd__total-label">
+              {notReady ? 'Пока рано платить. Расчёт предварительный.' : 'Осталось уплатить'}
+            </span>
           </div>
         )}
 
