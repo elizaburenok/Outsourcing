@@ -129,6 +129,8 @@ export function categoryHistory(
   id: DomainCategoryId,
   list: AugustPayment[],
   isPaid: IsPaid,
+  /** Метка текущего периода (по умолчанию «Август»; напр. Кейс 2 — «Сентябрь»). */
+  currentLabel: string = CURRENT_PERIOD_LABEL,
 ): DomainHistoryGroup[] {
   const { members } = CATEGORIES[id]
   const groups: DomainHistoryGroup[] = []
@@ -139,7 +141,7 @@ export function categoryHistory(
       p.state === 'paid' ? p : { ...p, state: 'paid', paidLabel: 'сегодня' },
     )
   if (current.length > 0) {
-    groups.push({ id: 'current', label: CURRENT_PERIOD_LABEL, payments: current })
+    groups.push({ id: 'current', label: currentLabel, payments: current })
   }
 
   for (const m of HISTORY) {
@@ -217,4 +219,43 @@ export function cardContent(
     title: lead.title,
     subtitle: severity === 'overdue' ? `Срок вышел ${date}` : `До ${date}`,
   }
+}
+
+/** Контент виджета общей суммы к уплате (макет 892-86541). */
+export interface TotalDueContent {
+  /** Сумма всех открытых платежей по всем доменам. */
+  amount: number
+  subtitle: string
+}
+
+/**
+ * Виджет общей суммы к уплате на Главной — единственное место, где сумма считается
+ * не по одному домену, а сразу по всем трём (УСН, НДС, Сотрудники). Ведущий платёж
+ * для подписи выбирается по срочности среди объединённого списка (не по порядку
+ * доменов), тем же STATE_RANK, что и внутри `categoryPayments`. Если открытых платежей
+ * нет вовсе — `null`: виджету нечего показывать, домены и так зелёные.
+ */
+export function totalDueContent(
+  paymentsByCat: Record<DomainCategoryId, AugustPayment[]>,
+): TotalDueContent | null {
+  const all = CATEGORY_ORDER.flatMap((id) => paymentsByCat[id])
+  if (all.length === 0) return null
+
+  const amount = all.reduce((sum, p) => sum + p.amount, 0)
+  const lead = [...all].sort((a, b) => STATE_RANK[a.state] - STATE_RANK[b.state])[0]
+  const date = lead.dueLabel ?? ''
+  const severity = categorySeverity(all)
+
+  let subtitle: string
+  if (severity === 'overdue') {
+    subtitle = `Срок вышел ${date} — на уплату налогов и взносов`
+  } else if (lead.state === 'process') {
+    subtitle = lead.preliminary
+      ? `Нужно примерно ${date || 'в конце месяца'} на уплату налогов и взносов`
+      : 'Рассчитаем сумму на уплату налогов и взносов'
+  } else {
+    subtitle = `Нужно до ${date} на уплату налогов и взносов`
+  }
+
+  return { amount, subtitle }
 }

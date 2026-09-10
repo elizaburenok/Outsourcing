@@ -54,7 +54,6 @@ export default function OctoberGroupsView() {
       openGroup.key === 'overdue'
         ? `${pluralPayments(openGroup.items.length)} просрочено`
         : openGroup.title,
-    totalLabel: openGroup.key === 'overdue' ? 'Уплатите как можно скорее' : 'Общая сумма',
     items: openGroup.items,
   }
 

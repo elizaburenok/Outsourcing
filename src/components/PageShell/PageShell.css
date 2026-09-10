@@ -27,6 +27,18 @@
   gap: var(--space-6x);
 }
 
+/* Правая колонка шире стандартной (360 вместо 280) — под неё, а не под пустое место,
+   рассчитан паддинг `.shell__right` (макет 892-86541: колонка 360px, отступы 20px). */
+.shell--wide-right {
+  grid-template-columns: 280px minmax(0, 1fr) 360px;
+}
+
+.shell__right {
+  grid-column: 3;
+  /* 105px сверху — как в макете 892-86541 (там это отступ до виджета в правой колонке). */
+  padding: 105px 20px 0;
+}
+
 @media (max-width: 900px) {
   .shell {
     grid-template-columns: 1fr;
@@ -37,5 +49,10 @@
   .shell__main {
     grid-column: 1;
     padding-right: 0;
+  }
+
+  .shell__right {
+    grid-column: 1;
+    padding: 0 20px;
   }
 }

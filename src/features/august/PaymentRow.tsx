@@ -46,17 +46,19 @@ export function PayIconPending({ category }: { category: PayCategory }) {
 export function paymentNote(p: AugustPayment) {
   const sfr = !p.viaEnp && p.category === 'travma' ? ' · в СФР, мимо ЕНП' : ''
   if (p.state === 'paid') return <span className="pay-note">Оплачено {p.paidLabel}</span>
-  if (p.state === 'process')
-    return (
-      <span className="pay-note">
-        {p.preliminary ? `С ${p.payFromLabel} по ${p.dueLabel}` : `Рассчитаем до ${p.dueLabel}`}
-      </span>
-    )
+  if (p.state === 'process') {
+    // preliminary — окно «С … по …»; «пока рано» с известной датой окна — «С …»;
+    // иначе сумма ещё считается — «Рассчитаем до …».
+    let note = `Рассчитаем до ${p.dueLabel}`
+    if (p.preliminary) note = `С ${p.payFromLabel} по ${p.dueLabel}`
+    else if (p.payFromLabel) note = `С ${p.payFromLabel}`
+    return <span className="pay-note">{note}</span>
+  }
   if (p.state === 'overdue')
     return <span className="pay-note pay-note--overdue">Просрочено, срок вышел {p.dueLabel}</span>
   return (
     <span className="pay-note">
-      до {p.dueLabel}
+      До {p.dueLabel}
       {sfr}
     </span>
   )
@@ -67,30 +69,37 @@ export default function PaymentRow({
   payment,
   onClick,
   edgePadding = 'on',
+  verticalSpacing = 'compact',
 }: {
   payment: AugustPayment
   /** Если задан — строка кликабельна (ведёт на страницу уплаты). */
   onClick?: () => void
   /** "off" — без бокового отступа Cell (для дроверов, где отступ задаёт сам список). */
   edgePadding?: 'on' | 'off'
+  /** Вертикальный паддинг Cell — "none" убирает его совсем (для плотных списков). */
+  verticalSpacing?: 'default' | 'compact' | 'none'
 }) {
   const isProcess = payment.state === 'process'
+  // «Пока рано» с известной суммой (`payFromLabel`) — показываем сумму и чистую иконку,
+  // как предварительный расчёт; часы-бейдж только когда суммы ещё нет.
+  const isEarly = isProcess && !payment.preliminary && !!payment.payFromLabel
+  const pending = isProcess && !payment.preliminary && !isEarly
   const cell = (
     <Cell
       textScale="M"
-      verticalSpacing="compact"
+      verticalSpacing={verticalSpacing}
       edgePadding={edgePadding}
       title={<span className="pay-title">{payment.title}</span>}
       description={paymentNote(payment)}
       leftAccessory={
-        isProcess && !payment.preliminary ? (
+        pending ? (
           <PayIconPending category={payment.category} />
         ) : (
           <PayIcon category={payment.category} />
         )
       }
       rightAccessory={
-        isProcess && !payment.preliminary ? undefined : (
+        pending ? undefined : (
           <span className={`pay-amount ${payment.state === 'paid' ? 'pay-amount--done' : ''}`}>
             {formatMoney(payment.amount)}
           </span>

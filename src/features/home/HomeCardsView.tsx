@@ -147,7 +147,6 @@ export default function HomeCardsView() {
           open
           onClose={() => setDrawer(null)}
           title={drawer.title}
-          totalLabel="Общая сумма"
           items={drawer.items}
           history={drawer.history}
         />
