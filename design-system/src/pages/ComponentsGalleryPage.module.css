@@ -1,0 +1,90 @@
+.page {
+  min-height: 100vh;
+  box-sizing: border-box;
+  background: var(--color-page-secondary);
+  color: var(--color-primitive-primary);
+  font-family: var(--font-family-primary);
+  padding: var(--spacing-m);
+  padding-bottom: var(--spacing-2xl);
+}
+
+.header {
+  margin-bottom: var(--spacing-xl);
+}
+
+.title {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  margin: 0 0 var(--spacing-1x);
+}
+
+.lead {
+  margin: 0;
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-12x);
+}
+
+.section {
+  background: var(--color-bg-default);
+  border-radius: var(--rounding-1x);
+  box-shadow: var(--shadow-surface-card);
+  padding: var(--spacing-m);
+}
+
+.sectionTitle {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  margin: 0 0 var(--spacing-m);
+}
+
+.demoColumn {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-m);
+  max-width: 420px;
+}
+
+.navHost {
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounding-1x);
+  overflow: hidden;
+}
+
+.drawerShell {
+  max-width: 400px;
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--rounding-2-5x);
+  overflow: hidden;
+  background: var(--color-popup-primary);
+}
+
+.drawerBody {
+  padding: var(--spacing-m);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.dropdownRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xl);
+  align-items: flex-start;
+}
+
+.dropdownFrame {
+  flex: 0 0 auto;
+}
+
+.calendarHost {
+  display: inline-block;
+}

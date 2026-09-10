@@ -1,0 +1,204 @@
+.root {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.paddingOn {
+  padding-left: var(--space-5x);
+  padding-right: var(--space-5x);
+}
+
+.paddingOff {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.padDefault {
+  padding-top: var(--space-3-5x);
+  padding-bottom: var(--space-3-5x);
+}
+
+.padCompact {
+  padding-top: var(--space-2-5x);
+  padding-bottom: var(--space-2-5x);
+}
+
+.padNone {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.leftSlot {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.leftSlotGutterWide {
+  padding-right: var(--space-5x);
+}
+
+.leftSlotGutterDefault {
+  padding-right: var(--space-4x);
+}
+
+.leftSlotGutterTight {
+  padding-right: var(--space-3x);
+}
+
+.leftSlotGutterOff {
+  padding-right: 0;
+}
+
+.main {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-0-5x);
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.rightSlot {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  flex-shrink: 0;
+}
+
+.rightSlotGutterOn {
+  padding-left: var(--space-3-5x);
+}
+
+.rightSlotGutterOff {
+  padding-left: 0;
+}
+
+.rightSlotAlignMulti {
+  padding-top: var(--space-2-5x);
+}
+
+.title {
+  font-family: var(--font-ui);
+  color: var(--t-primitive-primary);
+  margin: 0;
+  width: 100%;
+}
+
+.title5xl {
+  composes: title;
+  font-size: var(--text-cell-title-5xl-size);
+  line-height: var(--text-cell-title-5xl-line);
+  font-weight: var(--text-cell-title-5xl-weight);
+  letter-spacing: var(--text-cell-title-5xl-tracking);
+}
+
+.title4xl {
+  composes: title;
+  font-size: var(--text-cell-title-4xl-size);
+  line-height: var(--text-cell-title-4xl-line);
+  font-weight: var(--text-cell-title-4xl-weight);
+  letter-spacing: var(--text-cell-title-4xl-tracking);
+}
+
+.title3xl {
+  composes: title;
+  font-size: var(--text-cell-title-3xl-size);
+  line-height: var(--text-cell-title-3xl-line);
+  font-weight: var(--text-cell-title-3xl-weight);
+  letter-spacing: var(--text-cell-title-3xl-tracking);
+}
+
+.title2xl {
+  composes: title;
+  font-size: var(--text-cell-title-2xl-size);
+  line-height: var(--text-cell-title-2xl-line);
+  font-weight: var(--text-cell-title-2xl-weight);
+  letter-spacing: var(--text-cell-title-2xl-tracking);
+}
+
+.titleXl {
+  composes: title;
+  font-size: var(--text-cell-title-xl-size);
+  line-height: var(--text-cell-title-xl-line);
+  font-weight: var(--text-cell-title-xl-weight);
+  letter-spacing: var(--text-cell-title-xl-tracking);
+}
+
+.titleL {
+  composes: title;
+  font-size: var(--text-cell-title-l-size);
+  line-height: var(--text-cell-title-l-line);
+  font-weight: var(--text-cell-title-l-weight);
+  letter-spacing: var(--text-cell-title-l-tracking);
+}
+
+.titleM {
+  composes: title;
+  font-size: var(--text-cell-title-m-size);
+  line-height: var(--text-cell-title-m-line);
+  font-weight: var(--text-cell-title-m-weight);
+  letter-spacing: var(--text-cell-title-m-tracking);
+}
+
+.titleS {
+  composes: title;
+  font-size: var(--text-cell-title-s-size);
+  line-height: var(--text-cell-title-s-line);
+  font-weight: var(--text-cell-title-s-weight);
+  letter-spacing: var(--text-cell-title-s-tracking);
+}
+
+.titleXs {
+  composes: title;
+  font-size: var(--text-cell-title-xs-size);
+  line-height: var(--text-cell-title-xs-line);
+  font-weight: var(--text-cell-title-xs-weight);
+  letter-spacing: var(--text-cell-title-xs-tracking);
+}
+
+.meta {
+  font-family: var(--font-ui);
+  font-size: var(--text-body-s-size);
+  line-height: var(--text-body-s-line);
+  font-weight: var(--text-body-s-weight);
+  letter-spacing: var(--text-body-s-tracking);
+  color: var(--t-primitive-secondary);
+  margin: 0;
+  width: 100%;
+}
+
+.bullet {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: var(--space-1-25x);
+  width: 100%;
+}
+
+.bulletMark {
+  flex-shrink: 0;
+  width: var(--space-6-5x);
+  font-family: var(--font-ui);
+  color: var(--t-primitive-primary);
+  margin: 0;
+}
+
+.bulletBody {
+  flex: 1 1 0;
+  min-width: 0;
+}

@@ -1,0 +1,100 @@
+.root {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.avatar {
+  width: var(--space-18x);
+  height: var(--space-18x);
+  border-radius: 50%;
+  background: var(--t-bg-neutral-1);
+  position: relative;
+  overflow: hidden;
+}
+
+.avatarLogo {
+  position: absolute;
+  inset: 41.67% 16.67%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-ui);
+  font-size: var(--text-body-s-size);
+  line-height: 1;
+  font-weight: var(--text-counter-weight);
+  color: var(--t-primitive-secondary);
+}
+
+.iconCircle {
+  border-radius: 50%;
+  border: var(--stroke-2) solid var(--t-primitive-primary);
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+
+.icon30 {
+  composes: iconCircle;
+  width: var(--space-7-5x);
+  height: var(--space-7-5x);
+}
+
+.icon24 {
+  composes: iconCircle;
+  width: var(--space-6x);
+  height: var(--space-6x);
+}
+
+.icon18 {
+  composes: iconCircle;
+  width: var(--space-4-5x);
+  height: var(--space-4-5x);
+}
+
+.cardPreview {
+  width: var(--space-15x);
+  height: var(--space-9-5x);
+  border-radius: var(--radius-2-5x);
+  background: var(--t-bg-neutral-2);
+  flex-shrink: 0;
+}
+
+.avatarCheckbox {
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: 50%;
+  background: var(--t-bg-neutral-1);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.checkboxInner {
+  width: var(--space-6x);
+  height: var(--space-6x);
+  border-radius: 50%;
+  border: var(--stroke-2) solid var(--t-primitive-brand);
+  box-sizing: border-box;
+}
+
+.addButton {
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: var(--radius-2-5x);
+  background: var(--t-container-transparent-1);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  color: var(--t-primitive-primary);
+}
+
+.addIcon {
+  width: var(--space-6x);
+  height: var(--space-6x);
+  flex-shrink: 0;
+}

@@ -1,0 +1,129 @@
+.root {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: var(--color-container-default);
+  border-bottom: 1px solid var(--color-primitive-neutral-1);
+  font-family: var(--font-ui);
+}
+
+.inner {
+  display: flex;
+  align-items: center;
+  height: 74px;
+}
+
+.logoZone {
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-5x);
+  flex-shrink: 0;
+}
+
+.logo {
+  display: block;
+  width: 73px;
+  height: 34px;
+  object-fit: contain;
+}
+
+.navZone {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  padding: 0 var(--space-5x);
+  flex: 1;
+}
+
+.tab {
+  display: inline-flex;
+  align-items: center;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-primitive-primary);
+  font-family: inherit;
+  font-size: var(--text-m-size);
+  line-height: var(--text-m-line);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--text-m-tracking);
+  padding: var(--space-2-5x) var(--space-4x);
+  border-radius: var(--radius-2-5x);
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: var(--color-bg-neutral-1);
+}
+
+.rightZone {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--space-5x);
+  padding: 0 var(--space-5x);
+  flex-shrink: 0;
+}
+
+.user {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2x);
+  padding: var(--space-1x) var(--space-2x) var(--space-1x) var(--space-1x);
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-10x);
+  color: var(--color-primitive-primary);
+  cursor: pointer;
+}
+
+.user:hover {
+  background: var(--color-bg-neutral-1);
+}
+
+.avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--color-bg-brand-4);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  font-weight: var(--font-weight-demi-bold);
+}
+
+.userName {
+  font-size: var(--text-m-size);
+  line-height: var(--text-m-line);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--text-m-tracking);
+}
+
+.chevron {
+  flex-shrink: 0;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+}
+
+.notifyWrap {
+  position: relative;
+  display: inline-flex;
+}
+
+.notifyDot {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-primitive-error);
+  pointer-events: none;
+}

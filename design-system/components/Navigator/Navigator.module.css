@@ -1,0 +1,184 @@
+.root {
+  display: flex;
+  flex-direction: column;
+  width: 335px;
+  max-width: 100%;
+  background: var(--t-container-default);
+  border-radius: var(--radius-4x);
+  box-shadow: var(--shadow-card);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: var(--space-5x) var(--space-5x) 0;
+  border-radius: var(--radius-4x) var(--radius-4x) 0 0;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5x);
+  min-width: 0;
+}
+
+.title {
+  margin: 0;
+  font-size: var(--text-xl-size);
+  line-height: var(--text-xl-line);
+  font-weight: var(--text-xl-weight);
+  color: var(--t-primitive-primary);
+  white-space: nowrap;
+}
+
+.chevron {
+  display: inline-flex;
+  align-items: center;
+  padding-top: var(--space-0-5x);
+  flex-shrink: 0;
+}
+
+.chevronSvg {
+  width: 18px;
+  height: 18px;
+  color: var(--t-primitive-primary);
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4x);
+  padding: var(--space-5x);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: var(--space-5x);
+}
+
+.rowTightGap {
+  gap: var(--space-5x);
+}
+
+.leftPad {
+  padding-right: var(--space-3x);
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--t-bg-neutral-1);
+  flex-shrink: 0;
+}
+
+.textCol {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.textM {
+  margin: 0;
+  font-size: var(--text-m-size);
+  line-height: var(--text-m-line);
+  font-weight: var(--text-m-weight);
+  letter-spacing: var(--text-m-tracking);
+  color: var(--t-primitive-primary);
+}
+
+.textS {
+  margin: 0;
+  font-size: var(--text-body-s-size);
+  line-height: var(--text-body-s-line);
+  font-weight: var(--text-body-s-weight);
+  letter-spacing: var(--text-s-tracking);
+  color: var(--t-primitive-secondary);
+}
+
+.rightPad {
+  padding-left: var(--space-3-5x);
+}
+
+.radio {
+  width: var(--space-6x);
+  height: var(--space-6x);
+  border-radius: 50%;
+  border: 2px solid var(--t-primitive-neutral-4);
+  flex-shrink: 0;
+}
+
+.skeletonCircle {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--t-bg-neutral-3);
+  flex-shrink: 0;
+}
+
+.skeletonBar {
+  flex: 1 1 auto;
+  min-height: 20px;
+  border-radius: var(--radius-4-5x);
+  padding: 4px 0 2px;
+}
+
+.skeletonFill {
+  height: 100%;
+  min-height: 8px;
+  border-radius: var(--radius-10x);
+  background: var(--t-container-transparent-2);
+  opacity: 0.5;
+}
+
+.footer {
+  padding: 0 var(--space-5x) var(--space-5x);
+}
+
+.footerBtn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  min-height: 38px;
+  padding: var(--space-2-5x) var(--space-3-5x);
+  border-radius: var(--radius-2-5x);
+  background: var(--t-container-transparent-1);
+  border: none;
+  cursor: default;
+  font-family: var(--font-ui);
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  font-weight: var(--text-s-weight);
+  letter-spacing: var(--text-s-tracking);
+  color: var(--t-primitive-primary);
+}
+
+.root.general {
+  flex-direction: row;
+  align-items: center;
+  padding: var(--space-8x) var(--space-5x);
+  gap: var(--space-5x);
+}
+
+.generalText {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5x);
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.generalTitleRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-1-5x);
+}
