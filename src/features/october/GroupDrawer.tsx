@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
-import { Tabs } from '@ds/components/Tabs'
+import { Chip } from '@ds/components/Chip'
 import { formatMoney } from '@/lib/format'
 import { payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
@@ -23,7 +23,6 @@ type Tab = 'topay' | 'done'
 export default function GroupDrawer({
   open,
   title,
-  totalLabel = 'Общая сумма',
   payAllLabel = 'Уплатить всё',
   items,
   history = [],
@@ -31,7 +30,6 @@ export default function GroupDrawer({
 }: {
   open: boolean
   title: string
-  totalLabel?: string
   payAllLabel?: string
   items: AugustPayment[]
   /** Оплаченные операции домена по месяцам — под табом «Выполнено» (пусто → таб пустой). */
@@ -44,15 +42,17 @@ export default function GroupDrawer({
 
   // Платёж в состоянии `process` (напр. аванс УСН, пока квартал не закрыт) показываем
   // строкой-справкой, но платить его нельзя: из «Уплатить всё» исключаем. Предварительный
-  // расчёт (`preliminary`) при этом попадает в общую сумму сверху — цифра уже есть, просто
-  // платить рано; обычный `process` без суммы в total не идёт.
+  // расчёт (`preliminary`) и «пока рано» с известной суммой (`payFromLabel`) попадают в
+  // общую сумму сверху — цифра уже есть, просто платить рано; обычный `process` без суммы
+  // в total не идёт.
+  const hasEstimate = (p: AugustPayment) =>
+    p.state !== 'process' || p.preliminary || !!p.payFromLabel
   const payable = items.filter((p) => p.state !== 'process')
-  const total = items
-    .filter((p) => p.state !== 'process' || p.preliminary)
-    .reduce((sum, p) => sum + p.amount, 0)
-  // Сумма ещё не окончательная (напр. аванс УСН до закрытия квартала) — подписываем это,
-  // а не выдаём её за твёрдый «Общая сумма».
-  const hasPreliminary = items.some((p) => p.preliminary)
+  const total = items.filter(hasEstimate).reduce((sum, p) => sum + p.amount, 0)
+  // Сумма реально оплаченного по «Уплатить всё» — только `payable` (без «пока рано»/
+  // «в расчёте»), иначе модалка результата завышает сумму, когда в группе есть смесь
+  // просроченного и ещё не готового (напр. УСН/НДС с просрочкой, макет 894-96775).
+  const payableTotal = payable.reduce((sum, p) => sum + p.amount, 0)
 
   const [tab, setTab] = useState<Tab>('topay')
 
@@ -73,45 +73,46 @@ export default function GroupDrawer({
       <Drawer open={open} onClose={onClose} side="right" aria-label={title}>
         <DrawerHeader onClose={onClose}>{title}</DrawerHeader>
 
-        {/* Табы вынесены из .gd__body: закреплены под заголовком и не входят в скролл
-            списка. Внутри скроллируемого flex-контейнера DS-`Tabs` (overflow-x:auto)
-            схлопывался в 0 по высоте, когда список длинный (Сотрудники). */}
-        <Tabs
-          className="gd__tabs"
-          value={tab}
-          onChange={(id) => setTab(id as Tab)}
-          items={[
-            { id: 'topay', label: 'К уплате' },
-            { id: 'done', label: 'Выполнено' },
-          ]}
-        />
+        {items.length > 0 && (
+          <div className="gd__total">
+            <span className="gd__total-amount">{formatMoney(total)}</span>
+            <span className="gd__total-label">Осталось уплатить</span>
+          </div>
+        )}
+
+        {/* Табы «К уплате / Выполнено» — сегменты (DS Chip Tab), закреплены под общей суммой
+            вне скролла списка (см. макет 848-31345). */}
+        <div className="gd__tabs" role="tablist">
+          <Chip chipType="Tab" isSelected={tab === 'topay'} onClick={() => setTab('topay')}>
+            К уплате
+          </Chip>
+          <Chip chipType="Tab" isSelected={tab === 'done'} onClick={() => setTab('done')}>
+            Выполнено
+          </Chip>
+        </div>
 
         <div className="gd__body">
           {tab === 'topay' ? (
             items.length > 0 ? (
-              <>
-                <div className="gd__total">
-                  <span className="gd__total-amount">{formatMoney(total)}</span>
-                  <span className="gd__total-label">
-                    {hasPreliminary ? 'Предварительный расчёт' : totalLabel}
-                  </span>
-                </div>
-
-                <div className="gd__list">
-                  {items.map((p) => (
-                    <div key={p.id} className="gd__row">
-                      <PaymentRow
-                        payment={p}
-                        edgePadding="off"
-                        onClick={() => {
-                          onClose()
-                          navigate(payTo(p.id))
-                        }}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </>
+              <div className="gd__list">
+                {items.map((p) => (
+                  <div key={p.id} className="gd__row">
+                    <PaymentRow
+                      payment={p}
+                      edgePadding="off"
+                      verticalSpacing="none"
+                      onClick={
+                        p.state === 'process'
+                          ? undefined
+                          : () => {
+                              onClose()
+                              navigate(payTo(p.id))
+                            }
+                      }
+                    />
+                  </div>
+                ))}
+              </div>
             ) : (
               <p className="gd__empty">Всё уплачено — открытых платежей нет.</p>
             )
@@ -123,7 +124,7 @@ export default function GroupDrawer({
                   <div className="gd__list">
                     {group.payments.map((p) => (
                       <div key={p.id} className="gd__row">
-                        <PaymentRow payment={p} edgePadding="off" />
+                        <PaymentRow payment={p} edgePadding="off" verticalSpacing="none" />
                       </div>
                     ))}
                   </div>
@@ -143,7 +144,7 @@ export default function GroupDrawer({
       {showResult && (
         <PaymentResultModal title="Платежи отправлены" onDone={finishResult}>
           <p>
-            Отправили {pluralPayments(payable.length)} на {formatMoney(total)}.
+            Отправили {pluralPayments(payable.length)} на {formatMoney(payableTotal)}.
           </p>
           <p>Информация по платежам появится в ленте событий в течение 5 минут.</p>
         </PaymentResultModal>

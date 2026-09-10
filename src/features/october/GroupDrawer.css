@@ -5,13 +5,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4x);
-  padding: var(--space-4x) var(--space-5x) var(--space-6x);
+  padding: 0 var(--space-5x) var(--space-6x);
 }
 
 .gd__total {
+  flex-shrink: 0;
   display: flex;
   flex-direction: column;
   gap: var(--space-0-5x);
+  padding: var(--space-4x) var(--space-5x) 0;
 }
 
 .gd__total-amount {
@@ -28,16 +30,20 @@
 }
 
 .gd__tabs {
-  /* Табы «К уплате / Готово» — закреплены под заголовком, вне скролла списка.
-     flex-shrink:0 обязателен: DS-`Tabs` внутри flex-колонки имеет overflow-x:auto,
-     из-за чего его авто-min-height становится 0 и он схлопывается при длинном списке. */
+  /* Табы «К уплате / Выполнено» — сегменты (DS Chip Tab), закреплены под заголовком,
+     вне скролла списка. flex-shrink:0 — чтобы не схлопывались при длинном списке. */
   flex-shrink: 0;
-  padding: var(--space-2x) var(--space-5x) var(--space-3x);
+  display: flex;
+  gap: var(--space-2x);
+  padding: var(--space-8x) var(--space-5x) var(--space-6x);
 }
 
 .gd__list {
   display: flex;
   flex-direction: column;
+  /* Cell в списке — verticalSpacing="none" (без внешнего отступа), поэтому зазор между
+     строками задаёт сам список, а не паддинг ячейки. */
+  gap: var(--space-5x);
 }
 
 .gd__empty {

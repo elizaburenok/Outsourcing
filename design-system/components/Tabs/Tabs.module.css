@@ -1,0 +1,32 @@
+.root {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4x);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.root::-webkit-scrollbar {
+  display: none;
+}
+
+.tab {
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-ui);
+  font-size: var(--text-cell-title-l-size);
+  line-height: var(--text-cell-title-l-line);
+  font-weight: var(--text-cell-title-l-weight);
+  letter-spacing: var(--text-cell-title-l-tracking);
+  color: var(--t-primitive-neutral-3);
+  white-space: nowrap;
+  transition: color 0.15s ease;
+}
+
+.tab.selected {
+  color: var(--t-primitive-primary);
+}

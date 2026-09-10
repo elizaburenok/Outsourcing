@@ -1,0 +1,92 @@
+.root {
+  display: flex;
+  gap: var(--space-3x);
+  padding: var(--space-4x) var(--space-5x);
+  border-radius: var(--radius-3x);
+  background: var(--t-container-transparent-1);
+}
+
+.brand {
+  border: 1px solid var(--t-border-default);
+  background: transparent;
+}
+
+.success {
+  background: var(--t-bg-success);
+}
+
+.neutral {
+  background: var(--t-container-transparent-1);
+}
+
+/* Без фоновой заливки — например, внутри дровера */
+.plain {
+  background: transparent;
+  border: none;
+}
+
+.icon {
+  display: inline-flex;
+  flex: none;
+  margin-top: 1px;
+}
+
+.iconBrand {
+  color: var(--t-primitive-brand);
+}
+
+.iconSuccess {
+  color: var(--t-primitive-success);
+}
+
+.iconNeutral {
+  color: var(--t-primitive-secondary);
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5x);
+  min-width: 0;
+}
+
+.title {
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  font-weight: var(--font-weight-medium);
+  color: var(--t-primitive-primary);
+}
+
+.text {
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  color: var(--t-primitive-secondary);
+}
+
+.action {
+  align-self: flex-start;
+  margin-top: var(--space-0-5x);
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: var(--text-s-size);
+  line-height: var(--text-s-line);
+  font-weight: var(--font-weight-medium);
+  color: var(--t-primitive-brand);
+}
+
+.action:hover {
+  opacity: 0.85;
+}
+
+/* Однострочный компактный вариант («Входит в ваш тариф бухгалтерии») */
+.compact {
+  align-items: center;
+  gap: var(--space-2-5x);
+  padding: var(--space-3x) var(--space-4x);
+}
+
+.compact .title {
+  font-weight: var(--font-weight-regular);
+  color: var(--t-primitive-primary);
+}

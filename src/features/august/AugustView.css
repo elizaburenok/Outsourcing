@@ -62,6 +62,34 @@
   color: var(--color-primitive-secondary);
 }
 
+/* ---------- Кнопка «Создать задачу» (Кейс 2) ---------- */
+/* DS HeaderButton (Secondary) — пилюля высотой 40, сама ужимается по контенту. */
+.av__create {
+  display: flex;
+  margin-bottom: var(--space-4x);
+}
+
+/* ---------- Заголовок блока «Платежи» + сегменты (Кейс 2) ---------- */
+.av__pay-head {
+  padding: var(--space-4x) var(--space-5x) var(--space-2x);
+}
+
+.av__pay-title {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+/* ---------- Блок «Задачи» (Кейс 2) ---------- */
+.av__tasks {
+  margin-bottom: var(--space-8x);
+}
+
+.av__tasks .pay-row-btn {
+  padding-block: var(--space-1x);
+}
+
 /* ---------- Вкладки ---------- */
 /* Раскладку и типографику задаёт компонент Tabs (@ds/components/Tabs);
    здесь только отступы, т.к. вкладки теперь лежат внутри карточки списка (см. макет). */
