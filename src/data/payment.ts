@@ -11,6 +11,7 @@
 import { AUGUST_PAYMENTS, USN_ADVANCE, type AugustPayment, type PayCategory } from './august'
 import { OCTOBER_PAYMENTS } from './october'
 import { CASE2_PAYABLES } from './case2'
+import { CASE3_PAYABLES } from './case3'
 
 /** Счёт списания (номинальный, для показа). */
 export const PAYMENT_ACCOUNT = '2 480 310,55 ₽ — Расчётный, ···7742'
@@ -83,7 +84,8 @@ export function getPayableById(id: string): Payable | undefined {
   const p =
     AUGUST_PAYMENTS.find((x) => x.id === id) ??
     OCTOBER_PAYMENTS.find((x) => x.id === id) ??
-    CASE2_PAYABLES.find((x) => x.id === id)
+    CASE2_PAYABLES.find((x) => x.id === id) ??
+    CASE3_PAYABLES.find((x) => x.id === id)
   if (!p) return undefined
   // НДС: заголовок — полное название платежа («N-й платёж за …квартал»), без подзаголовка.
   if (p.category === 'nds') return toPayable(p, '', p.title)

@@ -5,3 +5,11 @@
 .av__create.case2__create {
   margin-bottom: var(--space-8x);
 }
+
+/* Иконки-категории в строках блока «Платежи» — 32×32 (в дровере раздела остаются 40×40).
+   Скоуп `[data-coach='pay']` — только карточка «Платежи», чтобы не задеть другие списки. */
+[data-coach='pay'] .pay-logo,
+[data-coach='pay'] .pay-icon {
+  width: var(--space-8x);
+  height: var(--space-8x);
+}

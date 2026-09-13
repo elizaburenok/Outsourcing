@@ -1,0 +1,34 @@
+/* Раздел «Бухучёт» — список выполненных платежей по периодам. Строки — общий
+   `PaymentRow`; здесь только отступы секций и списка. */
+
+.acc {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8x);
+}
+
+.acc__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4x);
+}
+
+/* Подпись периода (месяц) — приглушённый цвет, как в истории операций. */
+.acc__group-label {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-secondary);
+}
+
+.acc__list {
+  display: flex;
+  flex-direction: column;
+  /* Строки — Cell verticalSpacing="none", зазор между ними задаёт список. */
+  gap: var(--space-5x);
+}
+
+.acc__empty {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}

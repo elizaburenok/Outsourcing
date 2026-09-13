@@ -1,0 +1,6 @@
+<svg width="116" height="116" viewBox="0 0 116 116" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <path d="M58 0C97.556 0 116 18.444 116 58C116 97.556 97.556 116 58 116C18.444 116 0 97.556 0 58C0 18.444 18.444 0 58 0Z" fill="#B79FE9"/>
+  <rect x="22" y="33" width="72" height="50" rx="11" fill="#FFFFFF"/>
+  <text x="58" y="61" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="24" font-weight="700" letter-spacing="-1" fill="#B79FE9">НДС</text>
+  <rect x="34" y="70" width="48" height="6" rx="3" fill="#B79FE9"/>
+</svg>

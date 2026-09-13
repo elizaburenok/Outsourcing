@@ -5,6 +5,8 @@ import TotalDueWidget from '@/features/home/TotalDueWidget'
 import Case2View from '@/features/case2/Case2View'
 import { useCase2TotalDue } from '@/features/case2/useCase2TotalDue'
 import { useScenario } from '@/state/ScenarioProvider'
+import { CASE2 } from '@/data/case2'
+import { CASE3 } from '@/data/case3'
 
 /**
  * Раздел «Онлайн-бухгалтерия». По умолчанию (сценарии «Есть просрочка» / «Всё хорошо») —
@@ -20,8 +22,10 @@ import { useScenario } from '@/state/ScenarioProvider'
  */
 export default function HomePage() {
   const { scenario } = useScenario()
-  const isCase2 = scenario === 'case2'
-  const case2TotalDue = useCase2TotalDue()
+  // Кейс 2 (октябрь) и Кейс 3 (декабрь) — один и тот же экран-макет с разными наборами.
+  const isOb = scenario === 'case2' || scenario === 'case3'
+  const caseData = scenario === 'case3' ? CASE3 : CASE2
+  const totalDue = useCase2TotalDue(caseData)
 
   return (
     <PageShell
@@ -30,12 +34,12 @@ export default function HomePage() {
           hasBackButton
           hasTextBlock
           title="Онлайн-бухгалтерия"
-          subtitle={isCase2 ? 'УСН «Доходы» — 6%' : 'УСН «Доходы» + НДС 5%'}
+          subtitle={isOb ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'УСН «Доходы» + НДС 5%'}
         />
       }
-      rightRail={isCase2 && case2TotalDue ? <TotalDueWidget content={case2TotalDue} /> : undefined}
+      rightRail={isOb && totalDue ? <TotalDueWidget content={totalDue} /> : undefined}
     >
-      {isCase2 ? <Case2View /> : <HomeCardsView />}
+      {isOb ? <Case2View data={caseData} /> : <HomeCardsView />}
     </PageShell>
   )
 }

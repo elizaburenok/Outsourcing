@@ -1,17 +1,13 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
-import { Chip } from '@ds/components/Chip'
 import { formatMoney } from '@/lib/format'
 import { payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
 import { pluralPayments, type AugustPayment, type PayCategory } from '@/data/august'
-import type { DomainHistoryGroup } from '@/features/home/domain'
 import PaymentRow from '@/features/august/PaymentRow'
 import PaymentResultModal from '@/features/payment/PaymentResultModal'
 import './GroupDrawer.css'
-
-type Tab = 'topay' | 'done'
 
 /** Короткое имя раздела для шапки дровера — вместо полного названия платежа. */
 const DOMAIN_LABEL: Record<PayCategory, string> = {
@@ -33,46 +29,43 @@ function singleDomainLabel(items: AugustPayment[]): string | undefined {
 
 /**
  * Дровер раздела справа — обобщение OverdueDrawer. Открывается по клику на доменную
- * карточку (УСН, НДС, Сотрудники) и всегда содержит два таба: «К уплате» — открытые
- * платежи домена (сумма под заголовком, кликабельные строки ведут на уплату, в футере
- * «Уплатить всё»), и «Выполнено» — история операций домена по месяцам. Собран на DS
- * `Drawer`/`Tabs`/`DrawerFooter`.
+ * карточку (Налоги и взносы, НДС, Сотрудники): открытые платежи домена (сумма под
+ * заголовком, кликабельные строки ведут на уплату, в футере «Уплатить всё»). Выполненные
+ * платежи здесь не показываем — они живут в разделе «Бухучёт». Собран на DS
+ * `Drawer`/`DrawerFooter`.
+ *
+ * Платежи, которые ещё нельзя уплатить (`process` — «в расчёте» или «по графику»),
+ * показываются отдельной секцией «Не входит в расчёты» под списком к уплате (макет
+ * 949-17180). Сумма раздела и «Уплатить всё» считаются только по тому, что реально можно
+ * платить сейчас.
  */
 export default function GroupDrawer({
   open,
   title,
   payAllLabel = 'Уплатить всё',
   items,
-  history = [],
   onClose,
 }: {
   open: boolean
   title: string
   payAllLabel?: string
   items: AugustPayment[]
-  /** Оплаченные операции домена по месяцам — под табом «Выполнено» (пусто → таб пустой). */
-  history?: DomainHistoryGroup[]
   onClose: () => void
 }) {
   const navigate = useNavigate()
   const { markPaid } = usePayments()
   const [showResult, setShowResult] = useState(false)
 
-  // Платёж в состоянии `process` (напр. аванс УСН, пока квартал не закрыт) показываем
-  // строкой-справкой, но платить его нельзя: из «Уплатить всё» исключаем. Предварительный
-  // расчёт (`preliminary`) и «пока рано» с известной суммой (`payFromLabel`) попадают в
-  // общую сумму сверху — цифра уже есть, просто платить рано; обычный `process` без суммы
-  // в total не идёт.
+  // `hasEstimate` — есть ли у платежа известная сумма (предварительная либо твёрдая).
   const hasEstimate = (p: AugustPayment) =>
     p.state !== 'process' || p.preliminary || !!p.payFromLabel
+  // Что можно платить сейчас, а что ещё нет («в расчёте» / «по графику»).
   const payable = items.filter((p) => p.state !== 'process')
-  const total = items.filter(hasEstimate).reduce((sum, p) => sum + p.amount, 0)
-  // Сумма реально оплаченного по «Уплатить всё» — только `payable` (без «пока рано»/
-  // «в расчёте»), иначе модалка результата завышает сумму, когда в группе есть смесь
-  // просроченного и ещё не готового (напр. УСН/НДС с просрочкой, макет 894-96775).
+  const upcoming = items.filter((p) => p.state === 'process')
+  // Разделение на «сейчас / позже» показываем только когда в группе есть и то и другое.
+  // Если что-то одно — список рисуем как раньше, чтобы не менять остальные экраны.
+  const isMixed = payable.length > 0 && upcoming.length > 0
   const payableTotal = payable.reduce((sum, p) => sum + p.amount, 0)
-
-  const [tab, setTab] = useState<Tab>('topay')
 
   // В шапке — короткое имя раздела (Налог по УСН / НДС / Сотрудники), а не полное
   // название платежа. Для смешанных групп («N просрочено») остаётся переданный title.
@@ -80,6 +73,11 @@ export default function GroupDrawer({
   // Платить ещё нечего (всё в расчёте, суммы предварительные) — вместо «Осталось
   // уплатить» подписываем, что это прикидка и время платить не пришло.
   const notReady = items.length > 0 && payable.length === 0
+  // «Осталось уплатить» — только то, что реально пора платить. Если платить нечего
+  // вовсе, показываем прикидку по известным суммам (сценарии «Всё хорошо» на Главной).
+  const total = notReady
+    ? items.filter(hasEstimate).reduce((sum, p) => sum + p.amount, 0)
+    : payableTotal
 
   if (!open) return null
 
@@ -93,9 +91,64 @@ export default function GroupDrawer({
     onClose()
   }
 
+  /**
+   * Строка платежа: кликабельна только если её можно уплатить. Для неготовой строки в
+   * смешанной группе даём подпись под суммой («Пока рано») — иначе она визуально ничем
+   * не отличается от оплачиваемых соседей. Слева — лого-иконка категории (40×40).
+   */
+  const row = (p: AugustPayment) => (
+    <div key={p.id} className="gd__row">
+      <PaymentRow
+        payment={p}
+        edgePadding="off"
+        verticalSpacing="none"
+        amountCaption={isMixed && p.state === 'process' && p.amount > 0 ? 'Пока рано' : undefined}
+        onClick={
+          p.state === 'process'
+            ? undefined
+            : () => {
+                onClose()
+                navigate(payTo(p.id))
+              }
+        }
+      />
+    </div>
+  )
+
+  /** Секция «Не входит в расчёты» — предварительный расчёт налога отдельной группой
+   *  с заголовком-подписью и внутренним отступом 24px до строк (макет 949-17180). */
+  const upcomingGroup = (
+    <section className="gd__upcoming">
+      <p className="gd__upcoming-label">Не входит в расчёты</p>
+      <div className="gd__list">{upcoming.map(row)}</div>
+    </section>
+  )
+
+  /**
+   * Содержимое «К уплате». Готовые платежи — единым списком; то, что ещё нельзя платить
+   * (`process`), выносим отдельной секцией «Не входит в расчёты» под списком (макет
+   * 949-17180). Если готового нет вовсе — секция становится единственным содержимым.
+   */
+  function toPayList() {
+    if (items.length === 0)
+      return <p className="gd__empty">Всё уплачено — открытых платежей нет.</p>
+
+    if (!isMixed) {
+      if (payable.length === 0 && upcoming.length > 0) return upcomingGroup
+      return <div className="gd__list">{items.map(row)}</div>
+    }
+
+    return (
+      <>
+        {payable.length > 0 && <div className="gd__list">{payable.map(row)}</div>}
+        {upcomingGroup}
+      </>
+    )
+  }
+
   return (
     <>
-      <Drawer open={open} onClose={onClose} side="right" aria-label={title}>
+      <Drawer open={open} onClose={onClose} side="right" aria-label={title} className="gd__panel">
         <DrawerHeader onClose={onClose}>{header}</DrawerHeader>
 
         {items.length > 0 && (
@@ -107,63 +160,9 @@ export default function GroupDrawer({
           </div>
         )}
 
-        {/* Табы «К уплате / Выполнено» — сегменты (DS Chip Tab), закреплены под общей суммой
-            вне скролла списка (см. макет 848-31345). */}
-        <div className="gd__tabs" role="tablist">
-          <Chip chipType="Tab" isSelected={tab === 'topay'} onClick={() => setTab('topay')}>
-            К уплате
-          </Chip>
-          <Chip chipType="Tab" isSelected={tab === 'done'} onClick={() => setTab('done')}>
-            Выполнено
-          </Chip>
-        </div>
+        <div className="gd__body">{toPayList()}</div>
 
-        <div className="gd__body">
-          {tab === 'topay' ? (
-            items.length > 0 ? (
-              <div className="gd__list">
-                {items.map((p) => (
-                  <div key={p.id} className="gd__row">
-                    <PaymentRow
-                      payment={p}
-                      edgePadding="off"
-                      verticalSpacing="none"
-                      onClick={
-                        p.state === 'process'
-                          ? undefined
-                          : () => {
-                              onClose()
-                              navigate(payTo(p.id))
-                            }
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <p className="gd__empty">Всё уплачено — открытых платежей нет.</p>
-            )
-          ) : history.length > 0 ? (
-            <div className="gd__history">
-              {history.map((group) => (
-                <section key={group.id} className="gd__group">
-                  <p className="gd__group-label">{group.label}</p>
-                  <div className="gd__list">
-                    {group.payments.map((p) => (
-                      <div key={p.id} className="gd__row">
-                        <PaymentRow payment={p} edgePadding="off" verticalSpacing="none" />
-                      </div>
-                    ))}
-                  </div>
-                </section>
-              ))}
-            </div>
-          ) : (
-            <p className="gd__empty">Пока нет завершённых операций.</p>
-          )}
-        </div>
-
-        {tab === 'topay' && payable.length > 0 && (
+        {payable.length > 0 && (
           <DrawerFooter type="1 Button" primaryAction={{ label: payAllLabel, onClick: payAll }} />
         )}
       </Drawer>

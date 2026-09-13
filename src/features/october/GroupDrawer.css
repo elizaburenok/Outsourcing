@@ -1,11 +1,18 @@
 /* Дровер группы налогов — оверлей/панель берём из DS `Drawer`, здесь только контент. */
+
+/* Ширина панели раздела — 480px (шире дефолтных 440px DS), max-width из DS сохраняется. */
+.drawer.gd__panel {
+  width: 480px;
+}
+
 .gd__body {
   flex: 1;
   overflow-y: auto;
   display: flex;
   flex-direction: column;
   gap: var(--space-4x);
-  padding: 0 var(--space-5x) var(--space-6x);
+  /* Верхний отступ 24px отделяет список от общей суммы (раньше его задавали табы). */
+  padding: var(--space-6x) var(--space-5x) var(--space-6x);
 }
 
 .gd__total {
@@ -29,15 +36,6 @@
   color: var(--color-primitive-secondary);
 }
 
-.gd__tabs {
-  /* Табы «К уплате / Выполнено» — сегменты (DS Chip Tab), закреплены под заголовком,
-     вне скролла списка. flex-shrink:0 — чтобы не схлопывались при длинном списке. */
-  flex-shrink: 0;
-  display: flex;
-  gap: var(--space-2x);
-  padding: var(--space-8x) var(--space-5x) var(--space-6x);
-}
-
 .gd__list {
   display: flex;
   flex-direction: column;
@@ -53,22 +51,19 @@
   margin: var(--space-2x) 0;
 }
 
-.gd__history {
+/* «Не входит в расчёты» — самостоятельная группа под списком к уплате.
+   Внутренний отступ 24px между подписью и строками (макет 949-17180). */
+.gd__upcoming {
   display: flex;
   flex-direction: column;
-  gap: var(--space-4x);
+  gap: var(--space-6x);
+  margin-top: var(--space-2x);
 }
 
-.gd__group {
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1x);
-}
-
-.gd__group-label {
+.gd__upcoming-label {
   font-size: var(--font-size-s);
   line-height: var(--line-height-s);
-  font-weight: var(--font-weight-demi-bold);
+  font-weight: var(--font-weight-medium);
   color: var(--color-primitive-secondary);
 }
 

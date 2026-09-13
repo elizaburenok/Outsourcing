@@ -3,7 +3,7 @@ import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { MainPageNavigationBar } from '@ds/components/MainPageNavigationBar'
 import { ROUTES } from '@/routes'
 import { PaymentsProvider } from '@/state/PaymentsProvider'
-import { ScenarioProvider } from '@/state/ScenarioProvider'
+import { ScenarioProvider, useScenario } from '@/state/ScenarioProvider'
 import { OnboardingProvider } from '@/state/OnboardingProvider'
 import ScenarioSwitch from '@/features/devtools/ScenarioSwitch'
 // import OnboardingLayer from '@/features/onboarding/OnboardingLayer' // временно скрыт, см. ниже
@@ -17,6 +17,27 @@ function ScrollToTop() {
   return null
 }
 
+/**
+ * Экосистемная шапка Точки (данность платформы, не наша навигация). Все клиенты — ООО;
+ * владелец счёта различается по сценарию именем (см. `scenarios.ts`).
+ */
+function EcosystemHeader({ onHome }: { onHome: () => void }) {
+  const { scenario } = useScenario()
+  const isCase2 = scenario === 'case2' || scenario === 'case3'
+  return (
+    <MainPageNavigationBar
+      navItems={[
+        { id: 'home', label: 'Главная', active: true, onClick: onHome },
+        { id: 'payments', label: 'Платежи' },
+        { id: 'services', label: 'Сервисы' },
+      ]}
+      userName={isCase2 ? 'Носковец О.Н., ООО' : 'Носковец П.А., ООО'}
+      avatarInitials={isCase2 ? 'НО' : 'ПН'}
+      hasNotification
+    />
+  )
+}
+
 export default function RootLayout() {
   const navigate = useNavigate()
 
@@ -27,16 +48,7 @@ export default function RootLayout() {
           <div className="app">
             <ScrollToTop />
             {/* Экосистемная шапка Точки — данность платформы, не наша навигация */}
-            <MainPageNavigationBar
-              navItems={[
-                { id: 'home', label: 'Главная', active: true, onClick: () => navigate(ROUTES.home) },
-                { id: 'payments', label: 'Платежи' },
-                { id: 'services', label: 'Сервисы' },
-              ]}
-              userName="Носковец П.А., ООО"
-              avatarInitials="ПН"
-              hasNotification
-            />
+            <EcosystemHeader onHome={() => navigate(ROUTES.home)} />
             <main className="app__main">
               <Outlet />
             </main>

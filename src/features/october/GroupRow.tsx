@@ -56,11 +56,8 @@ function groupNote(group: PayGroup): ReactNode {
     // Ещё не готов, но известна дата начала окна оплаты — «С 20 октября» (макет 407-47908).
     if (usn.state === 'process' && usn.payFromLabel)
       return <span className="pay-note">С {usn.payFromLabel}</span>
-    return (
-      <span className="pay-note">
-        {usn.state === 'process' ? 'Рассчитаем' : 'Уплатить'} до {usn.dueLabel}
-      </span>
-    )
+    if (usn.state === 'process') return <span className="pay-note">Рассчитаем до {usn.dueLabel}</span>
+    return <span className="pay-note">До {usn.dueLabel}</span>
   }
   if (group.key === 'nds') {
     // Несколько платежей, среди них есть просроченный — называем сколько и с какого
@@ -72,16 +69,14 @@ function groupNote(group: PayGroup): ReactNode {
     const due = nearestDue(group.items)
     return <span className="pay-note">{due ? `До ${due}` : ''}</span>
   }
-  const due = nearestDue(group.items)
-  // «Сотрудники» — единый блок зарплатных начислений: считаем «платежи» (взносы, НДФЛ,
-  // зарплата — всё это платежи по сотруднику), независимо от состава.
-  const count = pluralPayments(group.items.length)
-  return (
-    <span className="pay-note">
-      {count}
-      {due ? ` с ${due}` : ''}
-    </span>
-  )
+  // Есть просрочка среди зарплатных платежей — показываем её так же, как в УСН/НДС.
+  const mix = overdueMixNote(group.items)
+  if (mix) return mix
+  // «Сотрудники» — единый блок зарплатных начислений. Счётчик платежей ушёл вправо
+  // (под сумму, см. GroupRow), в подписи оставляем только ближайший срок.
+  const ready = group.items.filter((p) => p.state !== 'process')
+  const due = nearestDue(ready)
+  return <span className="pay-note">{due ? `До ${due}` : ''}</span>
 }
 
 /**
@@ -100,6 +95,10 @@ export default function GroupRow({
   const usnProcessing = group.key === 'usn' && group.items[0].state === 'process'
   // Ещё не готов, но окно оплаты известно (`payFromLabel`): сумма + подпись «Пока рано».
   const usnEarly = usnProcessing && !group.items[0].preliminary && !!group.items[0].payFromLabel
+  // Несколько платежей в группе → счётчик уезжает под сумму справа. НДС кодирует номер
+  // платежа в заголовке, поэтому его исключаем.
+  const readyItems = group.items.filter((p) => p.state !== 'process')
+  const multiPayments = group.key !== 'nds' && readyItems.length > 1
   const rightAccessory = group.done ? (
     <Check size={20} strokeWidth={2.25} className="pay-check" />
   ) : usnProcessing && group.items[0].preliminary ? (
@@ -114,6 +113,11 @@ export default function GroupRow({
     </span>
   ) : usnProcessing ? (
     <span className="pay-amount pay-amount--done">В процессе</span>
+  ) : multiPayments ? (
+    <span className="pay-amount-col">
+      <span className="pay-amount">{formatMoney(group.total)}</span>
+      <span className="pay-amount-caption">{pluralPayments(readyItems.length)}</span>
+    </span>
   ) : (
     <span className="pay-amount">{formatMoney(group.total)}</span>
   )

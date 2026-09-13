@@ -4,6 +4,7 @@ import { formatMoney } from '@/lib/format'
 import type { AugustPayment, PayCategory } from '@/data/august'
 import contributionsLogo from '@ds/src/logo/Contributions.png'
 import taxesLogo from '@ds/src/logo/Taxes.png'
+import vatLogo from '@ds/src/logo/Vat.svg'
 import avatarLogo from '@ds/src/logo/Avatar.png'
 import '@/features/payments/payment-row.css'
 import './AugustView.css'
@@ -15,7 +16,7 @@ export const CATEGORY: Record<PayCategory, string> = {
   salary: avatarLogo,
   vznos: contributionsLogo,
   usn: taxesLogo,
-  nds: taxesLogo,
+  nds: vatLogo,
 }
 
 export function PayIcon({ category, muted = false }: { category: PayCategory; muted?: boolean }) {
@@ -70,6 +71,8 @@ export default function PaymentRow({
   onClick,
   edgePadding = 'on',
   verticalSpacing = 'compact',
+  amountCaption,
+  hideIcon = false,
 }: {
   payment: AugustPayment
   /** Если задан — строка кликабельна (ведёт на страницу уплаты). */
@@ -78,6 +81,11 @@ export default function PaymentRow({
   edgePadding?: 'on' | 'off'
   /** Вертикальный паддинг Cell — "none" убирает его совсем (для плотных списков). */
   verticalSpacing?: 'default' | 'compact' | 'none'
+  /** Подпись под суммой справа (напр. «Пока рано») — когда строку ещё нельзя уплатить,
+   *  а в списке рядом есть оплачиваемые: сама сумма не объясняет, почему нет действия. */
+  amountCaption?: string
+  /** Скрыть лого-иконку слева (в дровере раздела строки без аватара — макет 949-17180). */
+  hideIcon?: boolean
 }) {
   const isProcess = payment.state === 'process'
   // «Пока рано» с известной суммой (`payFromLabel`) — показываем сумму и чистую иконку,
@@ -92,14 +100,19 @@ export default function PaymentRow({
       title={<span className="pay-title">{payment.title}</span>}
       description={paymentNote(payment)}
       leftAccessory={
-        pending ? (
+        hideIcon ? undefined : pending ? (
           <PayIconPending category={payment.category} />
         ) : (
           <PayIcon category={payment.category} />
         )
       }
       rightAccessory={
-        pending ? undefined : (
+        pending ? undefined : amountCaption ? (
+          <span className="pay-amount-col">
+            <span className="pay-amount">{formatMoney(payment.amount)}</span>
+            <span className="pay-amount-caption">{amountCaption}</span>
+          </span>
+        ) : (
           <span className={`pay-amount ${payment.state === 'paid' ? 'pay-amount--done' : ''}`}>
             {formatMoney(payment.amount)}
           </span>
