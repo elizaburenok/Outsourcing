@@ -248,7 +248,7 @@ export function totalDueContent(
 
   let subtitle: string
   if (severity === 'overdue') {
-    subtitle = `Срок вышел ${date} — на уплату налогов и взносов`
+    subtitle = 'Нужно в конце месяца на уплату налогов и взносов'
   } else if (lead.state === 'process') {
     subtitle = lead.preliminary
       ? `Нужно примерно ${date || 'в конце месяца'} на уплату налогов и взносов`

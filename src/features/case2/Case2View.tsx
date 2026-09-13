@@ -1,20 +1,18 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { CirclePlus } from 'lucide-react'
-import { ROUTES } from '@/routes'
+import { CirclePlus, ClipboardCheck, FileText } from 'lucide-react'
+import { ROUTES, payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
 import { HeaderButton } from '@ds/components/HeaderButton'
-import { Cell } from '@ds/components/Cell'
-import { CellRightAccessory } from '@ds/components/CellRightAccessory'
 import PageAction from '@ds/components/PageAction'
 import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/components/icons'
 import Card from '@/components/ui/Card'
+import SectionCard from '@/features/october/SectionCard'
 import GroupRow from '@/features/october/GroupRow'
 import GroupDrawer from '@/features/october/GroupDrawer'
 import type { PayGroup } from '@/features/october/groups'
-import { categoryHistory } from '@/features/home/domain'
-import { pluralPayments, type AugustPayment } from '@/data/august'
-import { CASE2_USN, CASE2_NDS, CASE2_EMPLOYEES, CASE2_PAYABLES, TASKS_IN_PROGRESS } from '@/data/case2'
+import type { AugustPayment, PayState } from '@/data/august'
+import { CASE2, TASKS_IN_PROGRESS, type ObCaseData } from '@/data/case2'
 import { MCHD_COUNT, CONNECTED_SERVICES, TARIFF_NAME, connectedServicesText } from '@/data/company'
 import CreateTaskDrawer from './CreateTaskDrawer'
 import '@/features/august/AugustView.css'
@@ -22,74 +20,104 @@ import './Case2View.css'
 
 const sum = (list: AugustPayment[]) => list.reduce((s, p) => s + p.amount, 0)
 
+/** Порядок внутри группы: сначала просроченное, потом к уплате, потом «по графику». */
+const STATE_RANK: Record<PayState, number> = { overdue: 0, due: 1, process: 2, paid: 3 }
+const byUrgency = (list: AugustPayment[]) =>
+  [...list].sort((a, b) => STATE_RANK[a.state] - STATE_RANK[b.state])
+
+/** Сумма группы для карточки — только то, что реально пора платить («в расчёте» не в счёт). */
+function splitTotals(list: AugustPayment[]): { total: number } {
+  return { total: sum(list.filter((p) => p.state !== 'process')) }
+}
+
 /**
- * КЕЙС 2 (макет 210-28862) — ООО на УСН «Доходы» 6% + НДС, есть сотрудники. Главная:
+ * Заголовок строки-группы: если в группе один платёж — показываем его конкретное название
+ * (напр. «1-й платёж за III квартал»), иначе — общее имя домена («Налоги и взносы»).
+ */
+function groupTitle(domain: string, items: AugustPayment[]): string {
+  return items.length === 1 ? items[0].title : domain
+}
+
+/**
+ * КЕЙС 2 (макет 210-28862) — ООО на УСН «Доходы» 6% + НДС, есть сотрудники, «сегодня» —
+ * октябрь 2026. У клиента одновременно готовые к уплате платежи и задолженность. Главная:
  *  - сверху кнопка «Создать задачу» → дроппер постановки задачи бухгалтеру;
- *  - блок «Платежи» — фиксированный список из трёх ячеек: налог по УСН («в расчёте»),
- *    НДС (к уплате, до 28 сентября), сотрудники (2 платежа к уплате, до 28 сентября).
- *    Клик по ячейке открывает дровер раздела; вкладки «К уплате / Выполнено» — внутри
- *    дровера (см. `GroupDrawer`, макет 848-31345), а не в самом блоке;
- *  - блок «Задачи» (сколько задач у бухгалтера в работе) — полноширинный, кликабельный;
+ *  - блок «Платежи» — три группы-домена: «Налоги и взносы» (аванс по УСН),
+ *    «НДС: III квартал» (текущий квартал), «Сотрудники» (НДФЛ и взносы, в т.ч.
+ *    просроченные за август). Если в группе один платёж — строка называет его конкретно
+ *    и ведёт сразу на страницу уплаты; если несколько — заголовок общий, а клик открывает
+ *    дровер раздела со списком к уплате (см. `GroupDrawer`);
+ *  - две плитки в ряд: «Задачи» (сколько задач у бухгалтера в работе → отчётность) и
+ *    «Бухучёт» (все выполненные платежи по налогам и взносам → раздел «Бухучёт»);
  *  - список сущностей снизу — как на остальных экранах.
  * Данные — из `@/data/case2` (самодостаточно, не трогают `AUGUST_PAYMENTS`).
  */
-export default function Case2View() {
+export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
   const navigate = useNavigate()
   const { isPaid } = usePayments()
   const [openGroup, setOpenGroup] = useState<PayGroup | null>(null)
   const [taskOpen, setTaskOpen] = useState(false)
 
-  // Ячейки блока «Платежи»: УСН («в расчёте», некликабелен) → НДС → Сотрудники.
-  const usnGroup: PayGroup = {
+  // Ячейки блока «Платежи»: Налоги и взносы → НДС → Сотрудники.
+  // «Налоги и взносы» — общий домен собственных налогов ООО (УСН, имущественные и т.д.).
+  // Сейчас в нём только готовый к уплате налог по УСН за III квартал.
+  const taxesOpen = byUrgency(data.taxes.filter((p) => !isPaid(p.id)))
+  const taxesGroup: PayGroup = {
     key: 'usn',
-    title: 'Налог по УСН за III кв. 2026',
-    items: [CASE2_USN],
-    total: CASE2_USN.amount,
-    payable: false,
+    title: groupTitle('Налоги и взносы', taxesOpen),
+    items: taxesOpen,
+    ...splitTotals(taxesOpen),
+    payable: taxesOpen.some((p) => p.state !== 'process'),
   }
-  const ndsOpen = CASE2_NDS.filter((p) => !isPaid(p.id))
-  const employeesOpen = CASE2_EMPLOYEES.filter((p) => !isPaid(p.id))
+
+  // НДС — только текущий (III) квартал: 1-й платёж к уплате, 2-й и 3-й по графику.
+  // На карточке показываем сумму того, что уже пора платить (`due`), в дровере — весь квартал.
+  const ndsOpen = byUrgency(data.nds.filter((p) => !isPaid(p.id)))
+  const ndsDue = ndsOpen.filter((p) => p.state !== 'process')
+
+  const employeesOpen = byUrgency(data.employees.filter((p) => !isPaid(p.id)))
   const employeesGroup: PayGroup =
     employeesOpen.length > 0
       ? {
           key: 'employees',
-          title: 'Сотрудники',
+          title: groupTitle('Сотрудники', employeesOpen),
           items: employeesOpen,
-          total: sum(employeesOpen),
+          ...splitTotals(employeesOpen),
           payable: true,
         }
       : { key: 'employees', title: 'Сотрудники', items: [], total: 0, payable: false, done: true }
 
   const groups: PayGroup[] = [
-    usnGroup,
+    taxesGroup,
     ...(ndsOpen.length > 0
       ? [
           {
             key: 'nds',
-            // Один платёж — называем его; несколько (в т.ч. с просрочкой) — «НДС: N платежей»,
-            // подпись со сроком/просрочкой считает `GroupRow` (макет 894-96775).
-            title: ndsOpen.length > 1 ? `НДС: ${pluralPayments(ndsOpen.length)}` : ndsOpen[0].title,
+            title: groupTitle('НДС: III квартал', ndsOpen),
             items: ndsOpen,
-            total: sum(ndsOpen),
-            payable: true,
+            // Сумма на карточке — только то, что пора платить сейчас (текущая доля квартала).
+            total: sum(ndsDue.length > 0 ? ndsDue : ndsOpen),
+            payable: ndsDue.length > 0,
           } as PayGroup,
         ]
       : []),
     employeesGroup,
   ]
 
-  // Все ячейки кликабельны — клик открывает дровер раздела (вкладки «К уплате / Выполнено» —
-  // внутри него). Для УСН «в расчёте» дровер показывает предварительный расчёт (без уплаты).
-  const onGroup = (g: PayGroup) => () => setOpenGroup(g)
+  // Клик по ячейке: если в группе один платёж и его уже можно уплатить — сразу на страницу
+  // уплаты; иначе (несколько платежей или предварительный расчёт) — дровер раздела с
+  // вкладками «К уплате / Выполнено».
+  const onGroup = (g: PayGroup) => () => {
+    if (g.items.length === 1 && g.items[0].state !== 'process') {
+      navigate(payTo(g.items[0].id))
+      return
+    }
+    setOpenGroup(g)
+  }
 
   const drawerProps = openGroup && {
     title: openGroup.title,
     items: openGroup.items,
-    // «Выполнено» — уплаченные налоги за прошлые периоды (+ оплаченные в этой сессии).
-    history:
-      openGroup.key !== 'overdue'
-        ? categoryHistory(openGroup.key, CASE2_PAYABLES, isPaid, 'Сентябрь')
-        : [],
   }
 
   return (
@@ -118,24 +146,25 @@ export default function Case2View() {
         </Card>
       </div>
 
-      <div className="av__tasks" data-coach="tasks">
-        <Card>
-          <button
-            type="button"
-            className="pay-row-btn"
+      {/* Две плитки: «Задачи» (в работе у бухгалтера) и «Бухучёт» (все выполненные
+          платежи по налогам и взносам) — макет 971-15104. */}
+      <div className="av__cards">
+        <div data-coach="tasks" className="av__card-cell">
+          <SectionCard
+            icon={ClipboardCheck}
+            title="Задачи"
+            note={`${TASKS_IN_PROGRESS.toLocaleString('ru-RU')} в работе у бухгалтера`}
             onClick={() => navigate(ROUTES.reports)}
-          >
-            <Cell
-              textScale="M"
-              verticalSpacing="compact"
-              title={<span className="pay-title">Задачи</span>}
-              description={
-                <span className="pay-note">{TASKS_IN_PROGRESS.toLocaleString('ru-RU')} в работе</span>
-              }
-              rightAccessory={<CellRightAccessory kind="Disclosure" />}
-            />
-          </button>
-        </Card>
+          />
+        </div>
+        <div className="av__card-cell">
+          <SectionCard
+            icon={FileText}
+            title="Бухучёт"
+            note="Доходы и расходы"
+            onClick={() => navigate(ROUTES.accounting)}
+          />
+        </div>
       </div>
 
       <div className="av__links">

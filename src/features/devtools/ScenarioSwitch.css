@@ -25,5 +25,6 @@
 
 .scn__tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-1x);
 }

@@ -28,6 +28,7 @@ export default function ScenarioSwitch() {
           </Chip>
         ))}
       </div>
+
       <Button visualVariant="Transparent" onClick={reset}>
         Сбросить сценарий
       </Button>

@@ -10,7 +10,7 @@
 
 import { AUGUST_PAYMENTS, USN_ADVANCE, usnPayment, type AugustPayment } from '@/data/august'
 
-export type ScenarioId = 'overdue' | 'ok' | 'case2'
+export type ScenarioId = 'overdue' | 'ok' | 'case2' | 'case3'
 
 export interface HomeScenario {
   id: ScenarioId
@@ -80,9 +80,18 @@ export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
     payments: AUGUST_PAYMENTS,
     usn: usnPayment('mid'),
   },
+  // Кейс 3 — тот же клиент, что и Кейс 2, но декабрь: пик налогового календаря (много
+  // платежей одновременно). Свои данные берёт из `@/data/case3`; Главная рендерит тот же
+  // `Case2View` с другим набором. `payments`/`usn` — для полноты типа.
+  case3: {
+    id: 'case3',
+    label: 'Кейс 3',
+    payments: AUGUST_PAYMENTS,
+    usn: usnPayment('mid'),
+  },
 }
 
-export const SCENARIO_ORDER: ScenarioId[] = ['ok', 'overdue', 'case2']
+export const SCENARIO_ORDER: ScenarioId[] = ['ok', 'overdue', 'case2', 'case3']
 
 /** Дефолтный сценарий — состояние, в которое возвращает кнопка сброса. */
 export const DEFAULT_SCENARIO: ScenarioId = 'overdue'

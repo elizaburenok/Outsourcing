@@ -81,15 +81,6 @@
   color: var(--color-primitive-primary);
 }
 
-/* ---------- Блок «Задачи» (Кейс 2) ---------- */
-.av__tasks {
-  margin-bottom: var(--space-8x);
-}
-
-.av__tasks .pay-row-btn {
-  padding-block: var(--space-1x);
-}
-
 /* ---------- Вкладки ---------- */
 /* Раскладку и типографику задаёт компонент Tabs (@ds/components/Tabs);
    здесь только отступы, т.к. вкладки теперь лежат внутри карточки списка (см. макет). */

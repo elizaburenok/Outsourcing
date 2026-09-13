@@ -148,7 +148,6 @@ export default function HomeCardsView() {
           onClose={() => setDrawer(null)}
           title={drawer.title}
           items={drawer.items}
-          history={drawer.history}
         />
       )}
     </div>
