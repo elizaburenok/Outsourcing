@@ -1,13 +1,17 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
+import { Tabs } from '@ds/components/Tabs'
 import { formatMoney } from '@/lib/format'
 import { payTo } from '@/routes'
 import { usePayments } from '@/state/PaymentsProvider'
-import { pluralPayments, type AugustPayment, type PayCategory } from '@/data/august'
+import { type AugustPayment, type PayCategory } from '@/data/august'
 import PaymentRow from '@/features/august/PaymentRow'
 import PaymentResultModal from '@/features/payment/PaymentResultModal'
+import AccountSelectModal from '@/features/payment/AccountSelectModal'
 import './GroupDrawer.css'
+
+type DrawerTab = 'topay' | 'done'
 
 /** Короткое имя раздела для шапки дровера — вместо полного названия платежа. */
 const DOMAIN_LABEL: Record<PayCategory, string> = {
@@ -29,10 +33,11 @@ function singleDomainLabel(items: AugustPayment[]): string | undefined {
 
 /**
  * Дровер раздела справа — обобщение OverdueDrawer. Открывается по клику на доменную
- * карточку (Налоги и взносы, НДС, Сотрудники): открытые платежи домена (сумма под
- * заголовком, кликабельные строки ведут на уплату, в футере «Уплатить всё»). Выполненные
- * платежи здесь не показываем — они живут в разделе «Бухучёт». Собран на DS
- * `Drawer`/`DrawerFooter`.
+ * карточку (Налоги и взносы, НДС, Сотрудники) и всегда содержит два таба (макет
+ * 1112-12994): «К уплате» — открытые платежи домена (сумма под заголовком, кликабельные
+ * строки ведут на уплату, в футере «Уплатить всё»), и «Выполнено» — уже закрытые платежи
+ * этого раздела за текущий период (некликабельные, со статусом «Оплачено»). Собран на DS
+ * `Drawer`/`Tabs`/`DrawerFooter`.
  *
  * Платежи, которые ещё нельзя уплатить (`process` — «в расчёте» или «по графику»),
  * показываются отдельной секцией «Не входит в расчёты» под списком к уплате (макет
@@ -44,17 +49,22 @@ export default function GroupDrawer({
   title,
   payAllLabel = 'Уплатить всё',
   items,
+  doneItems = [],
   onClose,
 }: {
   open: boolean
   title: string
   payAllLabel?: string
   items: AugustPayment[]
+  /** Закрытые платежи раздела для таба «Выполнено» (пусто → таб показывает заглушку). */
+  doneItems?: AugustPayment[]
   onClose: () => void
 }) {
   const navigate = useNavigate()
   const { markPaid } = usePayments()
+  const [showAccounts, setShowAccounts] = useState(false)
   const [showResult, setShowResult] = useState(false)
+  const [tab, setTab] = useState<DrawerTab>('topay')
 
   // `hasEstimate` — есть ли у платежа известная сумма (предварительная либо твёрдая).
   const hasEstimate = (p: AugustPayment) =>
@@ -81,8 +91,18 @@ export default function GroupDrawer({
 
   if (!open) return null
 
+  // «Уплатить» из дровера ведёт не сразу к результату, а к выбору счёта списания
+  // (макет 1178-16236): сперва модалка со счётами, и только по «Выбрать» платёж уходит
+  // и показывается результат.
   function payAll() {
+    setShowAccounts(true)
+  }
+
+  // Счёт выбран в модалке — списываем и показываем результат. `_accountId` пока не
+  // влияет на данные прототипа (счёт условный), но флоу проходит через выбор.
+  function confirmAccount(_accountId: string) {
     payable.forEach((p) => markPaid(p.id))
+    setShowAccounts(false)
     setShowResult(true)
   }
 
@@ -146,12 +166,27 @@ export default function GroupDrawer({
     )
   }
 
+  /** Содержимое «Выполнено» — закрытые платежи раздела (некликабельные, статус «Оплачено»). */
+  function doneList() {
+    if (doneItems.length === 0)
+      return <p className="gd__empty">Пока нет выполненных платежей.</p>
+    return (
+      <div className="gd__list">
+        {doneItems.map((p) => (
+          <div key={p.id} className="gd__row">
+            <PaymentRow payment={p} edgePadding="off" verticalSpacing="none" />
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   return (
     <>
       <Drawer open={open} onClose={onClose} side="right" aria-label={title} className="gd__panel">
         <DrawerHeader onClose={onClose}>{header}</DrawerHeader>
 
-        {items.length > 0 && (
+        {tab === 'topay' && items.length > 0 && (
           <div className="gd__total">
             <span className="gd__total-amount">{formatMoney(total)}</span>
             <span className="gd__total-label">
@@ -160,19 +195,35 @@ export default function GroupDrawer({
           </div>
         )}
 
-        <div className="gd__body">{toPayList()}</div>
+        <div className="gd__tabs">
+          <Tabs
+            items={[
+              { id: 'topay', label: 'К уплате' },
+              { id: 'done', label: 'Выполнено' },
+            ]}
+            value={tab}
+            onChange={(id) => setTab(id as DrawerTab)}
+          />
+        </div>
 
-        {payable.length > 0 && (
+        <div className="gd__body">{tab === 'topay' ? toPayList() : doneList()}</div>
+
+        {tab === 'topay' && payable.length > 0 && (
           <DrawerFooter type="1 Button" primaryAction={{ label: payAllLabel, onClick: payAll }} />
         )}
       </Drawer>
 
+      {showAccounts && (
+        <AccountSelectModal
+          onSelect={confirmAccount}
+          onClose={() => setShowAccounts(false)}
+        />
+      )}
+
       {showResult && (
-        <PaymentResultModal title="Платежи отправлены" onDone={finishResult}>
-          <p>
-            Отправили {pluralPayments(payable.length)} на {formatMoney(payableTotal)}.
-          </p>
-          <p>Информация по платежам появится в ленте событий в течение 5 минут.</p>
+        <PaymentResultModal title="Всё уплачено!" onDone={finishResult}>
+          <p>Отправили платёж {formatMoney(payableTotal)}.</p>
+          <p>Информация по платежу появится в ленте событий в течение 5 минут.</p>
         </PaymentResultModal>
       )}
     </>

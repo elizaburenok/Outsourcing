@@ -11,8 +11,15 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-4x);
-  /* Верхний отступ 24px отделяет список от общей суммы (раньше его задавали табы). */
-  padding: var(--space-6x) var(--space-5x) var(--space-6x);
+  /* Список отделяют от общей суммы табы «К уплате / Выполнено» над ним. */
+  padding: 0 var(--space-5x) var(--space-6x);
+}
+
+/* Табы «К уплате / Выполнено» (DS Tabs Carousel) — закреплены под общей суммой,
+   вне скролла списка (макет 1112-12994). flex-shrink:0 — не схлопываются на длинном списке. */
+.gd__tabs {
+  flex-shrink: 0;
+  padding: var(--space-8x) var(--space-5x);
 }
 
 .gd__total {

@@ -1,0 +1,144 @@
+.asm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: var(--color-overlay-popup);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-5x);
+  animation: asm-fade 0.15s ease;
+}
+
+@keyframes asm-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.asm {
+  width: min(92vw, 30rem);
+  background: var(--color-popup-primary);
+  border-radius: var(--radius-4-5x);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  animation: asm-pop 0.2s ease;
+}
+
+@keyframes asm-pop {
+  from {
+    transform: translateY(var(--space-4x));
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.asm__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4x);
+  padding: var(--space-7-5x) var(--space-10x) var(--space-5x);
+}
+
+.asm__title {
+  font-size: var(--font-size-2xl);
+  line-height: var(--line-height-2xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.asm__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-6x);
+  height: var(--space-6x);
+  margin-top: calc(-1 * var(--space-1x));
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-2-5x);
+  color: var(--color-primitive-primary);
+  cursor: pointer;
+}
+
+.asm__close:hover {
+  background: var(--color-bg-neutral-3);
+}
+
+.asm__list {
+  margin: 0 var(--space-5x);
+  padding: var(--space-2x);
+  border-radius: var(--radius-4x);
+  background: var(--color-container-transparent-1);
+}
+
+/* Строку не подсвечиваем: единственный индикатор выбора — радио справа. */
+.asm__row {
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  border-radius: var(--radius-3x);
+  padding: 0 var(--space-3x);
+}
+
+/* Разделитель между строками — под текстом, начинается после аватара; крайние не задевает. */
+.asm__row + .asm__row::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: calc(var(--space-3x) + var(--space-10x) + var(--space-4x));
+  right: var(--space-3x);
+  height: 1px;
+  background: var(--color-primitive-neutral-2);
+}
+
+/* Радио — только индикатор выбора; клик обрабатывает вся строка (role="radio"),
+   поэтому кнопку внутри выключаем из событий/фокуса, чтобы не было лишнего фокуса. */
+.asm__radio button {
+  pointer-events: none;
+}
+
+/* Аватар счёта — кружок 40×40. Банковский счёт — флаг-триколор (белый / синий / красный),
+   карта — брендовый кружок с иконкой карты. */
+.asm-avatar {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.asm-avatar--bank {
+  background: linear-gradient(
+    #ffffff 0 33.33%,
+    #0039a6 33.33% 66.66%,
+    #d52b1e 66.66% 100%
+  );
+}
+
+.asm-avatar--card {
+  background: var(--color-bg-brand-2);
+  color: var(--color-primitive-brand);
+}
+
+.asm__footer {
+  padding: var(--space-5x);
+}
+
+.asm__footer .asm__btn {
+  width: 100%;
+  max-width: none;
+}

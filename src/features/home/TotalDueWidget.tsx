@@ -1,4 +1,4 @@
-import { formatMoney } from '@/lib/format'
+import { formatMoney, nbsp } from '@/lib/format'
 import type { TotalDueContent } from './domain'
 import './TotalDueWidget.css'
 
@@ -16,7 +16,7 @@ export default function TotalDueWidget({ content }: { content: TotalDueContent }
   return (
     <div className="total-due-widget">
       <p className="total-due-widget__amount">{formatMoney(content.amount)}</p>
-      <p className="total-due-widget__subtitle">{content.subtitle}</p>
+      <p className="total-due-widget__subtitle">{nbsp(content.subtitle)}</p>
     </div>
   )
 }
