@@ -92,9 +92,11 @@ export default function GroupRow({
 }) {
   // Сумму не показываем, если группа полностью уплачена (done) или УСН ещё считается (process) —
   // кроме кейса 2, где даже в `process` показываем предварительную сумму с подписью снизу.
-  const usnProcessing = group.key === 'usn' && group.items[0].state === 'process'
+  // Группа с пустым списком (всё уплачено, `done`) тоже может иметь key='usn' — читаем
+  // первый платёж через optional chaining, иначе разбор состояния роняет строку.
+  const usnProcessing = group.key === 'usn' && group.items[0]?.state === 'process'
   // Ещё не готов, но окно оплаты известно (`payFromLabel`): сумма + подпись «Пока рано».
-  const usnEarly = usnProcessing && !group.items[0].preliminary && !!group.items[0].payFromLabel
+  const usnEarly = usnProcessing && !group.items[0]?.preliminary && !!group.items[0]?.payFromLabel
   // Несколько платежей в группе → счётчик уезжает под сумму справа. НДС кодирует номер
   // платежа в заголовке, поэтому его исключаем.
   const readyItems = group.items.filter((p) => p.state !== 'process')

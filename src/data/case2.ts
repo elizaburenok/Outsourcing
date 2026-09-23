@@ -110,6 +110,23 @@ export const CASE2_EMPLOYEES: AugustPayment[] = [
   },
 ]
 
+/**
+ * Следующий налог по УСН (IV квартал) — предварительный расчёт, который встаёт на место
+ * уплаченного платежа III квартала (макет 1178-16236, экран «По УСН всё уплачено»). Пока
+ * квартал не закрыт, сумма не посчитана (0 ₽) и окно оплаты впереди — строка показывает
+ * «Пока рано» с датами окна, а виджет суммы подписывает, что общая сумма примерная.
+ */
+export const CASE2_TAXES_UPCOMING: AugustPayment = {
+  id: 'c2-usn-q4',
+  title: 'Налог по УСН за IV квартал',
+  category: 'usn',
+  amount: 0,
+  viaEnp: true,
+  state: 'process',
+  payFromLabel: '20 по 28 апреля',
+  dueLabel: '28 апреля',
+}
+
 /** Платежи Кейса 2, которые можно уплатить (для страницы уплаты и вкладки «Выполнено»). */
 export const CASE2_PAYABLES: AugustPayment[] = [...CASE2_TAXES, ...CASE2_NDS, ...CASE2_EMPLOYEES]
 
@@ -124,6 +141,9 @@ export type ObCaseData = {
   employees: AugustPayment[]
   /** Всё, что можно уплатить (для страницы уплаты и вкладки «Выполнено»). */
   payables: AugustPayment[]
+  /** Следующий налог домена «Налоги и взносы», который показывается после уплаты текущего
+   *  (предварительный расчёт, «Пока рано»). Нет — строка просто становится «Оплачено». */
+  taxesUpcoming?: AugustPayment
   /** Метка текущего периода для таба «Выполнено» (напр. «Октябрь»). */
   historyLabel: string
 }
@@ -134,6 +154,7 @@ export const CASE2: ObCaseData = {
   nds: CASE2_NDS,
   employees: CASE2_EMPLOYEES,
   payables: CASE2_PAYABLES,
+  taxesUpcoming: CASE2_TAXES_UPCOMING,
   historyLabel: 'Октябрь',
 }
 

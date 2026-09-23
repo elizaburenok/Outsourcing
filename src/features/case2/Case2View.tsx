@@ -1,19 +1,16 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { CirclePlus, ClipboardCheck, FileText } from 'lucide-react'
-import { ROUTES, payTo } from '@/routes'
+import { CirclePlus, ShoppingBag } from 'lucide-react'
 import { usePayments } from '@/state/PaymentsProvider'
 import { HeaderButton } from '@ds/components/HeaderButton'
 import PageAction from '@ds/components/PageAction'
 import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/components/icons'
 import Card from '@/components/ui/Card'
-import SectionCard from '@/features/october/SectionCard'
 import GroupRow from '@/features/october/GroupRow'
 import GroupDrawer from '@/features/october/GroupDrawer'
 import type { PayGroup } from '@/features/october/groups'
 import type { AugustPayment, PayState } from '@/data/august'
-import { CASE2, TASKS_IN_PROGRESS, type ObCaseData } from '@/data/case2'
-import { MCHD_COUNT, CONNECTED_SERVICES, TARIFF_NAME, connectedServicesText } from '@/data/company'
+import { CASE2, type ObCaseData } from '@/data/case2'
+import { MCHD_COUNT, MARKETPLACES, INTEGRATIONS, TARIFF_NAME, marketplacesText, integrationsText } from '@/data/company'
 import CreateTaskDrawer from './CreateTaskDrawer'
 import '@/features/august/AugustView.css'
 import './Case2View.css'
@@ -47,13 +44,10 @@ function groupTitle(domain: string, items: AugustPayment[]): string {
  *    просроченные за август). Если в группе один платёж — строка называет его конкретно
  *    и ведёт сразу на страницу уплаты; если несколько — заголовок общий, а клик открывает
  *    дровер раздела со списком к уплате (см. `GroupDrawer`);
- *  - две плитки в ряд: «Задачи» (сколько задач у бухгалтера в работе → отчётность) и
- *    «Бухучёт» (все выполненные платежи по налогам и взносам → раздел «Бухучёт»);
  *  - список сущностей снизу — как на остальных экранах.
  * Данные — из `@/data/case2` (самодостаточно, не трогают `AUGUST_PAYMENTS`).
  */
 export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
-  const navigate = useNavigate()
   const { isPaid } = usePayments()
   const [openGroup, setOpenGroup] = useState<PayGroup | null>(null)
   const [taskOpen, setTaskOpen] = useState(false)
@@ -61,14 +55,30 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
   // Ячейки блока «Платежи»: Налоги и взносы → НДС → Сотрудники.
   // «Налоги и взносы» — общий домен собственных налогов ООО (УСН, имущественные и т.д.).
   // Сейчас в нём только готовый к уплате налог по УСН за III квартал.
+  // Когда все налоги домена уплачены, строка не пропадает, а остаётся со статусом
+  // «Оплачено» (как «Сотрудники») — клик по ней открывает дровер с вкладкой «Выполнено».
   const taxesOpen = byUrgency(data.taxes.filter((p) => !isPaid(p.id)))
-  const taxesGroup: PayGroup = {
-    key: 'usn',
-    title: groupTitle('Налоги и взносы', taxesOpen),
-    items: taxesOpen,
-    ...splitTotals(taxesOpen),
-    payable: taxesOpen.some((p) => p.state !== 'process'),
-  }
+  // Когда текущий налог уплачен, домен не гаснет в «Оплачено», а показывает следующий
+  // предварительный расчёт (IV квартал, «Пока рано») — если он задан в данных кейса
+  // (макет 1178-16236, экран «По УСН всё уплачено»).
+  const taxesGroup: PayGroup =
+    taxesOpen.length > 0
+      ? {
+          key: 'usn',
+          title: groupTitle('Налоги и взносы', taxesOpen),
+          items: taxesOpen,
+          ...splitTotals(taxesOpen),
+          payable: taxesOpen.some((p) => p.state !== 'process'),
+        }
+      : data.taxesUpcoming
+        ? {
+            key: 'usn',
+            title: groupTitle('Налоги и взносы', [data.taxesUpcoming]),
+            items: [data.taxesUpcoming],
+            total: data.taxesUpcoming.amount,
+            payable: false,
+          }
+        : { key: 'usn', title: 'Налоги и взносы', items: [], total: 0, payable: false, done: true }
 
   // НДС — только текущий (III) квартал: 1-й платёж к уплате, 2-й и 3-й по графику.
   // На карточке показываем сумму того, что уже пора платить (`due`), в дровере — весь квартал.
@@ -104,20 +114,27 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
     employeesGroup,
   ]
 
-  // Клик по ячейке: если в группе один платёж и его уже можно уплатить — сразу на страницу
-  // уплаты; иначе (несколько платежей или предварительный расчёт) — дровер раздела с
-  // вкладками «К уплате / Выполнено».
-  const onGroup = (g: PayGroup) => () => {
-    if (g.items.length === 1 && g.items[0].state !== 'process') {
-      navigate(payTo(g.items[0].id))
-      return
-    }
-    setOpenGroup(g)
+  // Клик по любой ячейке (в т.ч. по одиночным УСН и НДС) сперва открывает дровер раздела
+  // с вкладками «К уплате / Выполнено» — как в «Сотрудниках»; на страницу уплаты ведёт уже
+  // строка внутри дровера (макет 1112-12994).
+  const onGroup = (g: PayGroup) => () => setOpenGroup(g)
+
+  // Закрытые платежи раздела для вкладки «Выполнено»: оплаченные в этой сессии помечаем
+  // «Оплачено сегодня» (как в «Бухучёте»). Источник — полный список домена по ключу группы.
+  const domainSource: Partial<Record<PayGroup['key'], AugustPayment[]>> = {
+    usn: data.taxes,
+    nds: data.nds,
+    employees: data.employees,
   }
+  const doneOf = (list: AugustPayment[]): AugustPayment[] =>
+    list
+      .filter((p) => p.state === 'paid' || isPaid(p.id))
+      .map((p) => (p.state === 'paid' ? p : { ...p, state: 'paid' as PayState, paidLabel: 'сегодня' }))
 
   const drawerProps = openGroup && {
     title: openGroup.title,
     items: openGroup.items,
+    doneItems: doneOf(domainSource[openGroup.key] ?? []),
   }
 
   return (
@@ -146,27 +163,6 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
         </Card>
       </div>
 
-      {/* Две плитки: «Задачи» (в работе у бухгалтера) и «Бухучёт» (все выполненные
-          платежи по налогам и взносам) — макет 971-15104. */}
-      <div className="av__cards">
-        <div data-coach="tasks" className="av__card-cell">
-          <SectionCard
-            icon={ClipboardCheck}
-            title="Задачи"
-            note={`${TASKS_IN_PROGRESS.toLocaleString('ru-RU')} в работе у бухгалтера`}
-            onClick={() => navigate(ROUTES.reports)}
-          />
-        </div>
-        <div className="av__card-cell">
-          <SectionCard
-            icon={FileText}
-            title="Бухучёт"
-            note="Доходы и расходы"
-            onClick={() => navigate(ROUTES.accounting)}
-          />
-        </div>
-      </div>
-
       <div className="av__links">
         <PageAction
           title="Налогообложение и патенты"
@@ -181,8 +177,13 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
           />
         </div>
         <PageAction
-          title="Подключенные сервисы"
-          description={connectedServicesText(CONNECTED_SERVICES)}
+          title="Маркетплейсы"
+          description={marketplacesText(MARKETPLACES)}
+          iconLeft={<ShoppingBag size={24} strokeWidth={1.5} />}
+        />
+        <PageAction
+          title="Интеграции"
+          description={integrationsText(INTEGRATIONS)}
           iconLeft={<IntegrationIcon />}
         />
         <PageAction title="Тариф" description={TARIFF_NAME} iconLeft={<RequisitesTIcon />} />
