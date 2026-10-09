@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { MainPageNavigationBar } from '@ds/components/MainPageNavigationBar'
+import { isCaseScenario } from '@/data/paymentDemos'
 import { ROUTES } from '@/routes'
 import { PaymentsProvider } from '@/state/PaymentsProvider'
 import { ScenarioProvider, useScenario } from '@/state/ScenarioProvider'
@@ -23,7 +24,7 @@ function ScrollToTop() {
  */
 function EcosystemHeader({ onHome }: { onHome: () => void }) {
   const { scenario } = useScenario()
-  const isCase2 = scenario === 'case2' || scenario === 'case3'
+  const isCase2 = isCaseScenario(scenario) || scenario === 'onboarding' || scenario === 'onboarding_vat'
   return (
     <MainPageNavigationBar
       navItems={[
@@ -31,7 +32,7 @@ function EcosystemHeader({ onHome }: { onHome: () => void }) {
         { id: 'payments', label: 'Платежи' },
         { id: 'services', label: 'Сервисы' },
       ]}
-      userName={isCase2 ? 'Носковец О.Н., ООО' : 'Носковец П.А., ООО'}
+      userName={(scenario === 'ip' || scenario === 'ip_december') ? 'Носковец О.Н., ИП' : isCase2 ? 'Носковец О.Н., ООО' : 'Носковец П.А., ООО'}
       avatarInitials={isCase2 ? 'НО' : 'ПН'}
       hasNotification
     />

@@ -17,6 +17,10 @@ export const CATEGORY: Record<PayCategory, string> = {
   vznos: contributionsLogo,
   usn: taxesLogo,
   nds: vatLogo,
+  property: taxesLogo,
+  transport: taxesLogo,
+  ipfixed: contributionsLogo,
+  ipextra: contributionsLogo,
 }
 
 export function PayIcon({ category, muted = false }: { category: PayCategory; muted?: boolean }) {

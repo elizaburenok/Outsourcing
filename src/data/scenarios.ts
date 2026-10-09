@@ -10,7 +10,7 @@
 
 import { AUGUST_PAYMENTS, USN_ADVANCE, usnPayment, type AugustPayment } from '@/data/august'
 
-export type ScenarioId = 'overdue' | 'ok' | 'case2' | 'case3'
+export type ScenarioId = 'overdue' | 'ok' | 'case2' | 'case3' | 'case2_pending' | 'case2_overdue' | 'ip' | 'ip_december' | 'onboarding' | 'onboarding_vat'
 
 export interface HomeScenario {
   id: ScenarioId
@@ -56,6 +56,8 @@ const ALL_PAID: AugustPayment[] = AUGUST_PAYMENTS.map((p) =>
 )
 
 export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
+  onboarding: { id: 'onboarding', label: 'Онбординг', payments: [], usn: null },
+  onboarding_vat: { id: 'onboarding_vat', label: 'Онбординг · НДС', payments: [], usn: null },
   // Дефолт прототипа — сценарий «24 августа»: накопились просроченные платежи.
   overdue: {
     id: 'overdue',
@@ -76,10 +78,14 @@ export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
   // `Case2View` (см. HomePage), а не доменные карточки; `payments`/`usn` — для полноты типа.
   case2: {
     id: 'case2',
-    label: 'Кейс 2',
+    label: 'Готовы к уплате',
     payments: AUGUST_PAYMENTS,
     usn: usnPayment('mid'),
   },
+  case2_pending: { id: 'case2_pending', label: 'Ещё не рассчитаны', payments: [], usn: null },
+  case2_overdue: { id: 'case2_overdue', label: 'Просрочены', payments: [], usn: null },
+  ip: { id: 'ip', label: 'ИП · октябрь', payments: [], usn: null },
+  ip_december: { id: 'ip_december', label: 'ИП · декабрь', payments: [], usn: null },
   // Кейс 3 — тот же клиент, что и Кейс 2, но декабрь: пик налогового календаря (много
   // платежей одновременно). Свои данные берёт из `@/data/case3`; Главная рендерит тот же
   // `Case2View` с другим набором. `payments`/`usn` — для полноты типа.
@@ -91,7 +97,7 @@ export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
   },
 }
 
-export const SCENARIO_ORDER: ScenarioId[] = ['case2']
+export const SCENARIO_ORDER: ScenarioId[] = ['case2_pending', 'case2', 'case2_overdue', 'ip', 'ip_december', 'onboarding', 'onboarding_vat']
 
 /** Дефолтный сценарий — состояние, в которое возвращает кнопка сброса. */
 export const DEFAULT_SCENARIO: ScenarioId = 'case2'

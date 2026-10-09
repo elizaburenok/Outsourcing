@@ -12,6 +12,9 @@ import { AUGUST_PAYMENTS, USN_ADVANCE, type AugustPayment, type PayCategory } fr
 import { OCTOBER_PAYMENTS } from './october'
 import { CASE2_PAYABLES } from './case2'
 import { CASE3_PAYABLES } from './case3'
+import { DEMO_PAYABLES } from './paymentDemos'
+import { IP_CASE } from './ipCase'
+import { IP_DECEMBER_CASE } from './ipDecemberCase'
 
 /** Счёт списания (номинальный, для показа). */
 export const PAYMENT_ACCOUNT = '2 480 310,55 ₽ — Расчётный, ···7742'
@@ -24,6 +27,10 @@ const CATEGORY_TITLE: Record<PayCategory, string> = {
   vznos: 'Страховые взносы',
   travma: 'Взносы на травматизм',
   salary: 'Зарплата директору',
+  property: 'Налог на имущество',
+  transport: 'Транспортный налог',
+  ipfixed: 'Фиксированные взносы ИП',
+  ipextra: 'Дополнительный взнос ИП 1%',
 }
 
 /** Заголовок модалки результата оплаты («Флоу-результат») — с учётом рода/числа категории. */
@@ -34,6 +41,10 @@ const CATEGORY_PAID_TITLE: Record<PayCategory, string> = {
   vznos: 'Страховые взносы уплачены!',
   travma: 'Взносы на травматизм уплачены!',
   salary: 'Зарплата директору уплачена!',
+  property: 'Налог на имущество уплачен!',
+  transport: 'Транспортный налог уплачен!',
+  ipfixed: 'Фиксированные взносы ИП уплачены!',
+  ipextra: 'Дополнительный взнос ИП уплачен!',
 }
 
 export type Payable = {
@@ -66,15 +77,15 @@ function toPayable(
   return {
     id: p.id,
     category: p.category,
-    title,
+    title: p.id.startsWith('ip-') && p.category === 'salary' ? 'Зарплата' : title,
     subtitle,
     fullTitle: p.title,
-    paidTitle: CATEGORY_PAID_TITLE[p.category],
+    paidTitle: p.id.startsWith('ip-') && p.category === 'salary' ? 'Зарплата выплачена!' : CATEGORY_PAID_TITLE[p.category],
     amount: p.amount,
     dueLabel: p.dueLabel ?? '',
     requisites,
     account: PAYMENT_ACCOUNT,
-    hasCalc: p.category !== 'salary',
+    hasCalc: p.category !== 'salary' && !p.id.startsWith('ip-'),
   }
 }
 
@@ -85,7 +96,10 @@ export function getPayableById(id: string): Payable | undefined {
     AUGUST_PAYMENTS.find((x) => x.id === id) ??
     OCTOBER_PAYMENTS.find((x) => x.id === id) ??
     CASE2_PAYABLES.find((x) => x.id === id) ??
-    CASE3_PAYABLES.find((x) => x.id === id)
+    CASE3_PAYABLES.find((x) => x.id === id) ??
+    DEMO_PAYABLES.find((x) => x.id === id) ??
+    IP_CASE.payables.find((x) => x.id === id) ??
+    IP_DECEMBER_CASE.payables.find((x) => x.id === id)
   if (!p) return undefined
   // НДС: заголовок — полное название платежа («N-й платёж за …квартал»), без подзаголовка.
   if (p.category === 'nds') return toPayable(p, '', p.title)

@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Avatar">
+<mask id="mask0_0_714" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="34" height="34">
+<circle id="Mask" cx="17" cy="17" r="17" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_714)">
+<g id="Tinkoff Bank">
+<rect id="Fill" width="34" height="34" fill="#FFDD2D"/>
+<g id="Logo">
+<path id="Vector" d="M17 9.20833H26.2083V18.4476C26.2083 20.8169 24.9452 23.0012 22.8871 24.1903L17.0044 27.5812L11.1217 24.1903C9.06361 23.01 7.8005 20.8169 7.8005 18.4476L7.8005 9.20833H17Z" fill="white"/>
+<path id="Vector_2" d="M12.8435 14.0703V16.9417C13.2409 16.5013 13.9564 16.2018 14.769 16.2018H15.6612V19.5399C15.6612 20.4295 15.4227 21.2046 15.0605 21.6362H18.9293C18.5672 21.2046 18.3287 20.4295 18.3287 19.5399V16.2018H19.2208C20.0423 16.2018 20.7578 16.5013 21.1464 16.9417V14.0703H12.8435Z" fill-rule="evenodd" clip-rule="evenodd" fill="#333333"/>
+</g>
+</g>
+</g>
+</g>
+</svg>

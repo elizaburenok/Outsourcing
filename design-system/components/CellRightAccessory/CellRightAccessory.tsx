@@ -37,6 +37,7 @@ export type CellRightAccessoryProps = {
   /** Counter / stepper value */
   value?: number;
   disabled?: boolean;
+  ariaLabel?: string;
   onCheckedChange?: (next: boolean) => void;
   onStep?: (delta: number) => void;
 };
@@ -103,6 +104,7 @@ export function CellRightAccessory({
   checked = false,
   value = 0,
   disabled = false,
+  ariaLabel,
   onCheckedChange,
   onStep,
 }: CellRightAccessoryProps) {
@@ -121,7 +123,9 @@ export function CellRightAccessory({
           <button
             type="button"
             className={checked ? styles.checkboxChecked : styles.checkbox}
-            aria-pressed={checked}
+            role="checkbox"
+            aria-checked={checked}
+            aria-label={ariaLabel}
             onClick={() => onCheckedChange?.(!checked)}
           >
             {checked ? <CheckIcon className={styles.disclosure} /> : null}
@@ -134,7 +138,9 @@ export function CellRightAccessory({
           <button
             type="button"
             className={styles.radio}
-            aria-pressed={checked}
+            role="radio"
+            aria-checked={checked}
+            aria-label={ariaLabel}
             onClick={() => onCheckedChange?.(!checked)}
           >
             {checked ? <span className={styles.radioDot} /> : null}

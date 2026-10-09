@@ -3,8 +3,7 @@ import NavigationBar from '@ds/components/NavigationBar'
 import PageShell from '@/components/PageShell/PageShell'
 import AccountingView from '@/features/accounting/AccountingView'
 import { useScenario } from '@/state/ScenarioProvider'
-import { CASE2 } from '@/data/case2'
-import { CASE3 } from '@/data/case3'
+import { caseDataFor } from '@/data/paymentDemos'
 import { ROUTES } from '@/routes'
 
 /**
@@ -15,7 +14,7 @@ import { ROUTES } from '@/routes'
 export default function AccountingPage() {
   const navigate = useNavigate()
   const { scenario } = useScenario()
-  const data = scenario === 'case3' ? CASE3 : CASE2
+  const data = caseDataFor(scenario)
 
   return (
     <PageShell

@@ -28,14 +28,6 @@ function splitTotals(list: AugustPayment[]): { total: number } {
 }
 
 /**
- * Заголовок строки-группы: если в группе один платёж — показываем его конкретное название
- * (напр. «1-й платёж за III квартал»), иначе — общее имя домена («Налоги и взносы»).
- */
-function groupTitle(domain: string, items: AugustPayment[]): string {
-  return items.length === 1 ? items[0].title : domain
-}
-
-/**
  * КЕЙС 2 (макет 210-28862) — ООО на УСН «Доходы» 6% + НДС, есть сотрудники, «сегодня» —
  * октябрь 2026. У клиента одновременно готовые к уплате платежи и задолженность. Главная:
  *  - сверху кнопка «Создать задачу» → дроппер постановки задачи бухгалтеру;
@@ -49,6 +41,9 @@ function groupTitle(domain: string, items: AugustPayment[]): string {
  */
 export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
   const { isPaid } = usePayments()
+  const isIp = data.taxpayer === 'ip'
+  const taxKey = isIp ? 'taxes' : 'usn'
+  const taxTitle = isIp ? 'Налоги' : 'Налог по УСН'
   const [openGroup, setOpenGroup] = useState<PayGroup | null>(null)
   const [taskOpen, setTaskOpen] = useState(false)
 
@@ -64,21 +59,21 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
   const taxesGroup: PayGroup =
     taxesOpen.length > 0
       ? {
-          key: 'usn',
-          title: groupTitle('Налоги и взносы', taxesOpen),
+          key: taxKey,
+          title: taxTitle,
           items: taxesOpen,
           ...splitTotals(taxesOpen),
           payable: taxesOpen.some((p) => p.state !== 'process'),
         }
       : data.taxesUpcoming
         ? {
-            key: 'usn',
-            title: groupTitle('Налоги и взносы', [data.taxesUpcoming]),
+            key: taxKey,
+            title: taxTitle,
             items: [data.taxesUpcoming],
             total: data.taxesUpcoming.amount,
             payable: false,
           }
-        : { key: 'usn', title: 'Налоги и взносы', items: [], total: 0, payable: false, done: true }
+        : { key: taxKey, title: taxTitle, items: [], total: 0, payable: false, done: true }
 
   // НДС — только текущий (III) квартал: 1-й платёж к уплате, 2-й и 3-й по графику.
   // На карточке показываем сумму того, что уже пора платить (`due`), в дровере — весь квартал.
@@ -90,10 +85,10 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
     employeesOpen.length > 0
       ? {
           key: 'employees',
-          title: groupTitle('Сотрудники', employeesOpen),
+          title: 'Сотрудники',
           items: employeesOpen,
           ...splitTotals(employeesOpen),
-          payable: true,
+          payable: employeesOpen.some((p) => p.state !== 'process'),
         }
       : { key: 'employees', title: 'Сотрудники', items: [], total: 0, payable: false, done: true }
 
@@ -103,7 +98,7 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
       ? [
           {
             key: 'nds',
-            title: groupTitle('НДС: III квартал', ndsOpen),
+            title: 'НДС',
             items: ndsOpen,
             // Сумма на карточке — только то, что пора платить сейчас (текущая доля квартала).
             total: sum(ndsDue.length > 0 ? ndsDue : ndsOpen),
@@ -123,6 +118,7 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
   // «Оплачено сегодня» (как в «Бухучёте»). Источник — полный список домена по ключу группы.
   const domainSource: Partial<Record<PayGroup['key'], AugustPayment[]>> = {
     usn: data.taxes,
+    taxes: data.taxes,
     nds: data.nds,
     employees: data.employees,
   }
@@ -186,7 +182,7 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
           description={integrationsText(INTEGRATIONS)}
           iconLeft={<IntegrationIcon />}
         />
-        <PageAction title="Тариф" description={TARIFF_NAME} iconLeft={<RequisitesTIcon />} />
+        <PageAction title="Тариф" description={isIp ? 'Бухгалтерское обслуживание для ИП' : TARIFF_NAME} iconLeft={<RequisitesTIcon />} />
       </div>
 
       {drawerProps && <GroupDrawer open onClose={() => setOpenGroup(null)} {...drawerProps} />}

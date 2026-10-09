@@ -2,6 +2,8 @@ import { Chip } from '@ds/components/Chip'
 import { Button } from '@ds/components/Button'
 import { useScenario } from '@/state/ScenarioProvider'
 import { HOME_SCENARIOS, SCENARIO_ORDER } from '@/data/scenarios'
+import { useNavigate } from 'react-router-dom'
+import { ROUTES } from '@/routes'
 import './ScenarioSwitch.css'
 
 /**
@@ -12,6 +14,7 @@ import './ScenarioSwitch.css'
  */
 export default function ScenarioSwitch() {
   const { scenario, setScenario, reset } = useScenario()
+  const navigate = useNavigate()
 
   return (
     <aside className="scn" aria-label="Демо-сценарий прототипа">
@@ -22,7 +25,10 @@ export default function ScenarioSwitch() {
             key={id}
             chipType="Tab"
             isSelected={scenario === id}
-            onClick={() => setScenario(id)}
+            onClick={() => {
+              setScenario(id)
+              if (id === 'onboarding' || id === 'onboarding_vat') navigate(ROUTES.home)
+            }}
           >
             {HOME_SCENARIOS[id].label}
           </Chip>

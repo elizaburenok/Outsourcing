@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Content">
+<mask id="mask0_0_337" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="40">
+<circle id="Mask" cx="20" cy="20" r="20" fill="#191919"/>
+</mask>
+<g mask="url(#mask0_0_337)">
+<g id="Yandex Market">
+<rect width="40" height="40" fill="#FF5226"/>
+<path id="Logo" d="M18.9724 8.33333L5.41667 29.1667H11.6307L15.5462 23.1624L17.504 20.1603L18.4828 18.6592L19.1209 17.6808L18.7278 19.2212L18.185 21.3695L17.0995 25.6663L21.6959 26.4642L26.0052 21.1524L24.5684 27.1336L34.5833 25.2537L32.5403 21.9392L29.5027 22.6307L31.0376 16.298L27.1218 13.7192L24.5579 16.8949L23.2759 18.4827L22.418 19.5293L22.7757 18.1161L23.3023 16.0355L24.3554 11.8744L18.9724 8.33333Z" fill="#FFDD00"/>
+</g>
+</g>
+</g>
+</svg>

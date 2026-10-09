@@ -2,3 +2,9 @@
   display: flex;
   gap: var(--space-2x);
 }
+
+.onboarding-navigation .navigation-bar__title {
+  overflow: visible;
+  text-overflow: clip;
+  white-space: normal;
+}

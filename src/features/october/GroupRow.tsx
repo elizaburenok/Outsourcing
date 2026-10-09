@@ -36,7 +36,7 @@ function GroupIcon({ group }: { group: PayGroup }) {
         <AlertTriangle size={20} strokeWidth={2} />
       </span>
     )
-  if (group.key === 'usn') return <PayIcon category="usn" />
+  if (group.key === 'usn' || group.key === 'taxes') return <PayIcon category="usn" />
   if (group.key === 'nds') return <PayIcon category="nds" />
   // Сотрудники — единый аватар вне зависимости от состава.
   return <PayIcon category="salary" />
@@ -46,6 +46,24 @@ function GroupIcon({ group }: { group: PayGroup }) {
 function groupNote(group: PayGroup): ReactNode {
   if (group.done)
     return <span className="pay-note pay-note--done">Всё уплачено, ничего делать не нужно</span>
+  const allProcessing = group.items.length > 0 && group.items.every((p) => p.state === 'process' && !p.preliminary && !p.payFromLabel)
+  if (allProcessing) return <span className="pay-note">Бухгалтер рассчитывает платежи</span>
+  const overdue = group.items.filter((p) => p.state === 'overdue')
+  if (group.key === 'taxes') {
+    if (overdue.length > 0) {
+      const date = nearestDue(overdue)
+      return (
+        <span className="pay-note pay-note--overdue">
+          {overdue.length} {overdue.length === 1 ? 'просрочен' : 'просрочены'}
+          {date ? `, срок вышел ${date}` : ''}
+        </span>
+      )
+    }
+    const nearest = nearestDue(group.items.filter((p) => p.state === 'due'))
+    return <span className="pay-note">{nearest ? `До ${nearest}` : ''}</span>
+  }
+  if (overdue.length === group.items.length && overdue.length > 0)
+    return <span className="pay-note pay-note--overdue">Просрочено, срок вышел {nearestDue(overdue)}</span>
   if (group.key === 'overdue')
     return <span className="pay-note pay-note--overdue">Уплатите как можно скорее</span>
   if (group.key === 'usn') {
@@ -101,7 +119,10 @@ export default function GroupRow({
   // платежа в заголовке, поэтому его исключаем.
   const readyItems = group.items.filter((p) => p.state !== 'process')
   const multiPayments = group.key !== 'nds' && readyItems.length > 1
-  const rightAccessory = group.done ? (
+  const uncalculated = group.items.length > 0 && group.items.every((p) => p.state === 'process' && !p.preliminary && !p.payFromLabel)
+  const rightAccessory = uncalculated ? (
+    <span className="pay-amount pay-amount--done">В расчёте</span>
+  ) : group.done ? (
     <Check size={20} strokeWidth={2.25} className="pay-check" />
   ) : usnProcessing && group.items[0].preliminary ? (
     <span className="pay-amount-col">
