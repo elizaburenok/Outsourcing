@@ -136,6 +136,7 @@ export const CASE2_PAYABLES: AugustPayment[] = [...CASE2_TAXES, ...CASE2_NDS, ..
  * это позволяет держать несколько кейсов (октябрь, декабрь…) на одном экране-макете.
  */
 export type ObCaseData = {
+  taxpayer?: 'ip'
   taxes: AugustPayment[]
   nds: AugustPayment[]
   employees: AugustPayment[]

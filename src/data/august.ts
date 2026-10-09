@@ -17,7 +17,7 @@
 
 /** `process` — сумма ещё считается (квартал не закрыт), числа нет. */
 export type PayState = 'paid' | 'due' | 'overdue' | 'process'
-export type PayCategory = 'ndfl' | 'travma' | 'salary' | 'vznos' | 'usn' | 'nds'
+export type PayCategory = 'ndfl' | 'travma' | 'salary' | 'vznos' | 'usn' | 'nds' | 'property' | 'transport' | 'ipfixed' | 'ipextra'
 
 export type AugustPayment = {
   id: string

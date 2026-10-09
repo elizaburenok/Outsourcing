@@ -1,0 +1,13 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Avatar">
+<mask id="mask0_0_824" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="34" height="34">
+<circle id="Mask" cx="17" cy="17" r="17" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_824)">
+<g id="Alfabank">
+<rect id="Fill" width="34" height="34" fill="#EF3124"/>
+<path id="Logo" d="M10.625 26.2083V23.5001H23.565V26.2083H10.625ZM15.2462 14.7945H18.8429L17.1287 9.36139H17.0613L15.2466 14.7945H15.2462V14.7945ZM19.4473 8.35825L23.2626 19.8209H20.4393L19.5822 17.0964H14.4733L13.5487 19.8213H10.8944L14.8982 8.35865C15.2859 7.24679 15.7387 6.375 17.1958 6.375C18.6529 6.375 19.0782 7.25036 19.4473 8.35865V8.35825V8.35825Z" fill-rule="evenodd" clip-rule="evenodd" fill="white"/>
+</g>
+</g>
+</g>
+</svg>

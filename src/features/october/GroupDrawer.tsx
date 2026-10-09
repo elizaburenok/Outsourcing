@@ -21,6 +21,10 @@ const DOMAIN_LABEL: Record<PayCategory, string> = {
   travma: 'Сотрудники',
   salary: 'Сотрудники',
   vznos: 'Сотрудники',
+  property: 'Налоги',
+  transport: 'Налоги',
+  ipfixed: 'Налоги',
+  ipextra: 'Налоги',
 }
 
 /** Если все платежи из одного раздела — его короткое имя, иначе (смешанная группа,
@@ -79,12 +83,13 @@ export default function GroupDrawer({
 
   // В шапке — короткое имя раздела (Налог по УСН / НДС / Сотрудники), а не полное
   // название платежа. Для смешанных групп («N просрочено») остаётся переданный title.
-  const header = singleDomainLabel(items) ?? title
+  const header = title === 'Налоги' ? title : singleDomainLabel(items) ?? title
   // Платить ещё нечего (всё в расчёте, суммы предварительные) — вместо «Осталось
   // уплатить» подписываем, что это прикидка и время платить не пришло.
   const notReady = items.length > 0 && payable.length === 0
   // «Осталось уплатить» — только то, что реально пора платить. Если платить нечего
   // вовсе, показываем прикидку по известным суммам (сценарии «Всё хорошо» на Главной).
+  const uncalculated = notReady && !items.some(hasEstimate)
   const total = notReady
     ? items.filter(hasEstimate).reduce((sum, p) => sum + p.amount, 0)
     : payableTotal
@@ -188,9 +193,9 @@ export default function GroupDrawer({
 
         {tab === 'topay' && items.length > 0 && (
           <div className="gd__total">
-            <span className="gd__total-amount">{formatMoney(total)}</span>
+            <span className="gd__total-amount">{uncalculated ? 'В расчёте' : formatMoney(total)}</span>
             <span className="gd__total-label">
-              {notReady ? 'Пока рано платить. Расчёт предварительный.' : 'Осталось уплатить'}
+              {uncalculated ? 'Бухгалтер рассчитывает платежи' : notReady ? 'Пока рано платить. Расчёт предварительный.' : 'Осталось уплатить'}
             </span>
           </div>
         )}

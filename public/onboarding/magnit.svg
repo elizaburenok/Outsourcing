@@ -1,0 +1,16 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Content">
+<mask id="mask0_0_355" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="40" height="40">
+<circle id="Mask" cx="20" cy="20" r="20" fill="#191919"/>
+</mask>
+<g mask="url(#mask0_0_355)">
+<g id="Magnit Market">
+<rect width="40" height="40" fill="#FF462D"/>
+<g id="Logo">
+<path d="M17.3772 18.0743L13.499 24.015H13.5L10.8141 24.2416L11.1759 18.5967L9.00564 24.3943L5.83333 24.6623L9.36676 15.2259L13.6303 14.8658L13.3649 20.4569L17.2045 14.5643L21.9117 14.1667L18.3793 23.603L15.207 23.871L17.3772 18.0743Z" fill="white"/>
+<path d="M29.6322 20.001L25.7539 25.9417H25.7549L23.0691 26.1682L23.4308 20.5234L21.2606 26.321L18.0883 26.5889L21.6217 17.1526L25.8852 16.7924L25.6199 22.3836L29.4594 16.4909L34.1667 16.0933L30.6342 25.5297L27.4619 25.7976L29.6322 20.001Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</svg>

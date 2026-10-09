@@ -13,7 +13,7 @@ import { OCTOBER_PAYMENTS, octoberUsn } from '@/data/october'
 import { AUGUST_PAYMENTS, usnPayment, type Snapshot } from '@/data/august'
 import type { AugustPayment } from '@/data/august'
 
-export type GroupKey = 'overdue' | 'usn' | 'nds' | 'employees'
+export type GroupKey = 'overdue' | 'usn' | 'taxes' | 'nds' | 'employees'
 
 export type PayGroup = {
   key: GroupKey

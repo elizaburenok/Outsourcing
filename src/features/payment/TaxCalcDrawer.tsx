@@ -6,7 +6,7 @@ import type { PayCategory } from '@/data/august'
 import { pluralOps } from '@/lib/plural'
 import './TaxCalcDrawer.css'
 
-type RateCategory = Exclude<PayCategory, 'usn' | 'salary'>
+type RateCategory = Extract<PayCategory, 'ndfl' | 'vznos' | 'travma' | 'nds'>
 
 const RATE_HEADING: Record<RateCategory, string> = {
   ndfl: 'НДФЛ с зарплаты',

@@ -19,7 +19,11 @@ const ScenarioContext = createContext<ScenarioContextValue | null>(null)
 
 export function ScenarioProvider({ children }: { children: ReactNode }) {
   const { reset: resetPaid } = usePayments()
-  const [scenario, setScenario] = useState<ScenarioId>(DEFAULT_SCENARIO)
+  const [scenario, updateScenario] = useState<ScenarioId>(DEFAULT_SCENARIO)
+  const setScenario = useCallback((id: ScenarioId) => {
+    resetPaid()
+    updateScenario(id)
+  }, [resetPaid])
 
   const reset = useCallback(() => {
     setScenario(DEFAULT_SCENARIO)
@@ -28,7 +32,7 @@ export function ScenarioProvider({ children }: { children: ReactNode }) {
 
   const value = useMemo<ScenarioContextValue>(
     () => ({ scenario, setScenario, reset }),
-    [scenario, reset],
+    [scenario, reset, setScenario],
   )
 
   return <ScenarioContext.Provider value={value}>{children}</ScenarioContext.Provider>

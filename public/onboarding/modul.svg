@@ -1,0 +1,17 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="34" height="34" viewBox="0 0 34 34" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Avatar">
+<mask id="mask0_0_776" style="mask-type:alpha" maskUnits="userSpaceOnUse" x="0" y="0" width="34" height="34">
+<circle id="Mask" cx="17" cy="17" r="17" fill="white"/>
+</mask>
+<g mask="url(#mask0_0_776)">
+<g id="Modulbank">
+<rect id="Fill" width="34" height="34" fill="#253C77"/>
+<g id="Logo">
+<path d="M18.8416 18.8416V15.1583L22.5247 15.1583V18.8415L18.8416 18.8416L18.8418 22.5248H22.5251L22.5247 18.8415L26.208 18.8416V11.475H22.5247V7.79167H15.1581V11.475L11.475 11.475V7.79167H7.79167V15.1583H11.475V18.8416H7.79167V26.2082H11.475V22.5249H15.1583V18.8416H18.8416ZM15.1581 11.475L15.1583 15.1583H18.8416L18.8414 11.475H15.1581Z" fill-rule="evenodd" clip-rule="evenodd" fill="white"/>
+<path d="M22.5251 22.5248L26.2082 22.525V26.2083H22.5249L22.5251 22.5248Z" fill="white"/>
+<path d="M18.8418 22.5248L15.1583 22.5249L15.1581 26.2083H18.8414L18.8418 22.5248Z" fill="white"/>
+</g>
+</g>
+</g>
+</g>
+</svg>
