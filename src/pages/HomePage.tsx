@@ -38,7 +38,7 @@ export default function HomePage() {
 
   return (
     <PageShell
-      background={isOnboarding && (onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
+      background={isOnboarding && (onboardingPage === 'marketplaces' || onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
       aside={
         <NavigationBar
           className={isOnboarding && onboardingPage !== 'home' ? 'onboarding-navigation' : undefined}
