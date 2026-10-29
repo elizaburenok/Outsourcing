@@ -100,4 +100,4 @@ export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
 export const SCENARIO_ORDER: ScenarioId[] = ['case2_pending', 'case2', 'case2_overdue', 'ip', 'ip_december', 'onboarding', 'onboarding_vat']
 
 /** Дефолтный сценарий — состояние, в которое возвращает кнопка сброса. */
-export const DEFAULT_SCENARIO: ScenarioId = 'case2'
+export const DEFAULT_SCENARIO: ScenarioId = 'onboarding'
