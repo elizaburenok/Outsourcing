@@ -30,24 +30,26 @@ export default function HomePage() {
   const [onboardingPage, setOnboardingPage] = useState<OnboardingPage>('home')
   useEffect(() => setOnboardingPage('home'), [scenario])
   const onboardingTitles: Record<OnboardingPage, string> = {
-    home: 'Онлайн-бухгалтерия', signature: 'Электронная подпись', marketplaces: 'Маркетплейсы', wildberries: 'Подключение Wildberries', banks: 'Подключение интеграции', vat: 'Настройка НДС',
+    'wildberries-dashboard': 'Wildberries', 'ozon-dashboard': 'Ozon', 'wildberries-reports': 'Отчёты', 'ozon-reports': 'Отчёты',
+    'wildberries-details': 'Магазин на Wildberries', 'ozon-details': 'Магазин на Ozon', home: 'Онлайн-бухгалтерия', signature: 'Доверенность', sfr: 'Доверенность', marketplaces: 'Маркетплейсы', wildberries: 'Подключение Wildberries', ozon: 'Подключение Ozon', banks: 'Интеграции', 'bank-connect': 'Подключение интеграции', vat: 'Настройка НДС',
   }
   const caseData = caseDataFor(scenario)
   const totalDue = useCase2TotalDue(caseData)
 
   return (
     <PageShell
+      background={isOnboarding && (onboardingPage === 'marketplaces' || onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
       aside={
         <NavigationBar
           className={isOnboarding && onboardingPage !== 'home' ? 'onboarding-navigation' : undefined}
           hasBackButton
           hasTextBlock
           title={isOnboarding ? onboardingTitles[onboardingPage] : 'Онлайн-бухгалтерия'}
-          subtitle={isOnboarding ? (onboardingPage === 'home' ? (scenario === 'onboarding_vat' ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'ООО · УСН «Доходы» 6%') : undefined) : caseData.taxpayer === 'ip' ? 'ИП · УСН «Доходы» 6% + НДС 5%' : isOb ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'УСН «Доходы» + НДС 5%'}
+          subtitle={isOnboarding ? (onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'Ozon' : 'Wildberries') : onboardingPage === 'home' ? (scenario === 'onboarding_vat' ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'ООО · УСН «Доходы» 6%') : onboardingPage === 'signature' || onboardingPage === 'sfr' ? 'На АО «Точка»' : undefined) : caseData.taxpayer === 'ip' ? 'ИП · УСН «Доходы» 6% + НДС 5%' : isOb ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'УСН «Доходы» + НДС 5%'}
           hasRootLink={isOnboarding && onboardingPage !== 'home'}
           rootLinkText="Онлайн-бухгалтерия"
           onRootLinkClick={() => setOnboardingPage('home')}
-          onBackClick={() => setOnboardingPage(onboardingPage === 'wildberries' ? 'marketplaces' : 'home')}
+          onBackClick={() => setOnboardingPage(onboardingPage.endsWith('-details') || onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'ozon-dashboard' : 'wildberries-dashboard') : onboardingPage === 'wildberries' || onboardingPage === 'ozon' || onboardingPage.endsWith('-dashboard') ? 'marketplaces' : onboardingPage === 'bank-connect' ? 'banks' : 'home')}
         />
       }
       rightRail={isOb && !isOnboarding && totalDue ? <TotalDueWidget content={totalDue} /> : undefined}
