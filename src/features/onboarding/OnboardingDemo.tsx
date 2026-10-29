@@ -116,9 +116,9 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
 
       <div className="od__links">
         <PageAction title="Налогообложение" description="УСН «Доходы» — 6%" iconLeft={<img src="/onboarding/tax.svg" alt="" width="30" height="30" />} />
-        {done.includes('signature') && <PageAction title="Доверенность" description={done.includes('signature') ? 'Доверенность выпущена' : 'Добавьте подпись'} iconLeft={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} onClick={() => setSignatureDrawerOpen(true)} />}
-        {(connectingMarketplaces.length > 0 || connectedMarketplaces.length > 0) && <PageAction title="Маркетплейсы" description={connectingMarketplaces.length || connectedMarketplaces.length ? marketplace : 'Не подключено'} iconLeft={<img src="/onboarding/basket.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('marketplaces')} />}
-        {done.includes('banks') && <PageAction title="Интеграции" description={connectedBanks.length ? connectedBanks.map((item) => item.name).join(', ') : 'Подключите банк'} iconLeft={<img src="/onboarding/integration.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('banks')} />}
+        <PageAction title="Доверенность" description={done.includes('signature') ? 'Доверенность выпущена' : 'Добавьте подпись'} iconLeft={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} onClick={() => setSignatureDrawerOpen(true)} />
+        <PageAction title="Маркетплейсы" description={connectingMarketplaces.length || connectedMarketplaces.length ? marketplace : 'Не подключено'} iconLeft={<img src="/onboarding/basket.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('marketplaces')} />
+        <PageAction title="Интеграции" description={connectedBanks.length ? connectedBanks.map((item) => item.name).join(', ') : 'Подключите банк'} iconLeft={<img src="/onboarding/integration.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('banks')} />
         <PageAction title="Тариф" description="Бухгалтерское обслуживание для ООО" iconLeft={<img src="/onboarding/tariff.svg" alt="" width="30" height="30" />} />
       </div>
     </>}
