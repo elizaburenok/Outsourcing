@@ -28,6 +28,46 @@
   color: var(--color-primitive-secondary);
 }
 
+.scn__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 24px;
+}
+
+.scn__toggle {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--color-primitive-secondary);
+  cursor: pointer;
+}
+
+.scn__toggle:hover { background: rgba(25, 25, 25, .06); }
+.scn__toggle:focus-visible { outline: 2px solid #835de1; outline-offset: 3px; }
+
+.scn__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2x, 8px);
+}
+
+.scn__content[hidden] { display: none; }
+
+.scn--collapsed {
+  width: auto;
+  padding: 12px;
+  overflow: visible;
+}
+
+.scn--collapsed .scn__toggle { margin: 0; }
+
 .scn__tabs {
   display: flex;
   flex-wrap: wrap;
