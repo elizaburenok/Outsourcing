@@ -1,22 +1,29 @@
-import { useState } from 'react'
-import { Check, CirclePlus, Info, TriangleAlert } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { Check, Info, Plus, TriangleAlert } from 'lucide-react'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
 import { Cell } from '@ds/components/Cell'
 import { CellRightAccessory } from '@ds/components/CellRightAccessory'
 import PageAction from '@ds/components/PageAction'
 import Card from '@/components/ui/Card'
+import WildberriesConnection from './WildberriesConnection'
+import FnsAuthorization from './FnsAuthorization'
+import OzonConnection, { type OzonStore } from './OzonConnection'
+import MarketplaceDashboard, { MarketplaceReports } from './MarketplaceDashboard'
 import './OnboardingDemo.css'
 
-type Task = 'signature' | 'marketplaces' | 'banks' | 'vat'
-export type OnboardingPage = 'home' | Task | 'wildberries'
+type Task = 'signature' | 'sfr' | 'marketplaces' | 'banks' | 'vat'
+export type OnboardingPage = 'home' | Task | 'wildberries' | 'ozon' | 'bank-connect' | 'wildberries-details' | 'ozon-details' | 'wildberries-dashboard' | 'ozon-dashboard' | 'wildberries-reports' | 'ozon-reports'
 
 const BASE_TASKS: { id: Task; label: string }[] = [
-  { id: 'signature', label: 'Добавьте подпись' },
+  { id: 'signature', label: 'Выпустите доверенность для ФНС' },
+  { id: 'sfr', label: 'Выпустите доверенность в СФР' },
   { id: 'marketplaces', label: 'Подключите маркетплейсы' },
   { id: 'banks', label: 'Настройте интеграции с другими банками' },
 ]
-const MARKETPLACES = ['Wildberries', 'Ozon', 'Яндекс Маркет', 'Магнит Маркет']
-const MARKETPLACE_ICONS = ['wildberries', 'ozon', 'yandex', 'magnit']
+const SUGGESTED_MARKETPLACES = [
+  { name: 'Ozon', icon: 'ozon' },
+  { name: 'Wildberries', icon: 'wildberries' },
+]
 const BANKS = ['Сбербанк', 'Альфа-Банк', 'Т-Банк', 'Банк Открытие', 'Модульбанк']
 const BANK_ICONS = ['sber', 'alfa', 'tbank', 'otkritie', 'modul']
 
@@ -27,19 +34,62 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
 }) {
   const tasks = withVat ? [...BASE_TASKS, { id: 'vat' as Task, label: 'Настройте НДС' }] : BASE_TASKS
   const [signatureDrawerOpen, setSignatureDrawerOpen] = useState(false)
+  const [sfrDrawerOpen, setSfrDrawerOpen] = useState(false)
   const [onboardingDismissed, setOnboardingDismissed] = useState(false)
   const [done, setDone] = useState<Task[]>([])
   const [marketplace, setMarketplace] = useState('')
-  const [wildberriesDate, setWildberriesDate] = useState('01.01.2025')
-  const [wildberriesConfigured, setWildberriesConfigured] = useState(false)
+  const [connectingMarketplaces, setConnectingMarketplaces] = useState<string[]>([])
+  const [connectedMarketplaces, setConnectedMarketplaces] = useState<string[]>([])
+  const [marketplaceDates, setMarketplaceDates] = useState<Record<string, string>>({ Wildberries: '2026-01-01', Ozon: '2026-01-01' })
+  const [wildberriesToken, setWildberriesToken] = useState('')
+  const [ozonStores, setOzonStores] = useState<OzonStore[]>([])
+  const marketplaceTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map())
+  useEffect(() => () => { marketplaceTimers.current.forEach(clearTimeout) }, [])
   const [bank, setBank] = useState('')
+  const [connectedBanks, setConnectedBanks] = useState<{ name: string; date: string }[]>([])
   const [consent, setConsent] = useState(false)
+  const [bankSubmitted, setBankSubmitted] = useState(false)
+  const bankError = bankSubmitted && !bank
+  const consentError = bankSubmitted && !consent
   const completed = tasks.filter((task) => done.includes(task.id)).length
 
   function finish(task: Task) {
     setDone((current) => current.includes(task) ? current : [...current, task])
     setSignatureDrawerOpen(false)
+    setSfrDrawerOpen(false)
     onPageChange('home')
+  }
+
+  function startMarketplace(name: string, description: string) {
+    if (marketplaceTimers.current.has(name) || connectedMarketplaces.includes(name)) return
+    setConnectingMarketplaces((current) => current.includes(name) ? current : [...current, name])
+    setMarketplace(description)
+    marketplaceTimers.current.set(name, setTimeout(() => {
+      setConnectingMarketplaces((current) => current.filter((item) => item !== name))
+      setConnectedMarketplaces((current) => current.includes(name) ? current : [...current, name])
+      marketplaceTimers.current.delete(name)
+    }, 10_000))
+  }
+
+  function openBankForm() {
+    setBank('')
+    setConsent(false)
+    setBankSubmitted(false)
+    onPageChange('bank-connect')
+  }
+
+  function connectBank() {
+    setBankSubmitted(true)
+    if (!bank || !consent) return
+    setConnectedBanks((current) => current.some((item) => item.name === bank) ? current : [...current, { name: bank, date: new Intl.DateTimeFormat('ru-RU', { day: 'numeric', month: 'long', timeZone: 'Europe/Moscow' }).format(new Date()) }])
+    setDone((current) => current.includes('banks') ? current : [...current, 'banks'])
+    setBankSubmitted(false)
+    onPageChange('banks')
+  }
+
+  function finishMarketplace() {
+    if (SUGGESTED_MARKETPLACES.every((item) => connectingMarketplaces.includes(item.name) || connectedMarketplaces.includes(item.name))) finish('marketplaces')
+    else onPageChange('marketplaces')
   }
 
   return <div className={page === 'home' ? 'od od--home' : 'od od--subpage'}>
@@ -52,12 +102,11 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
             <span>{completed} из {tasks.length}</span>
             <img className="od__progress-icon" src="/onboarding/progress-icon.svg" alt="" width="24" height="24" />
           </div>
-          <img className="od__settings-art" src="/onboarding/settings.svg" alt="" width="210" height="240" />
         </div>
         <div className="od__card-tasks">
-          {tasks.map((task) => <button className="od__card-task" type="button" key={task.id} onClick={() => onPageChange(task.id)}>
-            <span className={done.includes(task.id) ? 'od__task-status od__task-status--done' : 'od__task-status'}>{done.includes(task.id) ? <Check size={17} /> : <img src="/onboarding/task-plus.svg" alt="" width="24" height="24" />}</span>
-            <span>{task.label}</span>
+          {tasks.map((task) => <button className="od__card-task" type="button" key={task.id} onClick={() => task.id === 'signature' ? setSignatureDrawerOpen(true) : task.id === 'sfr' ? setSfrDrawerOpen(true) : onPageChange(task.id)}>
+            <span className={done.includes(task.id) ? 'od__task-status od__task-status--done' : 'od__task-status'}>{done.includes(task.id) ? <Check size={15} strokeWidth={2} /> : <img src="/onboarding/task-plus.svg" alt="" width="24" height="24" />}</span>
+            <span className={done.includes(task.id) ? 'od__task-label--done' : undefined}>{task.label}</span>
           </button>)}
           <button className="od__card-dismiss" type="button" aria-label="Скрыть настройку банка" onClick={() => setOnboardingDismissed(true)}><img src="/onboarding/task-close.svg" alt="" width="20" height="20" /></button>
         </div>
@@ -67,53 +116,66 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
 
       <div className="od__links">
         <PageAction title="Налогообложение" description="УСН «Доходы» — 6%" iconLeft={<img src="/onboarding/tax.svg" alt="" width="30" height="30" />} />
-        <PageAction title="Доверенность" description={done.includes('signature') ? 'Доверенность выпущена' : 'Добавьте подпись'} iconLeft={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('signature')} />
-        <PageAction title="Маркетплейсы" description={done.includes('marketplaces') ? marketplace : 'Не подключено'} iconLeft={<img src="/onboarding/basket.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('marketplaces')} />
-        <PageAction title="Интеграции" description={done.includes('banks') ? bank : 'Подключите банк'} iconLeft={<img src="/onboarding/integration.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('banks')} />
+        {done.includes('signature') && <PageAction title="Доверенность" description={done.includes('signature') ? 'Доверенность выпущена' : 'Добавьте подпись'} iconLeft={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} onClick={() => setSignatureDrawerOpen(true)} />}
+        {(connectingMarketplaces.length > 0 || connectedMarketplaces.length > 0) && <PageAction title="Маркетплейсы" description={connectingMarketplaces.length || connectedMarketplaces.length ? marketplace : 'Не подключено'} iconLeft={<img src="/onboarding/basket.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('marketplaces')} />}
+        {done.includes('banks') && <PageAction title="Интеграции" description={connectedBanks.length ? connectedBanks.map((item) => item.name).join(', ') : 'Подключите банк'} iconLeft={<img src="/onboarding/integration.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('banks')} />}
         <PageAction title="Тариф" description="Бухгалтерское обслуживание для ООО" iconLeft={<img src="/onboarding/tariff.svg" alt="" width="30" height="30" />} />
       </div>
     </>}
 
-    {page === 'signature' && <div className="od__screen">
-      <p className="od__screen-intro">Добавьте электронную подпись для обмена документами с госорганами. Она юридически равна подписи на бумаге.</p>
-      <Card className="od__signature-card">
-        <h2>Мои подписи</h2>
-        <button type="button" className="od__add-signature" onClick={() => setSignatureDrawerOpen(true)}><CirclePlus size={24} />Добавить подпись</button>
-      </Card>
-      <div className="od__screen-actions">
-        <PageAction title="Автоматическая сдача отчётности" description="Сейчас отправляете вручную в ФНС и СФР" iconLeft={<img src="/onboarding/report-auto.svg" alt="" width="30" height="30" />} />
-        <PageAction title="Автонастройка компьютера" description="Подготовим компьютер и проверим работу электронной подписи" iconLeft={<img src="/onboarding/laptop.svg" alt="" width="30" height="30" />} />
-      </div>
-    </div>}
+    {page === 'signature' && <FnsAuthorization onDone={() => finish('signature')} />}
+
+    {page === 'sfr' && <FnsAuthorization variant="sfr" onDone={() => finish('sfr')} />}
 
     {page === 'marketplaces' && <div className="od__screen od__screen--marketplaces">
-      <div className="od__info"><img src="/onboarding/information-filled.svg" alt="" width="18" height="18" /><span>Подключите ваши маркетплейсы и загрузите отчёты, чтобы мы правильно учли операции по ним и корректно посчитали налог</span></div>
       <div className="od__marketplaces-list">
-        <p className="od__marketplaces-heading">Не подключено</p>
-        <div className="od__marketplaces-rows">{MARKETPLACES.map((name, index) => <button type="button" className="od__marketplace" key={name} aria-pressed={marketplace === name} onClick={() => { if (name === 'Wildberries') { setMarketplace(''); onPageChange('wildberries') } else setMarketplace(name) }}><img src={`/onboarding/${MARKETPLACE_ICONS[index]}.svg`} alt="" width="40" height="40" /><span>{name}</span></button>)}</div>
-        <button className="od__help" type="button"><img src="/onboarding/question-circle.svg" alt="" width="30" height="30" />Как работает сервис</button>
+        {connectedMarketplaces.length > 0 && <section className="od__marketplaces-group" aria-labelledby="connected-marketplaces">
+          <h2 className="od__marketplaces-heading" id="connected-marketplaces">Подключено</h2>
+          <div className="od__marketplaces-rows">{SUGGESTED_MARKETPLACES.filter(({ name }) => connectedMarketplaces.includes(name)).map(({ name, icon }) => <button type="button" className="od__marketplace" key={name} onClick={() => onPageChange(name === 'Wildberries' ? 'wildberries-dashboard' : 'ozon-dashboard')}><span className="od__marketplace-main"><img src={`/onboarding/${icon}.svg`} alt="" width="40" height="40" /><span>{name}</span></span></button>)}</div>
+        </section>}
+        {SUGGESTED_MARKETPLACES.some(({ name }) => !connectedMarketplaces.includes(name)) && <section className="od__marketplaces-group" aria-labelledby="suggested-marketplaces">
+          <h2 className="od__marketplaces-heading" id="suggested-marketplaces">Есть операции с доходом</h2>
+          <div className="od__marketplaces-rows">{SUGGESTED_MARKETPLACES.filter(({ name }) => !connectedMarketplaces.includes(name)).map(({ name, icon }) => <button type="button" className="od__marketplace" key={name} disabled={connectingMarketplaces.includes(name)} onClick={() => onPageChange(name === 'Wildberries' ? 'wildberries' : 'ozon')}><img src={`/onboarding/${icon}.svg`} alt="" width="40" height="40" /><span className="od__marketplace-text"><span>{name}</span>{connectingMarketplaces.includes(name) && <span className="od__marketplace-status">Подключаем</span>}</span></button>)}</div>
+        </section>}
+        <section className="od__marketplaces-group" aria-labelledby="other-marketplaces">
+          <h2 className="od__marketplaces-heading" id="other-marketplaces">Остальные</h2>
+          <div className="od__marketplace od__marketplace--unavailable" aria-disabled="true"><span className="od__marketplace-main"><img src="/onboarding/yandex.svg" alt="" width="40" height="40" /><span>Яндекс Маркет</span></span><span className="od__marketplace-note">Скоро добавим</span></div>
+        </section>
+        <button className="od__help" type="button"><img src="/onboarding/question-circle.svg" alt="" width="30" height="30" />Для чего нужны маркетплейсы?</button>
       </div>
-      <div className="od__page-footer"><button className="od__screen-cta" type="button" disabled={!marketplace} onClick={() => finish('marketplaces')}>Подключить</button></div>
     </div>}
 
-    {page === 'wildberries' && <div className="od__screen od__screen--wildberries">
-      <Cell className="od__wb-intro" textScale="M" verticalSpacing="none" horizontalSpacing="off" edgePadding="off" title={<><span>Настройте интеграцию, чтобы мы автоматически получали отчёты и учитывали их в подсчёте налогов.</span><span>Укажите дату, с которой Точка будет учитывать доходы от продаж на маркетплейсе.</span></>} />
-      <div className="od__wb-inputs">
-        <Card className="od__wb-card">
-          <h2>Автозагрузка отчётов</h2>
-          <button className="od__wb-action" type="button" onClick={() => setWildberriesConfigured(true)}><CirclePlus size={24} strokeWidth={1.5} /><span>{wildberriesConfigured ? 'Интеграция настроена' : 'Настроить интеграцию'}</span></button>
-        </Card>
-        <label className="od__wb-date"><span className="od__wb-date-label">Начало расчёта</span><span className="od__wb-date-control"><input type="text" inputMode="numeric" value={wildberriesDate} onChange={(event) => setWildberriesDate(event.target.value)} aria-label="Начало расчёта" /><img src="/onboarding/calendar.svg" alt="" width="24" height="24" /></span><span className="od__wb-date-help">С этой даты будем учитывать доходы от продаж</span></label>
-      </div>
-      <div className="od__page-footer"><button className="od__screen-cta" type="button" onClick={() => { setMarketplace('Wildberries'); finish('marketplaces') }}>Подключить</button></div>
+    {page === 'wildberries' && <WildberriesConnection onStart={(token, date) => { setMarketplaceDates((current) => ({ ...current, Wildberries: date })); setWildberriesToken(token); startMarketplace('Wildberries', 'Wildberries') }} onDone={finishMarketplace} />}
+    {page === 'ozon' && <OzonConnection onStart={(stores, date) => { setMarketplaceDates((current) => ({ ...current, Ozon: date })); setOzonStores(stores); startMarketplace('Ozon', `Ozon · ${stores.map((store) => store.name.trim()).join(', ')}`) }} onDone={finishMarketplace} />}
+
+    {(page === 'wildberries-dashboard' || page === 'ozon-dashboard') && (() => {
+      const name = page === 'wildberries-dashboard' ? 'Wildberries' : 'Ozon'
+      const prefix = name === 'Wildberries' ? 'wildberries' : 'ozon'
+      return <MarketplaceDashboard key={name} name={name} date={marketplaceDates[name]} onStore={() => onPageChange(`${prefix}-details`)} onReports={() => onPageChange(`${prefix}-reports`)} onDateChange={(date) => setMarketplaceDates((current) => ({ ...current, [name]: date }))} onDisconnect={() => {
+        const remaining = connectedMarketplaces.filter((item) => item !== name)
+        setConnectedMarketplaces(remaining)
+        setMarketplace(remaining.join(', '))
+        setDone((current) => current.filter((task) => task !== 'marketplaces'))
+        onPageChange('marketplaces')
+      }} />
+    })()}
+    {(page === 'wildberries-reports' || page === 'ozon-reports') && <MarketplaceReports />}
+
+    {page === 'wildberries-details' && <WildberriesConnection details initialToken={wildberriesToken} onStart={() => {}} onDone={() => onPageChange('wildberries-dashboard')} onSave={(token) => { setWildberriesToken(token); onPageChange('wildberries-dashboard') }} />}
+    {page === 'ozon-details' && <OzonConnection details initialStores={ozonStores} onStart={() => {}} onDone={() => onPageChange('ozon-dashboard')} onSave={(stores) => { setOzonStores(stores); setMarketplace(`Ozon · ${stores.map((store) => store.name.trim()).join(', ')}`); onPageChange('ozon-dashboard') }} />}
+
+    {page === 'banks' && connectedBanks.length > 0 && <div className="od__screen od__screen--connected-banks">
+      <h2>Подключённые банки</h2>
+      {connectedBanks.map(({ name, date }) => <Cell key={name} textScale="L" verticalSpacing="none" edgePadding="off" title={name} description={`Подключён ${date}`} leftAccessory={<img src={`/onboarding/${BANK_ICONS[BANKS.indexOf(name)]}.svg`} alt="" width="40" height="40" />} />)}
+      {connectedBanks.length < BANKS.length && <button className="od__connect-bank" type="button" onClick={openBankForm}><Cell textScale="L" verticalSpacing="none" edgePadding="off" title={<span className="od__connect-bank-label">Подключить банк</span>} leftAccessory={<span className="od__connect-bank-icon"><Plus size={24} strokeWidth={2} aria-hidden="true" /></span>} /></button>}
     </div>}
 
-    {page === 'banks' && <div className="od__screen od__screen--banks">
+    {(page === 'bank-connect' || (page === 'banks' && !connectedBanks.length)) && <div className="od__screen od__screen--banks">
       <h2>Подключить банк</h2>
       <Cell className="od__bank-intro" textScale="M" verticalSpacing="none" horizontalSpacing="off" edgePadding="off" title="Выберите один банк, с которым хотите настроить интеграцию" />
-      <div className="od__bank-cells" role="radiogroup" aria-label="Выберите банк">{BANKS.map((name, index) => <div className="od__bank-cell" key={name}><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={name} leftAccessory={<img src={`/onboarding/${BANK_ICONS[index]}.svg`} alt="" width="44" height="44" />} rightAccessory={<CellRightAccessory kind="Radio" checked={bank === name} ariaLabel={name} onCheckedChange={() => setBank(name)} />} /></div>)}</div>
-      <div className="od__bank-consent"><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={<><span className="od__bank-consent-link">Соглашаюсь</span> на передачу данных, составляющих банковскую тайну</>} description="Согласие нужно нам для работы с вашими данными. Они не выйдут за пределы Точки." rightAccessory={<CellRightAccessory kind="Checkbox" checked={consent} ariaLabel="Согласие на передачу данных" onCheckedChange={setConsent} />} /></div>
-      <div className="od__page-footer"><button className="od__screen-cta" type="button" disabled={!bank || !consent} onClick={() => finish('banks')}>Подключить</button></div>
+      <div className="od__bank-cells" role="radiogroup" aria-label="Выберите банк" aria-invalid={bankError} aria-describedby={bankError ? 'bank-selection-error' : undefined}>{BANKS.map((name, index) => connectedBanks.some((item) => item.name === name) ? null : <div className="od__bank-cell" key={name}><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={name} leftAccessory={<img src={`/onboarding/${BANK_ICONS[index]}.svg`} alt="" width="44" height="44" />} rightAccessory={<CellRightAccessory kind="Radio" checked={bank === name} ariaLabel={name} onCheckedChange={() => setBank(name)} />} /></div>)}{bankError && <div className="od__bank-error" id="bank-selection-error" role="alert">Выберите банк для подключения</div>}</div>
+      <div className="od__bank-consent" role="group" aria-invalid={consentError} aria-describedby={consentError ? 'bank-consent-error' : undefined}><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={<><span className="od__bank-consent-link">Соглашаюсь</span> на передачу данных, составляющих банковскую тайну</>} description="Согласие нужно нам для работы с вашими данными. Они не выйдут за пределы Точки." rightAccessory={<CellRightAccessory kind="Checkbox" checked={consent} ariaLabel="Согласие на передачу данных" onCheckedChange={setConsent} />} />{consentError && <div className="od__bank-error" id="bank-consent-error" role="alert">Необходимо подтвердить согласие</div>}</div>
+      <div className="od__page-footer"><button className="od__screen-cta" type="button" onClick={connectBank}>Подключить</button></div>
     </div>}
 
     {page === 'vat' && <div className="od__screen">
@@ -121,8 +183,8 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
       <div className="od__page-footer"><button className="od__screen-cta" type="button" onClick={() => finish('vat')}>Данные переданы</button></div>
     </div>}
 
-    <Drawer open={signatureDrawerOpen} onClose={() => setSignatureDrawerOpen(false)} side="right" className="od__drawer" aria-label="Доверенность ФНС">
-      <DrawerHeader onClose={() => setSignatureDrawerOpen(false)}>Доверенность ФНС</DrawerHeader>
+    <Drawer open={signatureDrawerOpen} onClose={() => setSignatureDrawerOpen(false)} side="right" className="od__drawer" aria-label="Выпуск доверенности для ФНС">
+      <DrawerHeader onClose={() => setSignatureDrawerOpen(false)} />
       <div className="od__body od__signature">
         <img src="/onboarding/hand-heart.png" alt="" width="120" height="120" />
         <h2>Отправка документов с любых гаджетов в налоговую</h2>
@@ -131,7 +193,17 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
         <p>Предупредим не позже, чем за 7 дней до отправки, чтобы вы всё проверили и отредактировали по необходимости.</p>
         <div className="od__notice"><TriangleAlert size={19} color="#E9B43E" /><div><strong>Обратите внимание</strong><p>Мы отправим декларацию за тот год и уведомление в ФНС за тот квартал, в котором вы подключили услугу. Отчитаться за более ранний период нужно самостоятельно.</p></div></div>
       </div>
-      <DrawerFooter primaryAction={{ label: done.includes('signature') ? 'Готово' : 'Выпустить доверенность', onClick: () => finish('signature') }} />
+      <DrawerFooter primaryAction={{ label: 'Выпустить доверенность', onClick: () => { setSignatureDrawerOpen(false); onPageChange('signature') } }} />
+    </Drawer>
+    <Drawer open={sfrDrawerOpen} onClose={() => setSfrDrawerOpen(false)} side="right" className="od__drawer" aria-label="Выпуск доверенности в СФР">
+      <DrawerHeader onClose={() => setSfrDrawerOpen(false)} />
+      <div className="od__body od__signature">
+        <img src="/onboarding/hand-heart.png" alt="" width="120" height="120" />
+        <h2>Отправка документов с любых гаджетов в Социальный фонд</h2>
+        <p>Достаточно выпустить доверенность на АО «Точка».</p>
+        <p>Подписывайте кадровые отчёты в Социальный фонд смс-кодом — всё без электронной подписи.</p>
+      </div>
+      <DrawerFooter primaryAction={{ label: 'Выпустить доверенность', onClick: () => { setSfrDrawerOpen(false); onPageChange('sfr') } }} />
     </Drawer>
   </div>
 }

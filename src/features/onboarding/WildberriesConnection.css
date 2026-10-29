@@ -1,0 +1,25 @@
+.od__screen.wb { gap:32px; letter-spacing:.16px; }
+.wb__intro { display:flex; flex-direction:column; gap:16px; }
+.wb__token { width:100%; padding:12px 20px; border-radius:12px; background:var(--color-container-transparent-1, rgba(25,25,25,.05)); }
+.wb__field { gap:8px; }
+.wb__field > div:first-child label { font-size:14px; line-height:18px; letter-spacing:.14px; }
+.wb__field > div:nth-child(2) { min-height:20px; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; }
+.wb__token:has(input[aria-invalid="true"]) { outline:1px solid var(--color-primitive-error, #d84d4d); }
+.wb__field > span[role="alert"] { margin-top:4px; }
+.wb__token:focus-within { outline:2px solid var(--color-primitive-brand, #835de1); outline-offset:2px; }
+.wb__help { margin-top:12px; padding-top:8px; border-top:1px solid rgba(25,25,25,.1); font-size:14px; line-height:18px; letter-spacing:.14px; }
+.wb__help summary { width:fit-content; color:var(--color-primitive-brand, #835de1); font-weight:500; list-style:none; cursor:pointer; }
+.wb__help summary::-webkit-details-marker { display:none; }
+.wb__help p { margin:12px 0 0; }
+.wb__notice { gap:16px; padding:12px 20px; border:1px solid var(--color-primitive-neutral-2, #d4d4d4); background:transparent; }
+.wb__notice > span { margin-top:-1px; }
+.wb__notice > div { gap:12px; }
+.wb__notice p { font-size:14px; line-height:18px; letter-spacing:.14px; color:var(--color-primitive-primary, #191919); }
+.wb__notice button { margin-top:0; font-size:14px; line-height:18px; letter-spacing:.14px; cursor:pointer; }
+.wb__footer { min-height:72px; padding:12px 20px; background:var(--color-page-primary, #fff); }
+.wb__footer .od__screen-cta { width:320px; min-width:0; min-height:48px; border-radius:12px; font-size:16px; line-height:20px; font-weight:500; letter-spacing:.16px; }
+.wb__result .frm__body { padding-top:20px; }
+.wb__result .frm__title { font-size:36px; line-height:40px; font-weight:600; }
+.wb__result .frm__title, .wb__result .frm__text p { margin:0; }
+.wb__result .frm__text { color:var(--color-primitive-primary, #191919); letter-spacing:.16px; }
+@media (max-width:520px) { .wb__result .frm__body { padding-right:24px; padding-left:24px; }.wb__result .frm__title { font-size:30px; line-height:34px; } }
