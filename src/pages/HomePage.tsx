@@ -31,14 +31,14 @@ export default function HomePage() {
   useEffect(() => setOnboardingPage('home'), [scenario])
   const onboardingTitles: Record<OnboardingPage, string> = {
     'wildberries-dashboard': 'Wildberries', 'ozon-dashboard': 'Ozon', 'wildberries-reports': 'Отчёты', 'ozon-reports': 'Отчёты',
-    'wildberries-details': 'Магазин на Wildberries', 'ozon-details': 'Магазин на Ozon', home: 'Онлайн-бухгалтерия', signature: 'Доверенность', sfr: 'Доверенность', marketplaces: 'Маркетплейсы', wildberries: 'Подключение Wildberries', ozon: 'Подключение Ozon', banks: 'Интеграции', 'bank-connect': 'Подключение интеграции', vat: 'Настройка НДС',
+    'wildberries-details': 'Магазин на Wildberries', 'ozon-details': 'Магазин на Ozon', home: 'Онлайн-бухгалтерия', authorizations: 'Доверенности', signature: 'Доверенность', sfr: 'Доверенность', marketplaces: 'Маркетплейсы', wildberries: 'Подключение Wildberries', ozon: 'Подключение Ozon', banks: 'Интеграции', 'bank-connect': 'Подключение интеграции', vat: 'Настройка НДС',
   }
   const caseData = caseDataFor(scenario)
   const totalDue = useCase2TotalDue(caseData)
 
   return (
     <PageShell
-      background={isOnboarding && (onboardingPage === 'marketplaces' || onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
+      background={isOnboarding && (onboardingPage === 'authorizations' || onboardingPage === 'marketplaces' || onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
       aside={
         <NavigationBar
           className={isOnboarding && onboardingPage !== 'home' ? 'onboarding-navigation' : undefined}
