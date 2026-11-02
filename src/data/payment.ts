@@ -59,6 +59,7 @@ export type Payable = {
   /** Заголовок модалки «Успех» после уплаты. */
   paidTitle: string
   amount: number
+  vatRate?: 5 | 7
   /** «до 28 октября» / «до 28 августа». */
   dueLabel: string
   /** Получатель платежа. */
@@ -82,6 +83,7 @@ function toPayable(
     fullTitle: p.title,
     paidTitle: p.id.startsWith('ip-') && p.category === 'salary' ? 'Зарплата выплачена!' : CATEGORY_PAID_TITLE[p.category],
     amount: p.amount,
+    vatRate: 'vatRate' in p ? p.vatRate : undefined,
     dueLabel: p.dueLabel ?? '',
     requisites,
     account: PAYMENT_ACCOUNT,
@@ -101,8 +103,11 @@ export function getPayableById(id: string): Payable | undefined {
     IP_CASE.payables.find((x) => x.id === id) ??
     IP_DECEMBER_CASE.payables.find((x) => x.id === id)
   if (!p) return undefined
-  // НДС: заголовок — полное название платежа («N-й платёж за …квартал»), без подзаголовка.
-  if (p.category === 'nds') return toPayable(p, '', p.title)
+  // НДС: в навигации отделяем квартал от номера части, как в макете платежа.
+  if (p.category === 'nds') {
+    const match = p.title.match(/^(?:НДС: )?(\d+-й) платёж за (I|II|III|IV) квартал$/)
+    return match ? toPayable(p, `${match[1]} платёж`, `НДС за ${match[2]} квартал`) : toPayable(p, '', p.title)
+  }
   return toPayable(p, p.title)
 }
 
@@ -111,7 +116,6 @@ const CALC_RATE: Partial<Record<PayCategory, number>> = {
   ndfl: 13,
   vznos: 30,
   travma: 0.5,
-  nds: 5,
 }
 
 /**
@@ -131,14 +135,11 @@ const CALC_BASE: Record<string, number> = {
   'travma-jul': 40_000,
   'travma-aug': 40_000,
   'ndfl-aug-2': 30_000,
-  // НДС на УСН, 5% без вычета — база это выручка за расчётный месяц квартала.
-  'nds-q2-2': 640_000,
   // Октябрьский сценарий (10 октября) — базы для налогов/взносов к уплате.
   'o-travma-sep': 40_000,
   'o-vznos-sep': 65_000,
   'o-ndfl-oct-1': 70_000,
   // Кейс 2 (10 сентября) — базы для расчёта в дровере уплаты.
-  'c2-nds-q2-3': 640_000,
   'c2-vznos-aug': 65_000,
   'c2-ndfl-sep-1': 70_000,
 }

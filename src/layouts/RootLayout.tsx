@@ -6,6 +6,7 @@ import { ROUTES } from '@/routes'
 import { PaymentsProvider } from '@/state/PaymentsProvider'
 import { ScenarioProvider, useScenario } from '@/state/ScenarioProvider'
 import { OnboardingProvider } from '@/state/OnboardingProvider'
+import ScenarioSwitch from '@/features/devtools/ScenarioSwitch'
 // import OnboardingLayer from '@/features/onboarding/OnboardingLayer' // временно скрыт, см. ниже
 import './RootLayout.css'
 
@@ -55,6 +56,7 @@ export default function RootLayout() {
             {/* Онбординг временно скрыт из прототипа — не проверяем на тесте, вернём позже.
                 <OnboardingLayer /> */}
             {/* Служебный тумблер сценариев прототипа (не элемент продукта) */}
+            <ScenarioSwitch />
           </div>
         </OnboardingProvider>
       </ScenarioProvider>

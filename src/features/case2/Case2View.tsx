@@ -134,7 +134,7 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
   }
 
   return (
-    <div className="av">
+    <div className="av case2">
       <div className="av__create case2__create" data-coach="add-task">
         <HeaderButton
           visualVariant="Secondary"
