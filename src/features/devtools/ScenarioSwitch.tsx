@@ -1,23 +1,22 @@
 import { useState } from 'react'
 import { ChevronDown, ListFilter } from 'lucide-react'
 import { Chip } from '@ds/components/Chip'
-import { Button } from '@ds/components/Button'
 import { useScenario } from '@/state/ScenarioProvider'
-import { HOME_SCENARIOS, SCENARIO_ORDER } from '@/data/scenarios'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '@/routes'
 import './ScenarioSwitch.css'
 
 /**
- * Служебный тумблер сценариев прототипа (не элемент продукта). Плавает в левом нижнем
- * углу поверх интерфейса: переключает состояние Главной («Всё хорошо» / «Есть просрочка»)
- * и сбрасывает весь сценарий в дефолт (в т.ч. уплаты текущей сессии). Собран из DS —
- * Chip (сегменты) и Button (сброс).
+ * Служебный переключатель между онбордингом и главной с готовыми платежами.
  */
 export default function ScenarioSwitch() {
-  const { scenario, setScenario, reset } = useScenario()
+  const { scenario, setScenario } = useScenario()
   const navigate = useNavigate()
   const [collapsed, setCollapsed] = useState(false)
+  const scenarios = [
+    { id: 'onboarding', label: 'Онбординг' },
+    { id: 'case2', label: 'Готовые платежи' },
+  ] as const
 
   return (
     <aside className={collapsed ? 'scn scn--collapsed' : 'scn'} aria-label="Демо-сценарий прототипа">
@@ -36,23 +35,20 @@ export default function ScenarioSwitch() {
       </div>
       <div className="scn__content" id="scenario-switch-content" hidden={collapsed}>
         <div className="scn__tabs">
-          {SCENARIO_ORDER.map((id) => (
+          {scenarios.map(({ id, label }) => (
             <Chip
               key={id}
               chipType="Tab"
               isSelected={scenario === id}
               onClick={() => {
-                setScenario(id)
-                if (id === 'onboarding' || id === 'onboarding_vat') navigate(ROUTES.home)
+                if (scenario !== id) setScenario(id)
+                navigate(ROUTES.home)
               }}
             >
-              {HOME_SCENARIOS[id].label}
+              {label}
             </Chip>
           ))}
         </div>
-        <Button visualVariant="Transparent" onClick={reset}>
-          Сбросить сценарий
-        </Button>
       </div>
     </aside>
   )
