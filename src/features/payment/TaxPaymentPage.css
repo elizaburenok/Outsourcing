@@ -27,12 +27,43 @@
   color: var(--color-primitive-secondary);
 }
 
-/* .tpp гарантирует --space-6x (24px) между секциями; добавляем --space-2x (8px)
-   сверху и снизу, чтобы получить целевые --space-8x (32px) по Figma. */
 .tpp__change-amount-btn {
   align-self: flex-start;
   margin-top: var(--space-2x);
   margin-bottom: var(--space-2x);
+}
+
+/* Квартальный контекст НДС на странице отдельного платежа. */
+.tpp__vat-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4x);
+  padding: var(--space-5x);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-4-5x);
+  color: var(--color-primitive-primary);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+}
+
+.tpp__vat-copy {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2-5x);
+}
+
+.tpp__vat-total {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+  padding-top: var(--space-4x);
+  border-top: 1px solid var(--color-border-default);
+}
+
+.tpp__vat-total strong {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-medium);
 }
 
 /* ---------- Навигаторы ---------- */
@@ -43,7 +74,7 @@
 }
 
 .tpp-tile {
-  padding: var(--space-3x) var(--space-5x);
+  padding: var(--space-5x);
   cursor: pointer;
   transition: background-color 0.15s ease;
 }
@@ -126,6 +157,7 @@
 
 .tpp__footer-btn {
   min-width: 15rem;
+  max-width: 20rem;
 }
 
 /* ---------- Тост ---------- */
@@ -153,5 +185,23 @@
   to {
     opacity: 1;
     transform: translate(-50%, 0);
+  }
+}
+
+@media (max-width: 900px) {
+  .tpp {
+    padding-bottom: calc(var(--space-18x) * 2);
+  }
+
+  .tpp__footer {
+    flex-direction: column-reverse;
+    gap: var(--space-2x);
+    padding: var(--space-3x) var(--space-5x);
+  }
+
+  .tpp__footer-btn {
+    width: 100%;
+    min-width: 0;
+    max-width: none;
   }
 }

@@ -69,4 +69,13 @@
   height: 24px;
 }
 
+.drawer-header__back {
+  left: var(--space-5x);
+  right: auto;
+}
+
+.drawer-header--navigation .drawer-header__title {
+  padding-inline: var(--space-10x);
+}
+
 

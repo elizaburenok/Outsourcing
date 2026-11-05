@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ClipboardList, ChevronDown, Calculator, Pencil } from 'lucide-react'
 import NavigationBar from '@ds/components/NavigationBar'
 import { Button } from '@ds/components/Button'
@@ -10,6 +10,7 @@ import Card from '@/components/ui/Card'
 import { ROUTES } from '@/routes'
 import { formatMoney } from '@/lib/format'
 import { getPayableById } from '@/data/payment'
+import { getVatCalculation } from '@/data/vat'
 import { usePayments } from '@/state/PaymentsProvider'
 import TaxCalcDrawer from './TaxCalcDrawer'
 import PaymentResultModal from './PaymentResultModal'
@@ -31,6 +32,8 @@ function NavTile({
     <Card className="tpp-tile" role="button" tabIndex={0} onClick={onClick}>
       <Cell
         textScale="M"
+        verticalSpacing="none"
+        edgePadding="off"
         title={<span className="tpp-tile__title">{title}</span>}
         description={<span className="tpp-tile__desc">{description}</span>}
         rightAccessory={<span className="tpp-tile__icon">{icon}</span>}
@@ -43,13 +46,13 @@ function NavTile({
  * Страница уплаты налога (дизайн из «Пульса» / Figma, пересобран на DS). Открывается
  * по клику на налог с Главной. Кнопка «Уплатить» помечает платёж оплаченным и
  * показывает результат флоу; после «Готово» платёж уходит во вкладку «Выполнено».
- * «Расчёт налогов» (дровер) — для всех налогов и взносов, кроме зарплаты директора
- * (это не налог). Кнопки «Уже сдано» и «Изменить сумму» — заглушки.
+ * «Расчёт налогов» (дровер) — для всех налогов и взносов, кроме зарплаты директора.
  */
 export default function TaxPaymentPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
-  const { markPaid } = usePayments()
+  const [searchParams] = useSearchParams()
+  const { markPaid, isPaid } = usePayments()
   const payable = getPayableById(id)
 
   const [showCalc, setShowCalc] = useState(false)
@@ -69,6 +72,9 @@ export default function TaxPaymentPage() {
   }, [toast])
 
   if (!payable) return null
+  const vat = getVatCalculation(payable)
+  const vatView = searchParams.get('vatView') === 'accordion' ? 'accordion' : 'screens'
+  const paid = isPaid(payable.id)
 
   function goHome() {
     navigate(ROUTES.home)
@@ -97,17 +103,30 @@ export default function TaxPaymentPage() {
       <div className="tpp">
         <header className="tpp__header">
           <p className="tpp__amount">{formatMoney(payable.amount)}</p>
-          {payable.dueLabel && <p className="tpp__due">до {payable.dueLabel}</p>}
+          {payable.dueLabel && <p className="tpp__due">{vat && paid ? 'Уплачено' : `До ${payable.dueLabel}`}</p>}
         </header>
 
-        <HeaderButton
+        {!vat && <HeaderButton
           className="tpp__change-amount-btn"
           visualVariant="Secondary"
           icon={<Pencil size={20} strokeWidth={1.75} />}
           onClick={() => setToast('Изменение суммы появится позже')}
         >
           Изменить сумму
-        </HeaderButton>
+        </HeaderButton>}
+
+        {vat && (
+          <div className="tpp__vat-summary">
+            <div className="tpp__vat-copy">
+              <p>Вы можете изменить сумму и уплатить весь НДС сразу — налоговая будет ежемесячно списывать с ЕНС по 1/3 от общей суммы налога.</p>
+              <p>Предлагаем распределить налоговую нагрузку и платить частями строго в нужные сроки: {formatMoney(vat.installments[0])} до 28 {vat.months[0]}, {formatMoney(vat.installments[1])} до 28 {vat.months[1]} и {formatMoney(vat.installments[2])} до 28 {vat.months[2]}.</p>
+            </div>
+            <div className="tpp__vat-total">
+              <span>Всего НДС за {vat.quarter} квартал</span>
+              <strong>{formatMoney(vat.tax)}</strong>
+            </div>
+          </div>
+        )}
 
         <div className="tpp__navigators">
           {payable.hasCalc && (
@@ -143,17 +162,17 @@ export default function TaxPaymentPage() {
         <Button
           className="tpp__footer-btn"
           visualVariant="Secondary"
-          onClick={() => setToast('Отметить сданным появится позже')}
+          onClick={vat ? () => { markPaid(payable.id); goHome() } : () => setToast('Отметить сданным появится позже')}
         >
-          Уже сдано
+          {vat ? 'Уже уплачено' : 'Уже сдано'}
         </Button>
-        <Button className="tpp__footer-btn" visualVariant="Primary" onClick={pay}>
+        <Button className="tpp__footer-btn" visualVariant="Primary" onClick={pay} disabled={paid}>
           Уплатить
         </Button>
       </div>
 
       {payable.hasCalc && (
-        <TaxCalcDrawer payable={payable} open={showCalc} onClose={() => setShowCalc(false)} />
+        <TaxCalcDrawer key={vatView} payable={payable} open={showCalc} onClose={() => setShowCalc(false)} vatView={vatView} />
       )}
 
       {showResult && (

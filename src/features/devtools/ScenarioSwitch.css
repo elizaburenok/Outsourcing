@@ -73,3 +73,15 @@
   flex-wrap: wrap;
   gap: var(--spacing-1x);
 }
+
+.scn__variant {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2x);
+  margin-top: var(--spacing-2x);
+}
+
+.scn__variant-label {
+  font-size: var(--font-size-xs);
+  color: var(--color-primitive-secondary);
+}
