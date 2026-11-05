@@ -43,6 +43,20 @@
   color: var(--color-primitive-primary);
 }
 
+/* Context Summary из Figma: 20px внутри, 16px между ячейками, 6px внутри ячейки. */
+.tcd__summary--vat-design {
+  padding: var(--space-5x);
+  gap: var(--space-4x);
+}
+
+.tcd__summary--vat-design .tcd__line {
+  gap: var(--space-1-5x);
+}
+
+.tcd__summary--vat-design .tcd__line-value {
+  line-height: var(--line-height-title-xl);
+}
+
 .tcd__accent {
   color: var(--color-primitive-brand);
   font-weight: var(--font-weight-medium);
@@ -83,9 +97,32 @@
 
 .tcd__income-title {
   font-size: var(--font-size-title-l);
-  line-height: var(--line-height-title-l);
+  line-height: var(--line-height-title-xl);
   font-weight: var(--font-weight-demi-bold);
   color: var(--color-primitive-primary);
+}
+
+.tcd--vat .tcd__income-head {
+  align-items: center;
+  padding-top: 0;
+}
+
+.tcd--vat .tcd__summary + .tcd__income-head {
+  margin-top: var(--space-4x);
+}
+
+.tcd__category-intro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4x);
+}
+
+.tcd__category-total {
+  color: var(--color-primitive-primary);
+  font-size: var(--font-size-4xl);
+  line-height: var(--line-height-4xl);
+  font-weight: var(--font-weight-demi-bold);
+  white-space: nowrap;
 }
 
 .tcd__income-total {
@@ -125,17 +162,21 @@
   color: var(--color-primitive-default-fixed);
 }
 
-.tcd--vat .tcd__avatar {
-  border-radius: var(--radius-2-5x);
-  corner-shape: squircle;
-}
-
 .tcd__row-text {
   display: flex;
   flex-direction: column;
   gap: var(--space-0-5x);
   flex: 1;
   min-width: 0;
+}
+
+.tcd--vat .tcd__avatar {
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: 0;
+  /* Original 40×40 Figma export: alpha preserves its exact silhouette. */
+  mask: url('./assets/figma-avatar.svg') center / contain no-repeat;
+  mask-mode: alpha;
 }
 
 .tcd__row-name {
@@ -168,34 +209,6 @@
   padding-top: var(--space-8x);
 }
 
-.tcd__back {
-  position: absolute;
-  left: var(--space-5x);
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  padding: var(--space-1x);
-  border: 0;
-  background: transparent;
-  color: var(--color-primitive-primary);
-  cursor: pointer;
-}
-
-.tcd__contractor {
-  display: block;
-  width: 100%;
-  border: 0;
-  padding: 0;
-  background: transparent;
-  color: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.tcd__contractor:hover {
-  background: var(--color-bg-neutral-1);
-}
-
 .tcd__contractor-amount {
   display: flex;
   flex-direction: column;
@@ -206,8 +219,13 @@
   line-height: var(--line-height-m);
 }
 
-.tcd__contractor-amount small,
-.tcd__document small {
+.tcd__contractor-amount > span {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tcd__contractor-amount small {
   display: block;
   color: var(--color-primitive-secondary);
   font-size: var(--font-size-s);
@@ -215,38 +233,142 @@
   font-weight: var(--font-weight-regular);
 }
 
-.tcd__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2x);
-  margin-bottom: var(--space-3x);
+.tcd__vat-context {
+  color: var(--color-primitive-secondary);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
 }
 
-.tcd__filter {
-  padding: var(--space-2x) var(--space-3x);
-  border: 1px solid transparent;
-  border-radius: var(--radius-2-5x);
-  background: var(--color-container-transparent-1);
+.tcd__income-overview {
+  font-size: var(--font-size-l);
+  line-height: var(--line-height-l);
   color: var(--color-primitive-primary);
+}
+
+.tcd__contractor-button {
+  display: block;
+  width: 100%;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: inherit;
   font: inherit;
+  text-align: left;
   cursor: pointer;
+  border-radius: var(--radius-3x);
 }
 
-.tcd__filter--active {
-  border-color: var(--color-primitive-primary);
-  background: var(--color-container-default);
+.tcd__category-list {
+  gap: var(--space-6x);
 }
 
-.tcd__detail-summary { gap: var(--space-3x); }
-.tcd__detail-line, .tcd__document {
+.tcd__accordion-section {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--space-6x);
+}
+
+.tcd__category-accessory {
+  display: inline-flex;
+  align-items: center;
   gap: var(--space-3x);
 }
 
-.tcd__document { padding: var(--space-3x) 0; }
-.tcd__document strong, .tcd__detail-line strong { font-weight: var(--font-weight-medium); }
-.tcd__empty { color: var(--color-primitive-secondary); }
+.tcd__chevron {
+  flex: none;
+  color: var(--color-primitive-secondary);
+  transition: transform 160ms ease;
+}
+
+.tcd__chevron--open {
+  transform: rotate(180deg);
+}
+
+.tcd__category-list .tcd__contractor-amount {
+  font-weight: var(--font-weight-demi-bold);
+}
+
+.tcd__contractor-list {
+  gap: var(--space-6x);
+}
+
+.tcd--vat .tcd__contractor-list .tcd__avatar {
+  width: var(--space-8x);
+  height: var(--space-8x);
+}
+
+.tcd__contractor-button:hover {
+  background: var(--color-container-transparent-1);
+}
+
+.tcd__contractor-button:focus-visible {
+  outline: var(--space-0-5x) solid var(--color-primitive-brand);
+}
+
+.tcd--vat .tcd__body--details {
+  gap: var(--space-8x);
+}
+
+.tcd__filters {
+  display: flex;
+  gap: var(--space-2-5x);
+  flex-wrap: wrap;
+}
+
+.tcd__detail-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3x);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-3x);
+  padding: var(--space-3x) var(--space-5x);
+}
+
+.tcd__detail-summary-row {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-4x);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+}
+
+.tcd__detail-summary-row strong {
+  font-weight: var(--font-weight-medium);
+  white-space: nowrap;
+}
+
+.tcd__detail-caption {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1-5x);
+}
+
+.tcd__timeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-8x);
+}
+
+.tcd__groups,
+.tcd__group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-5x);
+}
+
+.tcd__groups {
+  gap: var(--space-8x);
+}
+
+.tcd__group-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4x);
+}
 
 @media (max-width: 900px) {
   .tcd--vat {

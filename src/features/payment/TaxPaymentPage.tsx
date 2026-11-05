@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ClipboardList, ChevronDown, Calculator, Pencil } from 'lucide-react'
 import NavigationBar from '@ds/components/NavigationBar'
 import { Button } from '@ds/components/Button'
@@ -51,6 +51,7 @@ function NavTile({
 export default function TaxPaymentPage() {
   const { id = '' } = useParams()
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
   const { markPaid, isPaid } = usePayments()
   const payable = getPayableById(id)
 
@@ -71,7 +72,8 @@ export default function TaxPaymentPage() {
   }, [toast])
 
   if (!payable) return null
-  const vat = getVatCalculation(payable, payable.vatRate ?? 5)
+  const vat = getVatCalculation(payable)
+  const vatView = searchParams.get('vatView') === 'accordion' ? 'accordion' : 'screens'
   const paid = isPaid(payable.id)
 
   function goHome() {
@@ -170,7 +172,7 @@ export default function TaxPaymentPage() {
       </div>
 
       {payable.hasCalc && (
-        <TaxCalcDrawer payable={payable} open={showCalc} onClose={() => setShowCalc(false)} />
+        <TaxCalcDrawer key={vatView} payable={payable} open={showCalc} onClose={() => setShowCalc(false)} vatView={vatView} />
       )}
 
       {showResult && (

@@ -1,12 +1,15 @@
-import { useState } from 'react'
-import { ArrowLeft, Info } from 'lucide-react'
+import { useLayoutEffect, useRef, useState } from 'react'
+import { ChevronDown, Info } from 'lucide-react'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
 import { Cell } from '@ds/components/Cell'
 import { formatMoney } from '@/lib/format'
 import { USN_CALC, getCalcBreakdown, type Payable, type CalcBreakdown } from '@/data/payment'
 import type { PayCategory } from '@/data/august'
 import { pluralOps } from '@/lib/plural'
-import { getVatCalculation, vatForDocument, type VatContractor } from '@/data/vat'
+import { getVatCalculation } from '@/data/vat'
+import { VatCategoryDetails } from './VatContractorDetails'
+import backIcon from './assets/figma-arrow-left.svg'
+import closeIcon from './assets/figma-close.svg'
 import './TaxCalcDrawer.css'
 
 type RateCategory = Extract<PayCategory, 'ndfl' | 'vznos' | 'travma'>
@@ -40,37 +43,47 @@ export default function TaxCalcDrawer({
   payable,
   open,
   onClose,
+  vatView = 'screens',
 }: {
   payable: Payable
   open: boolean
   onClose: () => void
+  vatView?: 'screens' | 'accordion'
 }) {
   const calc = getCalcBreakdown(payable)
-  const vat = getVatCalculation(payable, payable.vatRate ?? 5)
-  const [selectedContractor, setSelectedContractor] = useState<string | null>(null)
-  const [filter, setFilter] = useState<'all' | 'sale' | 'advance'>('all')
-  if (!calc && !vat) return null
-  const contractor = vat?.contractors.find((item) => item.id === selectedContractor)
-  const close = () => {
-    setSelectedContractor(null)
-    setFilter('all')
-    onClose()
+  const vat = getVatCalculation(payable)
+  const [selectedKind, setSelectedKind] = useState<'sale' | 'purchase' | null>(null)
+  const [selectedName, setSelectedName] = useState<string | null>(null)
+  const [expandedKind, setExpandedKind] = useState<'sale' | 'purchase' | null>(null)
+  const bodyRef = useRef<HTMLDivElement>(null)
+  const savedScrollTop = useRef(0)
+  const accordion = vatView === 'accordion' && !!vat
+  const close = () => { setSelectedName(null); setSelectedKind(null); setExpandedKind(null); savedScrollTop.current = 0; onClose() }
+  const back = () => {
+    if (selectedName) {
+      setSelectedName(null)
+      if (accordion) setSelectedKind(null)
+    } else setSelectedKind(null)
   }
+  const sectionTitle = selectedKind === 'sale' ? 'Продажи' : selectedKind === 'purchase' ? 'Покупки' : 'Расчёт налога'
+  useLayoutEffect(() => {
+    if (accordion && open && !selectedKind && !selectedName && bodyRef.current) {
+      bodyRef.current.scrollTop = savedScrollTop.current
+    }
+  }, [accordion, open, selectedKind, selectedName])
+  if (!calc && !vat) return null
 
   return (
-    <Drawer open={open} onClose={close} side="right" aria-label="Расчёт налога" className={vat ? 'tcd--vat' : undefined}>
-      <DrawerHeader onClose={close}>
-        {contractor && <button type="button" className="tcd__back" aria-label="К расчёту НДС" onClick={() => setSelectedContractor(null)}><ArrowLeft size={24} /></button>}
-        {contractor ? contractor.name : 'Расчёт налога'}
+    <Drawer open={open} onClose={close} side="right" aria-label={selectedName ? `Операции: ${selectedName}` : sectionTitle} className={vat ? 'tcd--vat' : undefined}>
+      <DrawerHeader onClose={close}
+        backAction={selectedKind ? { onClick: back, label: selectedName ? accordion ? 'Назад к расчёту налога' : 'Назад к контрагентам' : 'Назад к расчёту налога', icon: <img src={backIcon} alt="" /> } : undefined}
+        closeIcon={selectedKind ? <img src={closeIcon} alt="" /> : undefined}>
+        {selectedName ?? sectionTitle}
       </DrawerHeader>
 
-      <div className="tcd__body">
-        {vat ? (
-          contractor ? (
-            <VatContractorDetail contractor={contractor} vat={vat} filter={filter} onFilter={setFilter} />
-          ) : (
-            <VatCalc vat={vat} onSelect={(id) => { setFilter('all'); setSelectedContractor(id) }} />
-          )
+      <div ref={bodyRef} key={`${selectedKind ?? 'summary'}-${selectedName ?? ''}`} className={`tcd__body${selectedKind ? ' tcd__body--details' : ''}`}>
+        {vat && selectedKind ? <VatCategoryDetails kind={selectedKind} vat={vat} selectedName={selectedName} onSelect={setSelectedName} /> : vat ? (
+          <VatCalc vat={vat} payable={payable} accordion={accordion} expandedKind={expandedKind} onExpand={setExpandedKind} onSelect={setSelectedKind} onSelectContractor={(kind, name) => { savedScrollTop.current = bodyRef.current?.scrollTop ?? 0; setSelectedKind(kind); setSelectedName(name) }} />
         ) : calc?.kind === 'usn' ? (
           <UsnCalc />
         ) : calc ? (
@@ -92,68 +105,60 @@ export default function TaxCalcDrawer({
 
 type VatCalculation = NonNullable<ReturnType<typeof getVatCalculation>>
 
-function VatCalc({ vat, onSelect }: { vat: VatCalculation; onSelect: (id: string) => void }) {
-  return <>
-    <h2 className="tcd__heading-title">НДС за {vat.quarter} квартал</h2>
-    <div className="tcd__summary">
-      <p className="tcd__hint">Персональный бухгалтер уже рассчитал НДС по закрывающим документам и авансовым платежам.</p>
-      <p className="tcd__hint">Вам осталось проверить расчёт и уплатить налог.</p>
-      <div className="tcd__line">
-        <p className="tcd__line-label">Доход за {vat.quarter} квартал с учётом НДС</p>
-        <p className="tcd__line-value">{formatMoney(vat.gross)}</p>
-      </div>
-      <div className="tcd__line">
-        <p className="tcd__line-label">НДС за текущий квартал платится в следующем квартале: ежемесячно, равными частями</p>
-        <p className="tcd__line-value">{formatMoney(vat.tax)} / 3 ≈ {formatMoney(vat.installments[0])}</p>
-      </div>
-    </div>
-    <div className="tcd__income-head">
-      <div><h3 className="tcd__income-title">НДС за {vat.quarter} квартал</h3><span className="tcd__row-ops">{vat.contractors.length} контрагента</span></div>
-      <span className="tcd__income-total">{formatMoney(vat.tax)}</span>
-    </div>
-    <ul className="tcd__list">
-      {vat.contractors.map((item) => {
-        const income = item.documents.reduce((sum, document) => sum + document.gross, 0)
-        const tax = item.documents.reduce((sum, document) => sum + vatForDocument(document, vat.rate), 0)
-        return <li key={item.id}>
-          <button type="button" className="tcd__contractor" onClick={() => onSelect(item.id)}>
-            <Cell textScale="M" edgePadding="off" verticalSpacing="compact"
-              leftAccessory={<span className="tcd__avatar" style={{ background: item.color }} aria-hidden>{item.initials}</span>}
-              title={item.name} description={`${item.documents.length} ${item.documents.length === 1 ? 'документ' : 'документа'}`}
-              rightAccessory={<span className="tcd__contractor-amount">{formatMoney(tax)}<small>Доход {formatMoney(income)}</small></span>}
-            />
-          </button>
-        </li>
-      })}
-    </ul>
-  </>
-}
-
-function VatContractorDetail({ contractor, vat, filter, onFilter }: {
-  contractor: VatContractor
+function VatCalc({ vat, payable, accordion, expandedKind, onExpand, onSelect, onSelectContractor }: {
   vat: VatCalculation
-  filter: 'all' | 'sale' | 'advance'
-  onFilter: (value: 'all' | 'sale' | 'advance') => void
+  payable: Payable
+  accordion: boolean
+  expandedKind: 'sale' | 'purchase' | null
+  onExpand: (kind: 'sale' | 'purchase' | null) => void
+  onSelect: (kind: 'sale' | 'purchase') => void
+  onSelectContractor: (kind: 'sale' | 'purchase', name: string) => void
 }) {
-  const documents = contractor.documents.filter((document) => filter === 'all' || document.kind === filter)
-  const allTax = contractor.documents.reduce((sum, document) => sum + vatForDocument(document, vat.rate), 0)
-  const income = contractor.documents.reduce((sum, document) => sum + document.gross, 0)
+  const [sales, advances, offsets, purchases] = vat.sections
+  const salesGross = Math.round((sales.gross + advances.gross - offsets.gross) * 100) / 100
+  const salesVat = Math.round((sales.vat + advances.vat - offsets.vat) * 100) / 100
+  const categories = [
+    { kind: 'purchase' as const, title: 'Покупки', amount: purchases.gross },
+    { kind: 'sale' as const, title: 'Продажи', amount: salesGross },
+  ]
   return <>
-    <div className="tcd__filters" role="group" aria-label="Тип документов">
-      {([['all', 'Все'], ['sale', 'НДС с продаж'], ['advance', 'НДС с предоплат']] as const).map(([value, label]) =>
-        <button key={value} type="button" className={`tcd__filter ${filter === value ? 'tcd__filter--active' : ''}`} onClick={() => onFilter(value)}>{label}</button>
-      )}
+    <div className="tcd__heading">
+      <h2 className="tcd__heading-title">НДС за {vat.quarter} квартал 2026</h2>
     </div>
-    <div className="tcd__summary tcd__detail-summary">
-      <div className="tcd__detail-line"><span>Доход с учётом НДС</span><strong>{formatMoney(income)}</strong></div>
-      <div className="tcd__detail-line"><span>НДС к уплате</span><strong>{formatMoney(allTax)}</strong></div>
+    <div className="tcd__summary tcd__summary--vat-design">
+      <p className="tcd__hint">Бухгалтер посчитал налог к уплате</p>
+      <div className="tcd__line">
+        <p className="tcd__line-label">Продажи за {vat.quarter} квартал с учётом НДС</p>
+        <p className="tcd__line-value">{formatMoney(salesGross)}</p>
+      </div>
+      <div className="tcd__line">
+        <p className="tcd__line-label">Покупки за {vat.quarter} квартал с учётом НДС</p>
+        <p className="tcd__line-value">{formatMoney(purchases.gross)}</p>
+      </div>
+      <div className="tcd__line">
+        <p className="tcd__line-label">НДС за квартал{vat.rate === 22 ? ': из НДС с продаж вычитаем НДС с покупок' : ''}</p>
+        <p className="tcd__line-value">{vat.rate === 22 ? <>{formatMoney(salesVat)} − {formatMoney(purchases.vat)} = </> : null}{formatMoney(vat.tax)}</p>
+      </div>
+      {vat.rate !== 22 && <p className="tcd__vat-context">При ставке {vat.rate}% входной НДС с покупок не принимается к вычету.</p>}
+      <div className="tcd__line">
+        <p className="tcd__line-label">НДС за текущий квартал платится в следующем квартале: ежемесячно, тремя частями. {payable.subtitle || 'Текущий платёж'}{payable.dueLabel ? ` — до ${payable.dueLabel}` : ''}</p>
+        <p className="tcd__line-value">{formatMoney(payable.amount)}</p>
+      </div>
     </div>
-    {documents.length ? <ul className="tcd__list">
-      {documents.map((document) => <li key={document.id} className="tcd__document">
-        <span><strong>{document.title}</strong><small>НДС {vat.rate}%</small></span>
-        <span className="tcd__contractor-amount">{formatMoney(vatForDocument(document, vat.rate))}<small>Доход {formatMoney(document.gross)}</small></span>
-      </li>)}
-    </ul> : <p className="tcd__empty">Документов этого типа нет.</p>}
+    <div className="tcd__income-head"><h3 className="tcd__income-title">НДС с операций</h3></div>
+    <div className="tcd__list tcd__category-list">
+      {categories.map(({ kind, title, amount }) => <section className="tcd__accordion-section" key={kind}>
+        <button type="button" className="tcd__contractor-button" onClick={() => accordion ? onExpand(expandedKind === kind ? null : kind) : onSelect(kind)}
+          aria-expanded={accordion ? expandedKind === kind : undefined} aria-controls={accordion && expandedKind === kind ? `vat-${kind}-contractors` : undefined}>
+          <Cell textScale="M" edgePadding="off" verticalSpacing="none" title={title}
+            rightAccessory={<span className="tcd__category-accessory"><span className="tcd__contractor-amount">{formatMoney(amount)}</span>
+              {accordion && <ChevronDown className={expandedKind === kind ? 'tcd__chevron tcd__chevron--open' : 'tcd__chevron'} size={20} aria-hidden />}</span>} />
+        </button>
+        {accordion && expandedKind === kind && <div id={`vat-${kind}-contractors`} className="tcd__accordion-content">
+          <VatCategoryDetails kind={kind} vat={vat} selectedName={null} onSelect={(name) => onSelectContractor(kind, name)} showTotal={false} />
+        </div>}
+      </section>)}
+    </div>
   </>
 }
 

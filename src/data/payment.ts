@@ -59,7 +59,7 @@ export type Payable = {
   /** Заголовок модалки «Успех» после уплаты. */
   paidTitle: string
   amount: number
-  vatRate?: 5 | 7
+  vatRate?: 5 | 7 | 22
   /** «до 28 октября» / «до 28 августа». */
   dueLabel: string
   /** Получатель платежа. */

@@ -6,6 +6,9 @@ export interface DrawerHeaderProps {
   children?: React.ReactNode;
   /** Close button click handler */
   onClose?: () => void;
+  /** Optional navigation action on the left. */
+  backAction?: { onClick: () => void; icon: React.ReactNode; label: string };
+  closeIcon?: React.ReactNode;
   /** Additional CSS class name */
   className?: string;
   /** HTML data attributes */
@@ -16,14 +19,17 @@ export const DrawerHeader: React.FC<DrawerHeaderProps> = (props: DrawerHeaderPro
   const {
     children,
     onClose,
+    backAction,
+    closeIcon,
     className,
     'data-testid': dataTestId,
   } = props;
 
-  const classes = ['drawer-header', className].filter(Boolean).join(' ');
+  const classes = ['drawer-header', backAction && 'drawer-header--navigation', className].filter(Boolean).join(' ');
 
   return (
     <div className={classes} data-testid={dataTestId}>
+      {backAction && <button type="button" className="drawer-header__close drawer-header__back" onClick={backAction.onClick} aria-label={backAction.label}>{backAction.icon}</button>}
       <div className="drawer-header__title">
         {children}
       </div>
@@ -35,7 +41,7 @@ export const DrawerHeader: React.FC<DrawerHeaderProps> = (props: DrawerHeaderPro
           onClick={onClose}
           aria-label="Закрыть панель"
         >
-          <svg
+          {closeIcon ?? <svg
             aria-hidden="true"
             className="drawer-header__close-icon"
             width="24"
@@ -50,7 +56,7 @@ export const DrawerHeader: React.FC<DrawerHeaderProps> = (props: DrawerHeaderPro
               strokeLinecap="round"
               strokeLinejoin="round"
             />
-          </svg>
+          </svg>}
         </button>
       )}
     </div>

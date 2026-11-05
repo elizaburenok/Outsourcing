@@ -25,7 +25,7 @@ export type AugustPayment = {
   category: PayCategory
   amount: number
   /** Специальная ставка НДС для платежей на УСН. */
-  vatRate?: 5 | 7
+  vatRate?: 5 | 7 | 22
   /** false → отдельной платёжкой в СФР, мимо ЕНП (травматизм). */
   viaEnp: boolean
   state: PayState
