@@ -43,47 +43,36 @@ export default function TaxCalcDrawer({
   payable,
   open,
   onClose,
-  vatView = 'screens',
 }: {
   payable: Payable
   open: boolean
   onClose: () => void
-  vatView?: 'screens' | 'accordion'
 }) {
   const calc = getCalcBreakdown(payable)
   const vat = getVatCalculation(payable)
-  const [selectedKind, setSelectedKind] = useState<'sale' | 'purchase' | null>(null)
-  const [selectedName, setSelectedName] = useState<string | null>(null)
+  const [selectedContractor, setSelectedContractor] = useState<{ kind: 'sale' | 'purchase'; name: string } | null>(null)
   const [expandedKind, setExpandedKind] = useState<'sale' | 'purchase' | null>(null)
   const bodyRef = useRef<HTMLDivElement>(null)
   const savedScrollTop = useRef(0)
-  const accordion = vatView === 'accordion' && !!vat
-  const close = () => { setSelectedName(null); setSelectedKind(null); setExpandedKind(null); savedScrollTop.current = 0; onClose() }
-  const back = () => {
-    if (selectedName) {
-      setSelectedName(null)
-      if (accordion) setSelectedKind(null)
-    } else setSelectedKind(null)
-  }
-  const sectionTitle = selectedKind === 'sale' ? 'Продажи' : selectedKind === 'purchase' ? 'Покупки' : 'Расчёт налога'
+  const close = () => { setSelectedContractor(null); setExpandedKind(null); savedScrollTop.current = 0; onClose() }
   useLayoutEffect(() => {
-    if (accordion && open && !selectedKind && !selectedName && bodyRef.current) {
+    if (open && !selectedContractor && bodyRef.current) {
       bodyRef.current.scrollTop = savedScrollTop.current
     }
-  }, [accordion, open, selectedKind, selectedName])
+  }, [open, selectedContractor])
   if (!calc && !vat) return null
 
   return (
-    <Drawer open={open} onClose={close} side="right" aria-label={selectedName ? `Операции: ${selectedName}` : sectionTitle} className={vat ? 'tcd--vat' : undefined}>
+    <Drawer open={open} onClose={close} side="right" aria-label={selectedContractor ? `Операции: ${selectedContractor.name}` : 'Расчёт налога'} className={vat ? 'tcd--vat' : undefined}>
       <DrawerHeader onClose={close}
-        backAction={selectedKind ? { onClick: back, label: selectedName ? accordion ? 'Назад к расчёту налога' : 'Назад к контрагентам' : 'Назад к расчёту налога', icon: <img src={backIcon} alt="" /> } : undefined}
-        closeIcon={selectedKind ? <img src={closeIcon} alt="" /> : undefined}>
-        {selectedName ?? sectionTitle}
+        backAction={selectedContractor ? { onClick: () => setSelectedContractor(null), label: 'Назад к расчёту налога', icon: <img src={backIcon} alt="" /> } : undefined}
+        closeIcon={selectedContractor ? <img src={closeIcon} alt="" /> : undefined}>
+        {selectedContractor?.name ?? 'Расчёт налога'}
       </DrawerHeader>
 
-      <div ref={bodyRef} key={`${selectedKind ?? 'summary'}-${selectedName ?? ''}`} className={`tcd__body${selectedKind ? ' tcd__body--details' : ''}`}>
-        {vat && selectedKind ? <VatCategoryDetails kind={selectedKind} vat={vat} selectedName={selectedName} onSelect={setSelectedName} /> : vat ? (
-          <VatCalc vat={vat} payable={payable} accordion={accordion} expandedKind={expandedKind} onExpand={setExpandedKind} onSelect={setSelectedKind} onSelectContractor={(kind, name) => { savedScrollTop.current = bodyRef.current?.scrollTop ?? 0; setSelectedKind(kind); setSelectedName(name) }} />
+      <div ref={bodyRef} key={selectedContractor?.name ?? 'summary'} className={`tcd__body${selectedContractor ? ' tcd__body--details' : ''}`}>
+        {vat && selectedContractor ? <VatCategoryDetails kind={selectedContractor.kind} vat={vat} selectedName={selectedContractor.name} /> : vat ? (
+          <VatCalc vat={vat} payable={payable} expandedKind={expandedKind} onExpand={setExpandedKind} onSelectContractor={(kind, name) => { savedScrollTop.current = bodyRef.current?.scrollTop ?? 0; setSelectedContractor({ kind, name }) }} />
         ) : calc?.kind === 'usn' ? (
           <UsnCalc />
         ) : calc ? (
@@ -105,13 +94,11 @@ export default function TaxCalcDrawer({
 
 type VatCalculation = NonNullable<ReturnType<typeof getVatCalculation>>
 
-function VatCalc({ vat, payable, accordion, expandedKind, onExpand, onSelect, onSelectContractor }: {
+function VatCalc({ vat, payable, expandedKind, onExpand, onSelectContractor }: {
   vat: VatCalculation
   payable: Payable
-  accordion: boolean
   expandedKind: 'sale' | 'purchase' | null
   onExpand: (kind: 'sale' | 'purchase' | null) => void
-  onSelect: (kind: 'sale' | 'purchase') => void
   onSelectContractor: (kind: 'sale' | 'purchase', name: string) => void
 }) {
   const [sales, advances, offsets, purchases] = vat.sections
@@ -148,13 +135,13 @@ function VatCalc({ vat, payable, accordion, expandedKind, onExpand, onSelect, on
     <div className="tcd__income-head"><h3 className="tcd__income-title">НДС с операций</h3></div>
     <div className="tcd__list tcd__category-list">
       {categories.map(({ kind, title, amount }) => <section className="tcd__accordion-section" key={kind}>
-        <button type="button" className="tcd__contractor-button" onClick={() => accordion ? onExpand(expandedKind === kind ? null : kind) : onSelect(kind)}
-          aria-expanded={accordion ? expandedKind === kind : undefined} aria-controls={accordion && expandedKind === kind ? `vat-${kind}-contractors` : undefined}>
+        <button type="button" className="tcd__contractor-button" onClick={() => onExpand(expandedKind === kind ? null : kind)}
+          aria-expanded={expandedKind === kind} aria-controls={expandedKind === kind ? `vat-${kind}-contractors` : undefined}>
           <Cell textScale="M" edgePadding="off" verticalSpacing="none" title={title}
             rightAccessory={<span className="tcd__category-accessory"><span className="tcd__contractor-amount">{formatMoney(amount)}</span>
-              {accordion && <ChevronDown className={expandedKind === kind ? 'tcd__chevron tcd__chevron--open' : 'tcd__chevron'} size={20} aria-hidden />}</span>} />
+              <ChevronDown className={expandedKind === kind ? 'tcd__chevron tcd__chevron--open' : 'tcd__chevron'} size={20} aria-hidden /></span>} />
         </button>
-        {accordion && expandedKind === kind && <div id={`vat-${kind}-contractors`} className="tcd__accordion-content">
+        {expandedKind === kind && <div id={`vat-${kind}-contractors`} className="tcd__accordion-content">
           <VatCategoryDetails kind={kind} vat={vat} selectedName={null} onSelect={(name) => onSelectContractor(kind, name)} showTotal={false} />
         </div>}
       </section>)}

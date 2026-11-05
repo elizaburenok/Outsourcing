@@ -34,7 +34,7 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
   kind: Category
   vat: { rate: VatRate; sections: VatSection[] }
   selectedName: string | null
-  onSelect: (name: string) => void
+  onSelect?: (name: string) => void
   showTotal?: boolean
 }) {
   const [filter, setFilter] = useState<Filter>('all')
@@ -62,7 +62,7 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
     </div>}
     <ul className="tcd__list tcd__contractor-list" aria-label="Контрагенты">
       {groups.map((group, index) => <li key={group.name}>
-        <button type="button" className="tcd__contractor-button" onClick={() => onSelect(group.name)}
+        <button type="button" className="tcd__contractor-button" onClick={() => onSelect?.(group.name)}
           aria-label={`Операции: ${group.name}`}>
           <Cell textScale="M" edgePadding="off" verticalSpacing="none"
             leftAccessory={<span className="tcd__avatar" style={{ background: colors[index % colors.length] }} aria-hidden>{initials(group.name)}</span>}
