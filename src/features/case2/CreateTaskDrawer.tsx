@@ -31,10 +31,11 @@ function fileIcon(file: File) {
   return <FileText size={24} aria-hidden />
 }
 
-export default function CreateTaskDrawer({ open, onClose, onCreate, defaultTitle = '' }: {
+export default function CreateTaskDrawer({ open, onClose, onCreate, onFinish, defaultTitle = '' }: {
   open: boolean
   onClose: () => void
   onCreate: (title: string, description: string, attachments: string[], kind: TaskKind, fromDefault: boolean) => void
+  onFinish?: () => void
   defaultTitle?: string
 }) {
   const navigate = useNavigate()
@@ -71,8 +72,18 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, defaultTitle
 
   function close() { reset(); onClose() }
 
+  function goBack() {
+    if (defaultTitle && useDefaultTitle) { close(); return }
+    setKind(null)
+    setFiles([])
+    setFileError('')
+    setTitleError('')
+    clearTimers()
+  }
+
   function createAnother() {
     reset()
+    if (defaultTitle) return
     setUseDefaultTitle(false)
     setKind(null)
     setTitle('')
@@ -80,7 +91,8 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, defaultTitle
 
   function finish() {
     close()
-    navigate(ROUTES.home)
+    if (onFinish) onFinish()
+    else navigate(ROUTES.home)
   }
 
   function selectKind(next: TaskKind) {
@@ -148,7 +160,7 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, defaultTitle
   if (!open) return null
 
   return <><Drawer open={open} onClose={showResult ? undefined : close} side="right" className="ctd__drawer" aria-label={kind ? 'Создание задачи' : 'Выбор типа задачи'}>
-    <DrawerHeader onClose={close} backAction={kind && !useDefaultTitle ? { onClick: () => { setKind(null); setFiles([]); setFileError(''); setTitleError(''); clearTimers() }, icon: <ArrowLeft size={24} aria-hidden />, label: 'Назад к выбору задачи' } : undefined}>
+    <DrawerHeader onClose={close} backAction={kind ? { onClick: goBack, icon: <ArrowLeft size={24} aria-hidden />, label: defaultTitle && useDefaultTitle ? 'Назад к списку задач' : 'Назад к выбору задачи' } : undefined}>
       {kind === 'ordinary' ? 'Задача бухгалтеру' : kind === 'reconciliation' ? 'Обработка документов' : 'Новая задача'}
     </DrawerHeader>
 

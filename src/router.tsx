@@ -8,6 +8,7 @@ import ChatPage from './pages/ChatPage'
 import TaxPaymentPage from './features/payment/TaxPaymentPage'
 import TasksPage from './pages/TasksPage'
 import TaskDetailPage from './pages/TaskDetailPage'
+import PinnedTaskPage from './pages/PinnedTaskPage'
 import { ROUTES } from './routes'
 
 export { ROUTES }
@@ -25,6 +26,7 @@ export const router = createBrowserRouter([
       { path: 'reports', element: <ReportsPage /> },
       { path: 'pay/:id', element: <TaxPaymentPage /> },
       { path: 'tasks', element: <TasksPage /> },
+      { path: 'tasks/pinned/:id', element: <PinnedTaskPage /> },
       { path: 'tasks/:id', element: <TaskDetailPage /> },
       { path: '*', element: <Navigate to={ROUTES.home} replace /> },
     ],

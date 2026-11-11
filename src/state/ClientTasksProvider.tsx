@@ -2,7 +2,7 @@ import { createContext, useContext, useMemo, useState, type ReactNode } from 're
 import { INITIAL_CLIENT_TASKS, type ClientTask } from '@/data/clientTasks'
 import type { ClientTaskTopic } from '@/data/clientTaskCatalog'
 
-type TaskMetadata = { topic: ClientTaskTopic; subject?: string; attachments?: string[]; kind?: 'ordinary' | 'reconciliation' }
+type TaskMetadata = { topic: ClientTaskTopic; subject?: string; attachments?: string[]; kind?: 'ordinary' | 'reconciliation'; parentId?: string }
 
 type ClientTasksContextValue = {
   tasks: ClientTask[]
@@ -38,6 +38,7 @@ export function ClientTasksProvider({ children }: { children: ReactNode }) {
       subject: metadata?.subject,
       attachments: metadata?.attachments,
       kind: metadata?.kind,
+      parentId: metadata?.parentId,
     }
     setTasks((current) => {
       const created = current.filter((item) => item.id.startsWith('client-'))
