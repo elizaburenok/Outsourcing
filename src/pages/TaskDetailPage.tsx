@@ -4,8 +4,8 @@ import { Cell } from '@ds/components/Cell'
 import NavigationBar from '@ds/components/NavigationBar'
 import PageShell from '@/components/PageShell/PageShell'
 import { useClientTasks } from '@/state/ClientTasksProvider'
-import { ROUTES } from '@/routes'
-import { CLIENT_TASK_TOPICS, clientTaskContext } from '@/data/clientTaskCatalog'
+import { ROUTES, pinnedTaskTo } from '@/routes'
+import { CLIENT_TASK_TOPICS, clientTaskContext, clientTaskParentId } from '@/data/clientTaskCatalog'
 import type { ClientTask } from '@/data/clientTasks'
 
 function ReadOnlyCell({ label, value, empty = false }: { label: string; value: string; empty?: boolean }) {
@@ -14,8 +14,8 @@ function ReadOnlyCell({ label, value, empty = false }: { label: string; value: s
     textScale="S"
     verticalSpacing="none"
     edgePadding="off"
-    subtitle={label}
-    title={value}
+    title={label}
+    description={value}
   />
 }
 
@@ -43,10 +43,12 @@ export default function TaskDetailPage() {
   const { id } = useParams()
   const { tasks } = useClientTasks()
   const task = tasks.find((item) => item.id === id)
+  const parentId = task && clientTaskParentId(task)
+  const backTo = parentId ? pinnedTaskTo(parentId) : ROUTES.tasks
 
-  if (!task) return <PageShell aside={<NavigationBar hasBackButton hasTextBlock title="Задачи" onBackClick={() => navigate(ROUTES.tasks)} />}><p>Задача не найдена</p></PageShell>
+  if (!task) return <PageShell background="primary" aside={<NavigationBar hasBackButton hasTextBlock title="Задачи" onBackClick={() => navigate(ROUTES.tasks)} />}><p>Задача не найдена</p></PageShell>
 
-  return <PageShell aside={<NavigationBar hasBackButton hasTextBlock hasRootLink rootLinkText="Задачи" title="Задача" onBackClick={() => navigate(ROUTES.tasks)} onRootLinkClick={() => navigate(ROUTES.tasks)} />}>
+  return <PageShell background="primary" aside={<NavigationBar hasBackButton hasTextBlock hasRootLink rootLinkText="Задачи" title="Задача" onBackClick={() => navigate(backTo)} onRootLinkClick={() => navigate(ROUTES.tasks)} />}>
     <div className="client-task-detail">
       <header className="client-task-detail__header">
         <h2>{task.title}</h2>
@@ -71,11 +73,14 @@ export default function TaskDetailPage() {
         <ReadOnlyCell label="Замещающий бухгалтер 2" value={task.substituteAccountant2 || 'Не назначен'} empty={!task.substituteAccountant2} />
       </section>
 
-      {task.attachments?.length ? <section className="client-task-detail__documents" aria-label="Документы">
-        <h3 className="client-task-detail__documents-title">Документы</h3>
-        <div className="client-task-detail__documents-list">
-          {task.attachments.map((name, index) => <Cell key={`${name}-${index}`} className="client-task-detail__attachment" textScale="S" verticalSpacing="none" edgePadding="off" title={name} leftAccessory={<span className="client-task-detail__attachment-avatar">{attachmentIcon(name)}</span>} />)}
-        </div>
+      {task.attachments?.length ? <section className="client-task-detail__documents" aria-label="Загруженные файлы">
+        <h3 className="client-task-detail__documents-title">Загруженные файлы</h3>
+        <ul className="client-task-detail__documents-list">
+          {task.attachments.map((name, index) => <li key={`${name}-${index}`} className="client-task-detail__attachment">
+            <span className="client-task-detail__attachment-avatar">{attachmentIcon(name)}</span>
+            <span className="client-task-detail__attachment-name">{name}</span>
+          </li>)}
+        </ul>
       </section> : null}
     </div>
   </PageShell>

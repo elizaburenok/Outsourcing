@@ -15,6 +15,7 @@ export const ROUTES = {
   /** Страница уплаты конкретного налога/платежа. */
   pay: '/pay/:id',
   tasks: '/tasks',
+  pinnedTask: '/tasks/pinned/:id',
   task: '/tasks/:id',
 } as const
 
@@ -25,4 +26,8 @@ export function payTo(id: string): string {
 
 export function taskTo(id: string): string {
   return `/tasks/${encodeURIComponent(id)}`
+}
+
+export function pinnedTaskTo(id: string): string {
+  return `/tasks/pinned/${encodeURIComponent(id)}`
 }

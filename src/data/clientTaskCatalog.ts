@@ -31,3 +31,8 @@ export function clientTaskContext(task: { topic?: ClientTaskTopic; subject?: str
   if (topic === 'other') return `Создана ${task.createdAt}`
   return task.subject ? `${CLIENT_TASK_TOPICS[topic].label}: ${task.subject}` : CLIENT_TASK_TOPICS[topic].label
 }
+
+/** Поддерживаем также задачи, созданные из закреплённых строк до появления parentId. */
+export function clientTaskParentId(task: { parentId?: string; topic?: ClientTaskTopic; subject?: string }): string | undefined {
+  return task.parentId ?? PERMANENT_TASK_TYPES.find((type) => type.topic === task.topic && type.subject === task.subject)?.id
+}
