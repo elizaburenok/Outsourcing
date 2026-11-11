@@ -97,3 +97,22 @@
   font-weight: var(--font-weight-regular);
   color: var(--color-primitive-error);
 }
+
+/* Figma TUI Input, node 1119:16544. */
+.tuiRoot {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+  width: 100%;
+  min-height: var(--space-18x);
+  padding: var(--space-3x) var(--space-5x);
+  border-radius: var(--radius-3x);
+  background: var(--color-container-transparent-1);
+}
+
+.tuiRoot:focus-within { outline: 2px solid var(--color-primitive-brand); outline-offset: -2px; }
+.tuiError { outline: 2px solid var(--color-primitive-error); outline-offset: -2px; }
+.tuiLabel { color: var(--color-primitive-primary); font-size: var(--font-size-s); line-height: var(--line-height-s); font-weight: var(--font-weight-medium); }
+.tuiInputRow { display: flex; align-items: center; min-width: 0; }
+.tuiInput { width: 100%; min-width: 0; padding: 0; border: 0; outline: 0; background: none; color: var(--color-primitive-primary); font: inherit; font-size: var(--font-size-m); line-height: var(--line-height-m); }
+.tuiInput::placeholder { color: var(--color-primitive-neutral-4); }

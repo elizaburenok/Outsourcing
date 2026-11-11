@@ -1,9 +1,8 @@
 import { useState } from 'react'
 import { Cell } from '@ds/components/Cell'
 import { Chip } from '@ds/components/Chip'
-import { TimelineEvent } from '@ds/components/TimelineEvent'
 import { formatMoney } from '@/lib/format'
-import { pluralOps } from '@/lib/plural'
+import { pluralDocuments } from '@/lib/plural'
 import { vatForDocument, vatIncludedInGross, type VatDocument, type VatKind, type VatRate, type VatSection } from '@/data/vat'
 
 type Category = 'sale' | 'purchase'
@@ -13,12 +12,9 @@ const colors = [
   'var(--color-category-indigo)', 'var(--color-category-orchid)',
   'var(--color-category-sand)', 'var(--color-category-amethyst)',
 ] as const
-const labels: Record<VatKind, string> = {
-  sale: 'Продажа', purchase: 'Покупка', advance: 'Предоплата от покупателя', advanceOffset: 'Предоплата учтена в продаже',
-}
 const summaryLabels: Record<VatKind, string> = {
-  sale: 'Продажи', purchase: 'Покупки',
-  advance: 'Предоплата от покупателя', advanceOffset: 'Предоплата учтена в продаже',
+  sale: 'НДС с продаж', purchase: 'НДС с покупок',
+  advance: 'НДС с предоплаты', advanceOffset: 'НДС с зачтённой предоплаты',
 }
 function dateKey(title: string) {
   const date = title.match(/(\d{2})\.(\d{2})\.(\d{4})/)
@@ -26,6 +22,9 @@ function dateKey(title: string) {
 }
 function initials(name: string) {
   return name.replace(/^(ООО|АО|ИП)\s*/, '').replace(/^[«"]/, '').slice(0, 2).toUpperCase()
+}
+function sumVat(documents: VatDocument[], rate: VatRate) {
+  return Math.round(documents.reduce((sum, document) => sum + vatForDocument(document, rate), 0) * 100) / 100
 }
 function sumGross(documents: VatDocument[]) {
   return Math.round(documents.reduce((sum, document) => sum + document.gross, 0) * 100) / 100
@@ -47,9 +46,13 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
     byContractor.set(document.contractor, items)
   }
   const groups = [...byContractor].map(([name, items]) => {
-    const offsets = sumGross(items.filter((item) => item.kind === 'advanceOffset'))
-    const total = Math.round((sumGross(items.filter((item) => item.kind !== 'advanceOffset')) - offsets) * 100) / 100
-    return { name, items, total, offsets }
+    const offsetItems = items.filter((item) => item.kind === 'advanceOffset')
+    const otherItems = items.filter((item) => item.kind !== 'advanceOffset')
+    const offsets = sumVat(offsetItems, vat.rate)
+    const total = Math.round((sumVat(otherItems, vat.rate) - offsets) * 100) / 100
+    const gross = Math.round((sumGross(otherItems) - sumGross(offsetItems)) * 100) / 100
+    const net = Math.round((gross - total) * 100) / 100
+    return { name, items, total, net }
   }).sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'ru'))
   const selected = groups.find((group) => group.name === selectedName)
   const documents = selected?.items.filter((document) => filter === 'all' || document.kind === filter
@@ -63,12 +66,12 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
     <ul className="tcd__list tcd__contractor-list" aria-label="Контрагенты">
       {groups.map((group, index) => <li key={group.name}>
         <button type="button" className="tcd__contractor-button" onClick={() => onSelect?.(group.name)}
-          aria-label={`Операции: ${group.name}`}>
+          aria-label={`Документы: ${group.name}`}>
           <Cell textScale="M" edgePadding="off" verticalSpacing="none"
             leftAccessory={<span className="tcd__avatar" style={{ background: colors[index % colors.length] }} aria-hidden>{initials(group.name)}</span>}
-            title={group.name} description={pluralOps(group.items.length)}
+            title={group.name} description={pluralDocuments(group.items.length)}
             rightAccessory={<span className="tcd__contractor-amount">{formatMoney(group.total)}
-              {group.offsets > 0 && <small>Зачтено {formatMoney(group.offsets)}</small>}</span>} />
+              <small>Доход {formatMoney(group.net)}</small></span>} />
         </button>
       </li>)}
     </ul>
@@ -81,20 +84,31 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
           onClick={() => setFilter(id)}>{label}</Chip>)}
     </div>}
     <section className="tcd__detail-summary" aria-label={`Сводка: ${selected.name}`}>
+      <div className="tcd__detail-summary-row">
+        <span>Доход</span>
+        <strong>{formatMoney(selected.net)}</strong>
+      </div>
       {sections.filter((section) => section.kind !== 'advanceOffset' && section.documents.some((document) => document.contractor === selected.name)).map((section) =>
         <div className="tcd__detail-summary-row" key={section.kind}>
           <span>{summaryLabels[section.kind]}</span>
-          <strong>{formatMoney(sumGross(section.documents.filter((document) => document.contractor === selected.name)))}</strong>
+          <strong>{formatMoney(sumVat(section.documents.filter((document) => document.contractor === selected.name), vat.rate))}</strong>
         </div>)}
     </section>
     {documents.length ? <ul className="tcd__timeline" aria-label="Документы контрагента">
       {documents.map((document) => {
-        const positive = document.kind === 'sale' || document.kind === 'advance'
-        return <li key={document.id}><TimelineEvent positive={positive}
-          amount={`${positive ? '+' : '−'}${formatMoney(document.gross)}`}
-          status={`НДС ${formatMoney(document.kind === 'purchase' ? document.vat ?? vatIncludedInGross(document.gross, 22) : vatForDocument(document, vat.rate))}`}
-          title={labels[document.kind]}
-          description={document.title.replace(` от ${document.contractor}`, '')} /></li>
+        const documentVat = document.kind === 'purchase'
+          ? document.vat ?? vatIncludedInGross(document.gross, 22)
+          : vatForDocument(document, vat.rate)
+        const documentNet = Math.round((document.gross - documentVat) * 100) / 100
+        return <li key={document.id}>
+          <Cell textScale="M" edgePadding="off" verticalSpacing="none"
+            title={document.title.replace(` от ${document.contractor}`, '')}
+            description={`НДС ${vat.rate}%`}
+            rightAccessory={<span className="tcd__contractor-amount tcd__document-amount">
+              {formatMoney(documentVat)}
+              <small>Доход {formatMoney(documentNet)}</small>
+            </span>} />
+        </li>
       })}
     </ul> : <p className="tcd__vat-context" role="status">В этом квартале операций этого типа нет.</p>}
   </>

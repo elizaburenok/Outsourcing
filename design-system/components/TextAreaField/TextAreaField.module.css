@@ -93,3 +93,11 @@
   outline: 1px solid var(--color-primitive-error);
   outline-offset: 0;
 }
+
+/* Figma TUI Text Area, node 4392:38196. */
+.tuiRoot { display:flex; flex-direction:column; gap:var(--space-2x); width:100%; min-height:var(--space-18x); padding:var(--space-3x) var(--space-5x); border-radius:var(--radius-3x); background:var(--color-container-transparent-1); }
+.tuiRoot:focus-within { outline:2px solid var(--color-primitive-brand); outline-offset:-2px; }
+.tuiError { outline:2px solid var(--color-primitive-error); outline-offset:-2px; }
+.tuiLabel { color:var(--color-primitive-primary); font-size:var(--font-size-s); line-height:var(--line-height-s); font-weight:var(--font-weight-medium); }
+.tuiTextarea { flex:1; width:100%; min-height:var(--space-18x); padding:0; border:0; outline:0; resize:vertical; background:none; color:var(--color-primitive-primary); font:inherit; font-size:var(--font-size-m); line-height:var(--line-height-m); }
+.tuiTextarea::placeholder { color:var(--color-primitive-neutral-4); }

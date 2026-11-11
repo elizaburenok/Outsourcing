@@ -1,7 +1,7 @@
 import { useState } from 'react'
-import { CirclePlus, ShoppingBag } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
+import { ShoppingBag } from 'lucide-react'
 import { usePayments } from '@/state/PaymentsProvider'
-import { HeaderButton } from '@ds/components/HeaderButton'
 import PageAction from '@ds/components/PageAction'
 import { EmblemTIcon, PenIcon, IntegrationIcon, RequisitesTIcon } from '@ds/components/icons'
 import Card from '@/components/ui/Card'
@@ -12,6 +12,9 @@ import type { AugustPayment, PayState } from '@/data/august'
 import { CASE2, type ObCaseData } from '@/data/case2'
 import { MCHD_COUNT, MARKETPLACES, INTEGRATIONS, TARIFF_NAME, marketplacesText, integrationsText } from '@/data/company'
 import CreateTaskDrawer from './CreateTaskDrawer'
+import { CreateTaskButton, TasksEntry } from '@/features/clientTasks/TasksEntry'
+import { useClientTasks } from '@/state/ClientTasksProvider'
+import { ROUTES } from '@/routes'
 import '@/features/august/AugustView.css'
 import './Case2View.css'
 
@@ -40,6 +43,8 @@ function splitTotals(list: AugustPayment[]): { total: number } {
  * Данные — из `@/data/case2` (самодостаточно, не трогают `AUGUST_PAYMENTS`).
  */
 export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
+  const navigate = useNavigate()
+  const { createTask } = useClientTasks()
   const { isPaid } = usePayments()
   const isIp = data.taxpayer === 'ip'
   const taxKey = isIp ? 'taxes' : 'usn'
@@ -135,15 +140,7 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
 
   return (
     <div className="av case2">
-      <div className="av__create case2__create" data-coach="add-task">
-        <HeaderButton
-          visualVariant="Secondary"
-          icon={<CirclePlus size={20} strokeWidth={2} />}
-          onClick={() => setTaskOpen(true)}
-        >
-          Создать задачу
-        </HeaderButton>
-      </div>
+      <CreateTaskButton onClick={() => setTaskOpen(true)} />
 
       <div data-coach="pay">
         <Card className="av__list">
@@ -158,6 +155,8 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
           ))}
         </Card>
       </div>
+
+      <TasksEntry onClick={() => navigate(ROUTES.tasks)} />
 
       <div className="av__links">
         <PageAction
@@ -186,7 +185,7 @@ export default function Case2View({ data = CASE2 }: { data?: ObCaseData }) {
       </div>
 
       {drawerProps && <GroupDrawer open onClose={() => setOpenGroup(null)} {...drawerProps} />}
-      <CreateTaskDrawer open={taskOpen} onClose={() => setTaskOpen(false)} />
+      <CreateTaskDrawer open={taskOpen} onClose={() => setTaskOpen(false)} onCreate={(title, description, attachments, kind) => { createTask(title, description, { topic: 'other', attachments, kind }) }} />
     </div>
   )
 }

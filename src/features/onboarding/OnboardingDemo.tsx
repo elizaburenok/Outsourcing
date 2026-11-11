@@ -1,10 +1,15 @@
 import { useEffect, useRef, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Check, Info, Plus, TriangleAlert } from 'lucide-react'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
 import { Cell } from '@ds/components/Cell'
 import { CellRightAccessory } from '@ds/components/CellRightAccessory'
 import PageAction from '@ds/components/PageAction'
 import Card from '@/components/ui/Card'
+import CreateTaskDrawer from '@/features/case2/CreateTaskDrawer'
+import { CreateTaskButton, TasksEntry } from '@/features/clientTasks/TasksEntry'
+import { useClientTasks } from '@/state/ClientTasksProvider'
+import { ROUTES } from '@/routes'
 import WildberriesConnection from './WildberriesConnection'
 import FnsAuthorization from './FnsAuthorization'
 import OzonConnection, { type OzonStore } from './OzonConnection'
@@ -33,6 +38,9 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
   page: OnboardingPage
   onPageChange: (page: OnboardingPage) => void
 }) {
+  const navigate = useNavigate()
+  const { createTask } = useClientTasks()
+  const [taskDrawerOpen, setTaskDrawerOpen] = useState(false)
   const tasks = withVat ? [...BASE_TASKS, { id: 'vat' as Task, label: 'Настройте НДС' }] : BASE_TASKS
   const [signatureDrawerOpen, setSignatureDrawerOpen] = useState(false)
   const [sfrDrawerOpen, setSfrDrawerOpen] = useState(false)
@@ -101,6 +109,7 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
 
   return <div className={page === 'home' ? 'od od--home' : 'od od--subpage'}>
     {page === 'home' && <>
+      <CreateTaskButton onClick={() => setTaskDrawerOpen(true)} />
       {failedMarketplaces.map((name) => <button className="od__connection-error" type="button" key={name} onClick={() => onPageChange(name === 'Wildberries' ? 'wildberries' : 'ozon')}><strong>Не смогли подключить {name}</strong><span>Проверьте корректность данных и попробуйте ещё раз</span></button>)}
       {!onboardingDismissed && <div className="od__card">
         <div className="od__card-intro">
@@ -121,6 +130,7 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
       </div>}
 
       <Card className="od__payments"><h2>Платежи</h2><p>Текущих платежей нет</p></Card>
+      <TasksEntry onClick={() => navigate(ROUTES.tasks)} />
 
       <div className="od__links">
         <PageAction title="Налогообложение" description="УСН «Доходы» — 6%" iconLeft={<img src="/onboarding/tax.svg" alt="" width="30" height="30" />} />
@@ -131,6 +141,8 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
         <PageAction title="Тариф" description="Бухгалтерское обслуживание для ООО" iconLeft={<img src="/onboarding/tariff.svg" alt="" width="30" height="30" />} />
       </div>
     </>}
+
+    <CreateTaskDrawer open={taskDrawerOpen} onClose={() => setTaskDrawerOpen(false)} onCreate={(title, description, attachments, kind) => { createTask(title, description, { topic: 'other', attachments, kind }) }} />
 
     {page === 'signature' && <FnsAuthorization onDone={() => finish('signature')} />}
 

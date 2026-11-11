@@ -21,6 +21,9 @@ import {
   type DomainHistoryGroup,
 } from './domain'
 import '@/features/august/AugustView.css'
+import CreateTaskDrawer from '@/features/case2/CreateTaskDrawer'
+import { CreateTaskButton, TasksEntry } from '@/features/clientTasks/TasksEntry'
+import { useClientTasks } from '@/state/ClientTasksProvider'
 import './HomeCardsView.css'
 
 /** Снимок дровера в момент открытия — чтобы список и суммы не «схлопывались» после уплаты. */
@@ -47,6 +50,8 @@ export default function HomeCardsView() {
   const { levels, paymentsByCat, historyByCat } = useHomeModel()
   const { scenario } = useScenario()
   const [drawer, setDrawer] = useState<DrawerState | null>(null)
+  const [taskOpen, setTaskOpen] = useState(false)
+  const { createTask } = useClientTasks()
 
   // «Отчётность» — такая же доменная карточка, но её ведёт бухгалтер. Жёлтый тон
   // (attention), когда есть незакрытые задачи клиента (подписать/подтвердить), иначе
@@ -107,6 +112,7 @@ export default function HomeCardsView() {
 
   return (
     <div className="av">
+      <CreateTaskButton onClick={() => setTaskOpen(true)} />
       <div data-coach="pay" className="hc__grid">
         {cards.map((card) => (
           <CategoryCard
@@ -120,6 +126,8 @@ export default function HomeCardsView() {
           />
         ))}
       </div>
+
+      <TasksEntry onClick={() => navigate(ROUTES.tasks)} />
 
       <div className="av__links">
         <PageAction
@@ -150,6 +158,7 @@ export default function HomeCardsView() {
           items={drawer.items}
         />
       )}
+      <CreateTaskDrawer open={taskOpen} onClose={() => setTaskOpen(false)} onCreate={(title, description, attachments, kind) => { createTask(title, description, { topic: 'other', attachments, kind }) }} />
     </div>
   )
 }

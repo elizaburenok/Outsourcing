@@ -14,9 +14,15 @@ export const ROUTES = {
   chat: '/chat',
   /** Страница уплаты конкретного налога/платежа. */
   pay: '/pay/:id',
+  tasks: '/tasks',
+  task: '/tasks/:id',
 } as const
 
 /** Путь к странице уплаты для конкретного платежа. */
 export function payTo(id: string): string {
   return `/pay/${id}`
+}
+
+export function taskTo(id: string): string {
+  return `/tasks/${encodeURIComponent(id)}`
 }
