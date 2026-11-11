@@ -18,6 +18,9 @@ export interface FlowResultModalProps {
   primaryLabel: string;
   /** Called on primary button click, overlay Escape, or close */
   onPrimary: () => void;
+  /** Optional second action below the result text. */
+  secondaryLabel?: string;
+  onSecondary?: () => void;
 }
 
 /**
@@ -32,6 +35,8 @@ export const FlowResultModal: React.FC<FlowResultModalProps> = ({
   children,
   primaryLabel,
   onPrimary,
+  secondaryLabel,
+  onSecondary,
 }) => {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && onPrimary();
@@ -58,6 +63,9 @@ export const FlowResultModal: React.FC<FlowResultModalProps> = ({
           </div>
         </div>
         <div className="frm__footer">
+          {secondaryLabel && onSecondary && <Button className="frm__btn" visualVariant="Secondary" onClick={onSecondary}>
+            {secondaryLabel}
+          </Button>}
           <Button className="frm__btn" visualVariant="Primary" onClick={onPrimary}>
             {primaryLabel}
           </Button>

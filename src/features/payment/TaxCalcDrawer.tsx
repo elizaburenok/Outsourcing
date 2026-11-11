@@ -1,7 +1,8 @@
 import { useLayoutEffect, useRef, useState } from 'react'
-import { ChevronDown, Info } from 'lucide-react'
+import { Info } from 'lucide-react'
 import { Drawer, DrawerHeader, DrawerFooter } from '@ds/components/Drawer'
 import { Cell } from '@ds/components/Cell'
+import { AccordeonCell } from '@ds/components/AccordeonCell'
 import { formatMoney } from '@/lib/format'
 import { USN_CALC, getCalcBreakdown, type Payable, type CalcBreakdown } from '@/data/payment'
 import type { PayCategory } from '@/data/august'
@@ -63,8 +64,9 @@ export default function TaxCalcDrawer({
   if (!calc && !vat) return null
 
   return (
-    <Drawer open={open} onClose={close} side="right" aria-label={selectedContractor ? `Операции: ${selectedContractor.name}` : 'Расчёт налога'} className={vat ? 'tcd--vat' : undefined}>
+    <Drawer open={open} onClose={close} side="right" aria-label={selectedContractor ? `Документы: ${selectedContractor.name}` : 'Расчёт налога'} className={vat ? 'tcd--vat' : undefined}>
       <DrawerHeader onClose={close}
+        subtitle={selectedContractor ? selectedContractor.kind === 'purchase' ? 'Покупка' : 'Продажа' : undefined}
         backAction={selectedContractor ? { onClick: () => setSelectedContractor(null), label: 'Назад к расчёту налога', icon: <img src={backIcon} alt="" /> } : undefined}
         closeIcon={selectedContractor ? <img src={closeIcon} alt="" /> : undefined}>
         {selectedContractor?.name ?? 'Расчёт налога'}
@@ -102,11 +104,10 @@ function VatCalc({ vat, payable, expandedKind, onExpand, onSelectContractor }: {
   onSelectContractor: (kind: 'sale' | 'purchase', name: string) => void
 }) {
   const [sales, advances, offsets, purchases] = vat.sections
-  const salesGross = Math.round((sales.gross + advances.gross - offsets.gross) * 100) / 100
   const salesVat = Math.round((sales.vat + advances.vat - offsets.vat) * 100) / 100
   const categories = [
-    { kind: 'purchase' as const, title: 'Покупки', amount: purchases.gross },
-    { kind: 'sale' as const, title: 'Продажи', amount: salesGross },
+    { kind: 'sale' as const, title: 'Продажи', amount: salesVat },
+    { kind: 'purchase' as const, title: 'Покупки', amount: purchases.vat },
   ]
   return <>
     <div className="tcd__heading">
@@ -114,14 +115,6 @@ function VatCalc({ vat, payable, expandedKind, onExpand, onSelectContractor }: {
     </div>
     <div className="tcd__summary tcd__summary--vat-design">
       <p className="tcd__hint">Бухгалтер посчитал налог к уплате</p>
-      <div className="tcd__line">
-        <p className="tcd__line-label">Продажи за {vat.quarter} квартал с учётом НДС</p>
-        <p className="tcd__line-value">{formatMoney(salesGross)}</p>
-      </div>
-      <div className="tcd__line">
-        <p className="tcd__line-label">Покупки за {vat.quarter} квартал с учётом НДС</p>
-        <p className="tcd__line-value">{formatMoney(purchases.gross)}</p>
-      </div>
       <div className="tcd__line">
         <p className="tcd__line-label">НДС за квартал{vat.rate === 22 ? ': из НДС с продаж вычитаем НДС с покупок' : ''}</p>
         <p className="tcd__line-value">{vat.rate === 22 ? <>{formatMoney(salesVat)} − {formatMoney(purchases.vat)} = </> : null}{formatMoney(vat.tax)}</p>
@@ -137,9 +130,7 @@ function VatCalc({ vat, payable, expandedKind, onExpand, onSelectContractor }: {
       {categories.map(({ kind, title, amount }) => <section className="tcd__accordion-section" key={kind}>
         <button type="button" className="tcd__contractor-button" onClick={() => onExpand(expandedKind === kind ? null : kind)}
           aria-expanded={expandedKind === kind} aria-controls={expandedKind === kind ? `vat-${kind}-contractors` : undefined}>
-          <Cell textScale="M" edgePadding="off" verticalSpacing="none" title={title}
-            rightAccessory={<span className="tcd__category-accessory"><span className="tcd__contractor-amount">{formatMoney(amount)}</span>
-              <ChevronDown className={expandedKind === kind ? 'tcd__chevron tcd__chevron--open' : 'tcd__chevron'} size={20} aria-hidden /></span>} />
+          <AccordeonCell title={title} description={formatMoney(amount)} expanded={expandedKind === kind} />
         </button>
         {expandedKind === kind && <div id={`vat-${kind}-contractors`} className="tcd__accordion-content">
           <VatCategoryDetails kind={kind} vat={vat} selectedName={null} onSelect={(name) => onSelectContractor(kind, name)} showTotal={false} />

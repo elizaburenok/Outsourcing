@@ -1,9 +1,7 @@
-/* Кнопка остаётся в компоненте, но временно не показывается в прототипе. */
-.av__create.case2__create {
-  display: none;
-}
+.case2 { gap: var(--space-4x); }
+.case2 .av__links { margin-top: var(--space-4x); }
 
-/* От карточки платежей до первого PageAction — ровно 32px. */
+/* Платежи и задачи идут отдельными блоками. */
 .case2 > [data-coach='pay'] {
   margin-bottom: 0;
 }

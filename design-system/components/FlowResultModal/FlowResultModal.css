@@ -70,6 +70,9 @@
   color: var(--color-primitive-success);
 }
 
+.frm__avatar:has(img) { background: transparent; }
+.frm__avatar img { display: block; }
+
 .frm__content {
   display: flex;
   flex-direction: column;
@@ -89,10 +92,13 @@
   gap: var(--space-2-5x);
   font-size: var(--font-size-m);
   line-height: var(--line-height-m);
-  color: var(--color-primitive-secondary);
+  color: var(--color-primitive-primary);
 }
 
 .frm__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3x);
   padding: var(--space-5x);
 }
 

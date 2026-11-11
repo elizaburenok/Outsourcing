@@ -4,6 +4,7 @@ import './DrawerHeader.css';
 export interface DrawerHeaderProps {
   /** Title content. Can be text or any React node */
   children?: React.ReactNode;
+  subtitle?: React.ReactNode;
   /** Close button click handler */
   onClose?: () => void;
   /** Optional navigation action on the left. */
@@ -18,6 +19,7 @@ export interface DrawerHeaderProps {
 export const DrawerHeader: React.FC<DrawerHeaderProps> = (props: DrawerHeaderProps) => {
   const {
     children,
+    subtitle,
     onClose,
     backAction,
     closeIcon,
@@ -31,7 +33,8 @@ export const DrawerHeader: React.FC<DrawerHeaderProps> = (props: DrawerHeaderPro
     <div className={classes} data-testid={dataTestId}>
       {backAction && <button type="button" className="drawer-header__close drawer-header__back" onClick={backAction.onClick} aria-label={backAction.label}>{backAction.icon}</button>}
       <div className="drawer-header__title">
-        {children}
+        <span className="drawer-header__title-text">{children}</span>
+        {subtitle && <span className="drawer-header__subtitle">{subtitle}</span>}
       </div>
 
       {onClose && (

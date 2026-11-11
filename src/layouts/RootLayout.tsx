@@ -6,6 +6,7 @@ import { ROUTES } from '@/routes'
 import { PaymentsProvider } from '@/state/PaymentsProvider'
 import { ScenarioProvider, useScenario } from '@/state/ScenarioProvider'
 import { OnboardingProvider } from '@/state/OnboardingProvider'
+import { ClientTasksProvider } from '@/state/ClientTasksProvider'
 import ScenarioSwitch from '@/features/devtools/ScenarioSwitch'
 // import OnboardingLayer from '@/features/onboarding/OnboardingLayer' // временно скрыт, см. ниже
 import './RootLayout.css'
@@ -46,6 +47,7 @@ export default function RootLayout() {
     <PaymentsProvider>
       <ScenarioProvider>
         <OnboardingProvider>
+          <ClientTasksProvider>
           <div className="app">
             <ScrollToTop />
             {/* Экосистемная шапка Точки — данность платформы, не наша навигация */}
@@ -58,6 +60,7 @@ export default function RootLayout() {
             {/* Служебный тумблер сценариев прототипа (не элемент продукта) */}
             <ScenarioSwitch />
           </div>
+          </ClientTasksProvider>
         </OnboardingProvider>
       </ScenarioProvider>
     </PaymentsProvider>

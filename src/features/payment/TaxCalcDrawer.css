@@ -233,6 +233,10 @@
   font-weight: var(--font-weight-regular);
 }
 
+.tcd__document-amount {
+  font-weight: var(--font-weight-medium);
+}
+
 .tcd__vat-context {
   color: var(--color-primitive-secondary);
   font-size: var(--font-size-s);
@@ -266,22 +270,6 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-6x);
-}
-
-.tcd__category-accessory {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--space-3x);
-}
-
-.tcd__chevron {
-  flex: none;
-  color: var(--color-primitive-secondary);
-  transition: transform 160ms ease;
-}
-
-.tcd__chevron--open {
-  transform: rotate(180deg);
 }
 
 .tcd__category-list .tcd__contractor-amount {

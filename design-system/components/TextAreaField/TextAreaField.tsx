@@ -1,7 +1,7 @@
 import React, { useId, useState } from 'react';
 import styles from './TextAreaField.module.css';
 
-export type TextAreaFieldVariant = 'default' | 'raisedCard';
+export type TextAreaFieldVariant = 'default' | 'raisedCard' | 'tui';
 
 export interface TextAreaFieldProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
@@ -28,6 +28,25 @@ export const TextAreaField: React.FC<TextAreaFieldProps> = ({
   const id = idProp ?? uid;
   const [focused, setFocused] = useState(false);
   const error = Boolean(errorMessage);
+
+  if (variant === 'tui') {
+    return (
+      <div className={`${styles.tuiRoot} ${error ? styles.tuiError : ''} ${className ?? ''}`.trim()}>
+        <label className={styles.tuiLabel} htmlFor={id}>{label}</label>
+        <textarea
+          id={id}
+          className={styles.tuiTextarea}
+          disabled={disabled}
+          aria-invalid={error}
+          aria-describedby={error ? `${id}-error` : undefined}
+          onFocus={onFocus}
+          onBlur={onBlur}
+          {...areaProps}
+        />
+        {errorMessage && <span id={`${id}-error`} className={styles.message} role="alert">{errorMessage}</span>}
+      </div>
+    );
+  }
 
   const raised = variant === 'raisedCard';
 

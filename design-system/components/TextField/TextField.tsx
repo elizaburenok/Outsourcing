@@ -4,6 +4,8 @@ import styles from './TextField.module.css';
 export interface TextFieldProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'> {
   label: string;
+  /** TUI Input: подпись и значение внутри одного контейнера. */
+  variant?: 'default' | 'tui';
   errorMessage?: string;
   /** [custom] — paste helper; maps to Transparent Button / Icon control pattern in Figma TUI */
   accessoryRight?: React.ReactNode;
@@ -15,6 +17,7 @@ export interface TextFieldProps
 
 export const TextField: React.FC<TextFieldProps> = ({
   label,
+  variant = 'default',
   errorMessage,
   accessoryRight,
   compact = false,
@@ -29,6 +32,28 @@ export const TextField: React.FC<TextFieldProps> = ({
   const id = idProp ?? uid;
   const [focused, setFocused] = useState(false);
   const error = Boolean(errorMessage);
+
+  if (variant === 'tui') {
+    return (
+      <div className={`${styles.tuiRoot} ${error ? styles.tuiError : ''} ${disabled ? styles.controlDisabled : ''} ${className ?? ''}`.trim()}>
+        <label className={styles.tuiLabel} htmlFor={id}>{label}</label>
+        <div className={styles.tuiInputRow}>
+          <input
+            id={id}
+            className={styles.tuiInput}
+            disabled={disabled}
+            aria-invalid={error}
+            aria-describedby={error ? `${id}-error` : undefined}
+            onFocus={onFocus}
+            onBlur={onBlur}
+            {...inputProps}
+          />
+          {accessoryRight}
+        </div>
+        {errorMessage && <span id={`${id}-error`} className={styles.message} role="alert">{errorMessage}</span>}
+      </div>
+    );
+  }
 
   const controlClass = [
     styles.control,
