@@ -21,7 +21,7 @@ function ReadOnlyCell({ label, value, empty = false }: { label: string; value: s
 
 function taskType(task: ClientTask) {
   if (task.kind === 'ordinary') return 'Задача бухгалтеру'
-  if (task.kind === 'reconciliation') return 'Обработка документов для сверки'
+  if (task.kind === 'reconciliation') return 'Отправить документы для учета'
   return CLIENT_TASK_TOPICS[task.topic]?.label ?? 'Общий вопрос'
 }
 
