@@ -97,7 +97,7 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, onFinish, de
 
   function selectKind(next: TaskKind) {
     setKind(next)
-    setTitle(next === 'reconciliation' ? 'Обработка документов для сверки' : useDefaultTitle ? defaultTitle : '')
+    setTitle(next === 'reconciliation' ? 'Отправить документы для учета' : useDefaultTitle ? defaultTitle : '')
     setTitleError('')
     setDescription('')
     setFiles([])
@@ -152,7 +152,7 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, onFinish, de
     if (files.some((item) => item.status === 'adding')) return
     if (files.some((item) => item.status === 'error')) { setFileError('Удалите файлы с ошибками'); return }
     const readyFiles = files.filter((item) => item.status === 'ready')
-    if (kind === 'reconciliation' && readyFiles.length === 0) { setFileError('Добавьте хотя бы один документ для сверки'); return }
+    if (kind === 'reconciliation' && readyFiles.length === 0) { setFileError('Добавьте хотя бы один документ для учёта'); return }
     onCreate(title.trim(), description.trim(), readyFiles.map((item) => item.file.name), kind, Boolean(defaultTitle && useDefaultTitle))
     setShowResult(true)
   }
@@ -161,22 +161,22 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, onFinish, de
 
   return <><Drawer open={open} onClose={showResult ? undefined : close} side="right" className="ctd__drawer" aria-label={kind ? 'Создание задачи' : 'Выбор типа задачи'}>
     <DrawerHeader onClose={close} backAction={kind ? { onClick: goBack, icon: <ArrowLeft size={24} aria-hidden />, label: defaultTitle && useDefaultTitle ? 'Назад к списку задач' : 'Назад к выбору задачи' } : undefined}>
-      {kind === 'ordinary' ? 'Задача бухгалтеру' : kind === 'reconciliation' ? 'Обработка документов' : 'Новая задача'}
+      {kind === 'ordinary' ? 'Задача бухгалтеру' : kind === 'reconciliation' ? 'Отправить документы для учета' : 'Новая задача'}
     </DrawerHeader>
 
     {kind === null ? <div className="ctd__body ctd__body--choice">
       <div className="ctd__options">
         <button type="button" className="ctd__option" onClick={() => selectKind('ordinary')}>
-          <Cell textScale="M" verticalSpacing="none" title="Задача бухгалтеру" description="Задайте вопрос или поручите работу бухгалтеру" />
+          <Cell textScale="M" verticalSpacing="none" title="Задача бухгалтеру" description="Поставить задачу бухгалтеру" />
         </button>
         <button type="button" className="ctd__option" onClick={() => selectKind('reconciliation')}>
-          <Cell textScale="M" verticalSpacing="none" title="Обработка документов для сверки" description="Передайте документы, чтобы бухгалтер проверил расчёты" />
+          <Cell textScale="M" verticalSpacing="none" title="Отправить документы для учета" description="Передайте документы бухгалтеру для учёта" />
         </button>
       </div>
     </div> : <>
       <div className="ctd__body">
-        <TextField variant="tui" label="Название" value={title} onChange={(event) => { setTitle(event.target.value); if (titleError) setTitleError('') }} errorMessage={titleError} required placeholder={kind === 'reconciliation' ? 'Какие документы нужно обработать' : 'Что нужно сделать'} />
-        <TextAreaField variant="tui" label="Описание" value={description} onChange={(event) => setDescription(event.target.value)} placeholder={kind === 'reconciliation' ? 'Что и за какой период нужно сверить' : 'Детали задачи для бухгалтера'} />
+        <TextField variant="tui" label="Название" value={title} onChange={(event) => { setTitle(event.target.value); if (titleError) setTitleError('') }} errorMessage={titleError} required placeholder={kind === 'reconciliation' ? 'Какие документы нужно учесть' : 'Что нужно сделать'} />
+        <TextAreaField variant="tui" label="Описание" value={description} onChange={(event) => setDescription(event.target.value)} placeholder={kind === 'reconciliation' ? 'Какие документы и за какой период нужно учесть' : 'Детали задачи для бухгалтера'} />
         <div className="ctd__files">
           <input ref={fileInput} type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.txt,.rtf,.jpg,.jpeg,.png,.gif,.webp,.heic,.zip,.rar,.7z" className="ctd__file-input" onChange={onFileChange} aria-label="Выбрать документы" aria-required={kind === 'reconciliation'} />
           <div className={`ctd__file-group${dragging ? ' ctd__file-group--dragging' : ''}${fileError ? ' ctd__file-group--error' : ''}`}
