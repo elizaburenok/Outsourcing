@@ -1,0 +1,675 @@
+/*
+ * Чат поддержки + AI-Ассистент (макет «ОБ · Аутсорс», страница «🚧 НДС»,
+ * секция 4664:23226). Всё — токены ДС; размеры без токенов помечены (Figma).
+ *
+ * Ключевые кадры:
+ *  - кнопка «Homescreen Button» 70×70 (4664:23230) — тёмный сквируль,
+ *    тень Surfaces/Popout (0 20 40 rgba(0,0,0,0.1));
+ *  - окно 440×750 с фиксированной высотой (4664:23279 и др.): шапка 64,
+ *    табы 32, лента (скролл), инпут-пилюля 48.
+ */
+
+/* ------------------------------------------------------------------ */
+/* Плавающая кнопка чата                                              */
+/* ------------------------------------------------------------------ */
+
+.aw__fab {
+  position: fixed;
+  right: var(--space-10x);
+  bottom: var(--space-10x);
+  z-index: 85;
+  display: grid;
+  place-items: center;
+  width: 70px;
+  height: 70px;
+  padding: 0;
+  border: 0;
+  /* Figma: сквируль ~0.4·70 (Homescreen Button 1, State: Small) */
+  border-radius: 28px;
+  background: var(--color-bg-inverse);
+  color: var(--color-primitive-primary-on-inverse);
+  /* Surfaces/Popout (эффект ноды кнопки в Figma) */
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.aw__fab:hover {
+  transform: translateY(-2px);
+}
+
+.aw__fab:focus-visible {
+  outline: 2px solid var(--color-primitive-brand);
+  outline-offset: 3px;
+}
+
+/* ------------------------------------------------------------------ */
+/* Окно чата                                                          */
+/* ------------------------------------------------------------------ */
+
+.aw__window {
+  position: fixed;
+  right: var(--space-10x);
+  bottom: var(--space-10x);
+  z-index: 86;
+  display: flex;
+  flex-direction: column;
+  width: 440px;
+  max-width: calc(100vw - 2 * var(--space-10x));
+  /* Фиксированная высота окна (макет: 440×750). */
+  height: 750px;
+  max-height: calc(100vh - 2 * var(--space-10x));
+  background: var(--color-bg-default);
+  border-radius: var(--radius-4-5x);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+}
+
+/* Шапка: счёт + непрочитанная точка, поиск, закрыть. */
+.aw__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3x);
+  height: 64px;
+  flex: none;
+  padding: 0 var(--space-5x);
+}
+
+.aw__account {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  min-width: 0;
+}
+
+.aw__account-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1x);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+
+.aw__account-name {
+  font-size: var(--font-size-title-l);
+  line-height: var(--line-height-title-l);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.aw__account-btn svg {
+  flex: none;
+  color: var(--color-primitive-secondary);
+}
+
+.aw__unread-dot {
+  flex: none;
+  width: var(--space-2x);
+  height: var(--space-2x);
+  border-radius: 50%;
+  background: var(--color-primitive-error);
+}
+
+.aw__head-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  flex: none;
+}
+
+.aw__icon-btn {
+  display: grid;
+  place-items: center;
+  width: var(--space-8x);
+  height: var(--space-8x);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-2-5x);
+  background: transparent;
+  color: var(--color-primitive-primary);
+  cursor: pointer;
+}
+
+.aw__icon-btn:hover {
+  background: var(--color-container-transparent-1);
+}
+
+.aw__icon-btn:focus-visible,
+.aw__link:focus-visible,
+.aw__tab:focus-visible,
+.aw__send:focus-visible,
+.aw__input-icon:focus-visible,
+.aw__feedback-btn:focus-visible,
+.aw__account-btn:focus-visible {
+  outline: 2px solid var(--color-primitive-brand);
+  outline-offset: 2px;
+}
+
+/* Табы «Поддержка / AI-Ассистент». */
+.aw__tabs {
+  display: flex;
+  gap: var(--space-1-5x);
+  flex: none;
+  padding: 0 var(--space-5x) var(--space-3x);
+}
+
+.aw__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 var(--space-4x);
+  border: 2px solid transparent;
+  border-radius: var(--radius-2-5x);
+  background: var(--color-bg-neutral-1);
+  color: var(--color-primitive-primary);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  font-weight: var(--font-weight-regular);
+  cursor: pointer;
+}
+
+.aw__tab[aria-selected='true'] {
+  background: var(--color-bg-default);
+  border-color: var(--color-primitive-neutral-4);
+}
+
+/* Бейдж непрочитанного на табе (кадр 4664:23320). */
+.aw__tab--badged {
+  padding-right: var(--space-7x);
+}
+
+.aw__tab-badge {
+  position: absolute;
+  right: var(--space-1-5x);
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  min-width: var(--space-4x);
+  height: var(--space-4x);
+  padding: 0 var(--space-1x);
+  border-radius: var(--rounding-10x);
+  background: var(--color-primitive-error);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--font-size-xs);
+  line-height: 1;
+  font-weight: var(--font-weight-medium);
+}
+
+/* ------------------------------------------------------------------ */
+/* Лента сообщений                                                    */
+/* ------------------------------------------------------------------ */
+
+.aw__thread {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3x);
+  padding: var(--space-2x) var(--space-5x) var(--space-4x);
+  background: var(--color-bg-default);
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-bg-neutral-3) transparent;
+}
+
+/* Уведомление про ChatGPT (кадр 4664:23279). */
+.aw__note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3x);
+  flex: none;
+  padding: var(--space-4x);
+  border: 1px solid var(--color-border-default);
+  border-radius: var(--radius-3x);
+  background: var(--color-bg-default);
+}
+
+.aw__note-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-4-5x);
+  height: var(--space-4-5x);
+  border-radius: 50%;
+  background: var(--color-primitive-brand);
+  color: var(--color-primitive-primary-on-inverse);
+  font-size: var(--font-size-s);
+  line-height: 1;
+  font-weight: var(--font-weight-demi-bold);
+}
+
+.aw__note-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1x);
+  min-width: 0;
+}
+
+.aw__note-text {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-primary);
+}
+
+.aw__link {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-primitive-brand);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  text-align: left;
+  cursor: pointer;
+}
+
+.aw__link:hover {
+  text-decoration: underline;
+}
+
+/* Приветствие AI-Ассистента (кадр 4664:23254). */
+.aw__welcome {
+  display: flex;
+  flex-direction: column;
+  margin-top: var(--space-8x);
+}
+
+.aw__welcome-title {
+  font-size: var(--font-size-3xl);
+  line-height: var(--line-height-3xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.aw__welcome-accent {
+  display: block;
+  font-style: italic;
+  color: var(--color-primitive-brand);
+}
+
+.aw__welcome-sub {
+  margin-top: var(--space-2x);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+}
+
+.aw__sample {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3x);
+  margin-top: var(--space-6x);
+}
+
+.aw__sample-row {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-2x);
+  max-width: 90%;
+}
+
+.aw__sample-row--client {
+  align-self: flex-end;
+}
+
+.aw__sample-row--agent {
+  align-self: flex-start;
+}
+
+.aw__bubble {
+  padding: var(--space-3x) var(--space-4x);
+  border-radius: var(--radius-4x);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+}
+
+.aw__bubble--welcome {
+  background: var(--color-bg-brand);
+  color: var(--color-primitive-primary-on-inverse);
+}
+
+.aw__bubble--agent {
+  background: var(--color-bg-neutral-1);
+  color: var(--color-primitive-primary);
+}
+
+/* Аватары. */
+.aw__avatar {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-8x);
+  height: var(--space-8x);
+  border-radius: 50%;
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primitive-primary);
+}
+
+.aw__avatar--user {
+  background: var(--color-bg-neutral-2);
+}
+
+.aw__avatar--agent {
+  width: var(--space-7x);
+  height: var(--space-7x);
+  background: var(--color-bg-neutral-3);
+}
+
+.aw__avatar--ai {
+  background: var(--color-primitive-brand);
+  color: var(--color-primitive-primary-on-inverse);
+}
+
+/* Сообщения. */
+.aw__msg {
+  display: flex;
+  flex-direction: column;
+  max-width: 85%;
+  padding: var(--space-3x) var(--space-4x);
+  border-radius: var(--radius-4x);
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+}
+
+.aw__msg--client {
+  align-self: flex-end;
+  background: var(--color-bg-brand-1);
+  border-bottom-right-radius: var(--radius-2-5x);
+}
+
+.aw__msg--agent {
+  align-self: flex-start;
+  background: var(--color-bg-neutral-1);
+}
+
+.aw__msg-text {
+  white-space: pre-line;
+}
+
+.aw__msg-time {
+  align-self: flex-end;
+  margin-top: var(--space-1x);
+  font-size: var(--font-size-xs);
+  line-height: var(--line-height-xs);
+  color: var(--color-primitive-neutral-4);
+}
+
+.aw__agent-head {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2x);
+  margin-bottom: var(--space-2x);
+}
+
+.aw__agent-name {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Карточка вложения (кадр 4664:23238). */
+.aw__attach {
+  align-self: flex-start;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3x);
+  width: 100%;
+  padding: var(--space-4x);
+  border-radius: var(--radius-4x);
+  background: var(--color-bg-neutral-1);
+}
+
+.aw__attach-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-10x);
+  height: var(--space-10x);
+  border-radius: var(--radius-2-5x);
+  background: var(--color-container-transparent-1);
+}
+
+.aw__attach-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-0-5x);
+  min-width: 0;
+}
+
+.aw__attach-title {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-medium);
+}
+
+.aw__attach-meta {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+.aw__msg-time--attach {
+  margin-top: 0;
+  margin-left: auto;
+  flex: none;
+}
+
+/* Ответ AI-Ассистента (кадр 4664:23292). */
+.aw__answer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2x);
+  align-self: stretch;
+}
+
+.aw__answer-card {
+  width: 100%;
+  max-width: none;
+}
+
+.aw__answer-block {
+  margin: 0;
+}
+
+.aw__answer-block + .aw__answer-block {
+  margin-top: var(--space-3x);
+}
+
+.aw__answer-sources {
+  margin-top: var(--space-3x);
+  align-self: flex-start;
+}
+
+/* Ряд обратной связи под ответом. */
+.aw__feedback {
+  display: flex;
+  gap: var(--space-3x);
+  padding-left: var(--space-1x);
+}
+
+.aw__feedback-btn {
+  display: grid;
+  place-items: center;
+  width: var(--space-7x);
+  height: var(--space-7x);
+  padding: 0;
+  border: 0;
+  border-radius: var(--radius-2-5x);
+  background: transparent;
+  color: var(--color-primitive-neutral-4);
+  cursor: pointer;
+}
+
+.aw__feedback-btn:hover {
+  color: var(--color-primitive-secondary);
+  background: var(--color-container-transparent-1);
+}
+
+.aw__feedback-btn[aria-pressed='true'] {
+  color: var(--color-primitive-brand);
+}
+
+/* Статус «Собираю данные....» (кадр 4664:23279). */
+.aw__status {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5x);
+  flex: none;
+  padding-left: var(--space-1x);
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
+/* ------------------------------------------------------------------ */
+/* Инпут                                                              */
+/* ------------------------------------------------------------------ */
+
+.aw__input {
+  flex: none;
+  padding: var(--space-3x) var(--space-5x);
+  background: var(--color-bg-default);
+}
+
+.aw__pill {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1-5x);
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--space-1-5x) 0 var(--space-5x);
+  border: 1px solid var(--color-bg-neutral-3);
+  /* 40px на 48px = полная «пилюля» (макет). */
+  border-radius: var(--radius-10x);
+  background: var(--color-bg-default);
+  transition: border-color 0.15s ease;
+}
+
+.aw__pill:focus-within {
+  border-color: var(--color-bg-brand-3);
+}
+
+.aw__pill input {
+  flex: 1;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+  letter-spacing: var(--letter-spacing-m);
+}
+
+.aw__pill input::placeholder {
+  color: var(--color-primitive-neutral-4);
+}
+
+/* Круглая кнопка отправки: серая при пустом инпуте, фиолетовая с текстом. */
+.aw__send {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: var(--color-primitive-neutral-3);
+  color: var(--color-primitive-primary-on-inverse);
+  cursor: default;
+}
+
+.aw__send:not(:disabled) {
+  background: var(--color-bg-brand);
+  color: var(--color-primitive-primary-on-inverse);
+  cursor: pointer;
+}
+
+.aw__input-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--space-7x);
+  height: var(--space-7x);
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--color-primitive-neutral-4);
+  cursor: pointer;
+}
+
+.aw__input-icon:hover {
+  color: var(--color-primitive-secondary);
+  background: var(--color-container-transparent-1);
+}
+
+/* ------------------------------------------------------------------ */
+/* Модалка «Как работает Ассистент» (кадр 4664:23584)                 */
+/* ------------------------------------------------------------------ */
+
+.aw__overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 110;
+  display: grid;
+  place-items: center;
+  background: var(--color-overlay-popup);
+}
+
+.aw__modal {
+  position: relative;
+  width: 430px;
+  max-width: calc(100vw - 2 * var(--space-5x));
+  max-height: calc(100vh - 2 * var(--space-5x));
+  overflow-y: auto;
+  padding: var(--space-6x);
+  background: var(--color-bg-default);
+  border-radius: var(--radius-4-5x);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.aw__modal-close {
+  position: absolute;
+  top: var(--space-4x);
+  right: var(--space-4x);
+}
+
+.aw__modal-title {
+  margin-bottom: var(--space-4x);
+  padding-right: var(--space-8x);
+  font-size: var(--font-size-title-xl);
+  line-height: var(--line-height-title-xl);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.aw__modal p {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  color: var(--color-primitive-primary);
+}
+
+.aw__modal p + p {
+  margin-top: var(--space-3x);
+}
+
+.aw__modal .aw__link {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+}
