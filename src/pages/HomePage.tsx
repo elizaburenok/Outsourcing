@@ -4,6 +4,7 @@ import PageShell from '@/components/PageShell/PageShell'
 import HomeCardsView from '@/features/home/HomeCardsView'
 import TotalDueWidget from '@/features/home/TotalDueWidget'
 import Case2View from '@/features/case2/Case2View'
+import AssistantWidget from '@/features/assistant/AssistantWidget'
 import { useCase2TotalDue } from '@/features/case2/useCase2TotalDue'
 import { useScenario } from '@/state/ScenarioProvider'
 import { caseDataFor, isCaseScenario } from '@/data/paymentDemos'
@@ -36,25 +37,31 @@ export default function HomePage() {
   const caseData = caseDataFor(scenario)
   const totalDue = useCase2TotalDue(caseData)
 
+  // Чат поддержки + AI-Ассистент (макет, страница «🚧 НДС») — сценарий «Готовые платежи».
+  const showAssistant = scenario === 'case2'
+
   return (
-    <PageShell
-      background={isOnboarding && (onboardingPage === 'authorizations' || onboardingPage === 'marketplaces' || onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
-      aside={
-        <NavigationBar
-          className={isOnboarding && onboardingPage !== 'home' ? 'onboarding-navigation' : undefined}
-          hasBackButton
-          hasTextBlock
-          title={isOnboarding ? onboardingTitles[onboardingPage] : 'Онлайн-бухгалтерия'}
-          subtitle={isOnboarding ? (onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'Ozon' : 'Wildberries') : onboardingPage === 'home' ? (scenario === 'onboarding_vat' ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'ООО · УСН «Доходы» 6%') : onboardingPage === 'signature' || onboardingPage === 'sfr' ? 'На АО «Точка»' : undefined) : caseData.taxpayer === 'ip' ? 'ИП · УСН «Доходы» 6% + НДС 5%' : isOb ? 'ООО · УСН «Доходы» 6% + НДС 22%' : 'УСН «Доходы» + НДС 5%'}
-          hasRootLink={isOnboarding && onboardingPage !== 'home'}
-          rootLinkText="Онлайн-бухгалтерия"
-          onRootLinkClick={() => setOnboardingPage('home')}
-          onBackClick={() => setOnboardingPage(onboardingPage.endsWith('-details') || onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'ozon-dashboard' : 'wildberries-dashboard') : onboardingPage === 'wildberries' || onboardingPage === 'ozon' || onboardingPage.endsWith('-dashboard') ? 'marketplaces' : onboardingPage === 'bank-connect' ? 'banks' : 'home')}
-        />
-      }
-      rightRail={isOb && !isOnboarding && totalDue ? <TotalDueWidget content={totalDue} /> : undefined}
-    >
-      {isOnboarding ? <OnboardingDemo key={scenario} withVat={scenario === 'onboarding_vat'} page={onboardingPage} onPageChange={setOnboardingPage} /> : isOb ? <Case2View key={scenario} data={caseData} /> : <HomeCardsView />}
-    </PageShell>
+    <>
+      <PageShell
+        background={isOnboarding && (onboardingPage === 'authorizations' || onboardingPage === 'marketplaces' || onboardingPage === 'signature' || onboardingPage === 'sfr' || onboardingPage === 'banks' || onboardingPage === 'bank-connect' || onboardingPage.endsWith('-reports') || onboardingPage.endsWith('-details')) ? 'primary' : undefined}
+        aside={
+          <NavigationBar
+            className={isOnboarding && onboardingPage !== 'home' ? 'onboarding-navigation' : undefined}
+            hasBackButton
+            hasTextBlock
+            title={isOnboarding ? onboardingTitles[onboardingPage] : 'Онлайн-бухгалтерия'}
+            subtitle={isOnboarding ? (onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'Ozon' : 'Wildberries') : onboardingPage === 'home' ? (scenario === 'onboarding_vat' ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'ООО · УСН «Доходы» 6%') : onboardingPage === 'signature' || onboardingPage === 'sfr' ? 'На АО «Точка»' : undefined) : caseData.taxpayer === 'ip' ? 'ИП · УСН «Доходы» 6% + НДС 5%' : isOb ? 'ООО · УСН «Доходы» 6% + НДС 22%' : 'УСН «Доходы» + НДС 5%'}
+            hasRootLink={isOnboarding && onboardingPage !== 'home'}
+            rootLinkText="Онлайн-бухгалтерия"
+            onRootLinkClick={() => setOnboardingPage('home')}
+            onBackClick={() => setOnboardingPage(onboardingPage.endsWith('-details') || onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'ozon-dashboard' : 'wildberries-dashboard') : onboardingPage === 'wildberries' || onboardingPage === 'ozon' || onboardingPage.endsWith('-dashboard') ? 'marketplaces' : onboardingPage === 'bank-connect' ? 'banks' : 'home')}
+          />
+        }
+        rightRail={isOb && !isOnboarding && totalDue ? <TotalDueWidget content={totalDue} /> : undefined}
+      >
+        {isOnboarding ? <OnboardingDemo key={scenario} withVat={scenario === 'onboarding_vat'} page={onboardingPage} onPageChange={setOnboardingPage} /> : isOb ? <Case2View key={scenario} data={caseData} /> : <HomeCardsView />}
+      </PageShell>
+      {showAssistant && <AssistantWidget />}
+    </>
   )
 }
