@@ -1,3 +1,4 @@
+import { publicAsset } from '@/lib/publicAsset'
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Check, Info, Plus, TriangleAlert } from 'lucide-react'
@@ -117,15 +118,15 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
           <div className="od__progress" aria-label={`Выполнено ${completed} из ${tasks.length}`}>
             <span className="od__track"><span style={{ width: `${Math.max(10, completed / tasks.length * 100)}%` }} /></span>
             <span>{completed} из {tasks.length}</span>
-            <img className="od__progress-icon" src="/onboarding/progress-icon.svg" alt="" width="24" height="24" />
+            <img className="od__progress-icon" src={publicAsset('/onboarding/progress-icon.svg')} alt="" width="24" height="24" />
           </div>
         </div>
         <div className="od__card-tasks">
           {tasks.map((task) => <button className="od__card-task" type="button" key={task.id} onClick={() => task.id === 'signature' ? setSignatureDrawerOpen(true) : task.id === 'sfr' ? setSfrDrawerOpen(true) : onPageChange(task.id)}>
-            <span className={isTaskDone(task.id) ? 'od__task-status od__task-status--done' : 'od__task-status'}>{isTaskDone(task.id) ? <Check size={15} strokeWidth={2} /> : <img src="/onboarding/task-plus.svg" alt="" width="24" height="24" />}</span>
+            <span className={isTaskDone(task.id) ? 'od__task-status od__task-status--done' : 'od__task-status'}>{isTaskDone(task.id) ? <Check size={15} strokeWidth={2} /> : <img src={publicAsset('/onboarding/task-plus.svg')} alt="" width="24" height="24" />}</span>
             <span className={isTaskDone(task.id) ? 'od__task-label--done' : undefined}>{task.label}</span>
           </button>)}
-          <button className="od__card-dismiss" type="button" aria-label="Скрыть настройку банка" onClick={() => setOnboardingDismissed(true)}><img src="/onboarding/task-close.svg" alt="" width="20" height="20" /></button>
+          <button className="od__card-dismiss" type="button" aria-label="Скрыть настройку банка" onClick={() => setOnboardingDismissed(true)}><img src={publicAsset('/onboarding/task-close.svg')} alt="" width="20" height="20" /></button>
         </div>
       </div>}
 
@@ -133,12 +134,12 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
       <TasksEntry onClick={() => navigate(ROUTES.tasks)} />
 
       <div className="od__links">
-        <PageAction title="Налогообложение" description="УСН «Доходы» — 6%" iconLeft={<img src="/onboarding/tax.svg" alt="" width="30" height="30" />} />
-        <PageAction title="Доверенности" description={issuedAuthorizations.length ? issuedAuthorizations.join(', ') : 'Выпустите доверенность'} iconLeft={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('authorizations')} />
-        <PageAction title="Маркетплейсы" description={connectedMarketplaces.length ? connectedMarketplaces.join(', ') : 'Подключите маркетплейс'} iconLeft={<img src="/onboarding/basket.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('marketplaces')} />
-        <PageAction title="Интеграции" description={connectedBanks.length ? connectedBanks.map((item) => item.name).join(', ') : 'Подключите банк'} iconLeft={<img src="/onboarding/integration.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('banks')} />
-        {withVat && <PageAction title="НДС" description={done.includes('vat') ? 'Настроен' : 'Настройте НДС'} iconLeft={<img src="/onboarding/tax.svg" alt="" width="30" height="30" />} onClick={() => onPageChange('vat')} />}
-        <PageAction title="Тариф" description="Бухгалтерское обслуживание для ООО" iconLeft={<img src="/onboarding/tariff.svg" alt="" width="30" height="30" />} />
+        <PageAction title="Налогообложение" description="УСН «Доходы» — 6%" iconLeft={<img src={publicAsset('/onboarding/tax.svg')} alt="" width="30" height="30" />} />
+        <PageAction title="Доверенности" description={issuedAuthorizations.length ? issuedAuthorizations.join(', ') : 'Выпустите доверенность'} iconLeft={<img src={publicAsset('/onboarding/pen.svg')} alt="" width="30" height="30" />} onClick={() => onPageChange('authorizations')} />
+        <PageAction title="Маркетплейсы" description={connectedMarketplaces.length ? connectedMarketplaces.join(', ') : 'Подключите маркетплейс'} iconLeft={<img src={publicAsset('/onboarding/basket.svg')} alt="" width="30" height="30" />} onClick={() => onPageChange('marketplaces')} />
+        <PageAction title="Интеграции" description={connectedBanks.length ? connectedBanks.map((item) => item.name).join(', ') : 'Подключите банк'} iconLeft={<img src={publicAsset('/onboarding/integration.svg')} alt="" width="30" height="30" />} onClick={() => onPageChange('banks')} />
+        {withVat && <PageAction title="НДС" description={done.includes('vat') ? 'Настроен' : 'Настройте НДС'} iconLeft={<img src={publicAsset('/onboarding/tax.svg')} alt="" width="30" height="30" />} onClick={() => onPageChange('vat')} />}
+        <PageAction title="Тариф" description="Бухгалтерское обслуживание для ООО" iconLeft={<img src={publicAsset('/onboarding/tariff.svg')} alt="" width="30" height="30" />} />
       </div>
     </>}
 
@@ -151,8 +152,8 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
     {page === 'authorizations' && <div className="od__screen od__screen--authorizations">
       <h2>Доверенности</h2>
       {([['signature', 'Для налоговой'], ['sfr', 'Для Социального фонда']] as const).map(([id, title]) => done.includes(id)
-        ? <Cell key={id} textScale="L" verticalSpacing="none" edgePadding="off" title={title} description="Доверенность выпущена" leftAccessory={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} />
-        : <button className="od__authorization-action" type="button" key={id} onClick={() => id === 'signature' ? setSignatureDrawerOpen(true) : setSfrDrawerOpen(true)}><Cell textScale="L" verticalSpacing="none" edgePadding="off" title={title} description="Выпустить доверенность" leftAccessory={<img src="/onboarding/pen.svg" alt="" width="30" height="30" />} /></button>)}
+        ? <Cell key={id} textScale="L" verticalSpacing="none" edgePadding="off" title={title} description="Доверенность выпущена" leftAccessory={<img src={publicAsset('/onboarding/pen.svg')} alt="" width="30" height="30" />} />
+        : <button className="od__authorization-action" type="button" key={id} onClick={() => id === 'signature' ? setSignatureDrawerOpen(true) : setSfrDrawerOpen(true)}><Cell textScale="L" verticalSpacing="none" edgePadding="off" title={title} description="Выпустить доверенность" leftAccessory={<img src={publicAsset('/onboarding/pen.svg')} alt="" width="30" height="30" />} /></button>)}
     </div>}
 
     {page === 'marketplaces' && <div className="od__screen od__screen--marketplaces">
@@ -161,9 +162,9 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
           const connected = connectedMarketplaces.includes(name)
           const connecting = connectingMarketplaces.includes(name)
           const failed = failedMarketplaces.includes(name)
-          return <button type="button" className="od__marketplace" key={name} disabled={connecting} onClick={() => onPageChange(name === 'Wildberries' ? connected ? 'wildberries-dashboard' : 'wildberries' : connected ? 'ozon-dashboard' : 'ozon')}><img src={`/onboarding/${icon}.svg`} alt="" width="40" height="40" /><span className="od__marketplace-text"><span>{name}</span>{(connecting || connected || failed) && <span className="od__marketplace-status">{connecting ? 'Подключаем' : connected ? 'Подключён' : 'Ошибка подключения'}</span>}</span></button>
+          return <button type="button" className="od__marketplace" key={name} disabled={connecting} onClick={() => onPageChange(name === 'Wildberries' ? connected ? 'wildberries-dashboard' : 'wildberries' : connected ? 'ozon-dashboard' : 'ozon')}><img src={publicAsset(`/onboarding/${icon}.svg`)} alt="" width="40" height="40" /><span className="od__marketplace-text"><span>{name}</span>{(connecting || connected || failed) && <span className="od__marketplace-status">{connecting ? 'Подключаем' : connected ? 'Подключён' : 'Ошибка подключения'}</span>}</span></button>
         })}</div>
-        <button className="od__help" type="button"><img src="/onboarding/question-circle.svg" alt="" width="30" height="30" />Для чего нужны маркетплейсы?</button>
+        <button className="od__help" type="button"><img src={publicAsset('/onboarding/question-circle.svg')} alt="" width="30" height="30" />Для чего нужны маркетплейсы?</button>
       </div>
     </div>}
 
@@ -186,14 +187,14 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
 
     {page === 'banks' && connectedBanks.length > 0 && <div className="od__screen od__screen--connected-banks">
       <h2>Подключённые банки</h2>
-      {connectedBanks.map(({ name, date }) => <Cell key={name} textScale="L" verticalSpacing="none" edgePadding="off" title={name} description={`Подключён ${date}`} leftAccessory={<img src={`/onboarding/${BANK_ICONS[BANKS.indexOf(name)]}.svg`} alt="" width="40" height="40" />} />)}
+      {connectedBanks.map(({ name, date }) => <Cell key={name} textScale="L" verticalSpacing="none" edgePadding="off" title={name} description={`Подключён ${date}`} leftAccessory={<img src={publicAsset(`/onboarding/${BANK_ICONS[BANKS.indexOf(name)]}.svg`)} alt="" width="40" height="40" />} />)}
       {connectedBanks.length < BANKS.length && <button className="od__connect-bank" type="button" onClick={openBankForm}><Cell textScale="L" verticalSpacing="none" edgePadding="off" title={<span className="od__connect-bank-label">Подключить банк</span>} leftAccessory={<span className="od__connect-bank-icon"><Plus size={24} strokeWidth={2} aria-hidden="true" /></span>} /></button>}
     </div>}
 
     {(page === 'bank-connect' || (page === 'banks' && !connectedBanks.length)) && <div className="od__screen od__screen--banks">
       <h2>Подключить банк</h2>
       <Cell className="od__bank-intro" textScale="M" verticalSpacing="none" horizontalSpacing="off" edgePadding="off" title="Выберите один банк, с которым хотите настроить интеграцию" />
-      <div className="od__bank-cells" role="radiogroup" aria-label="Выберите банк" aria-invalid={bankError} aria-describedby={bankError ? 'bank-selection-error' : undefined}>{BANKS.map((name, index) => connectedBanks.some((item) => item.name === name) ? null : <div className="od__bank-cell" key={name}><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={name} leftAccessory={<img src={`/onboarding/${BANK_ICONS[index]}.svg`} alt="" width="44" height="44" />} rightAccessory={<CellRightAccessory kind="Radio" checked={bank === name} ariaLabel={name} onCheckedChange={() => setBank(name)} />} /></div>)}{bankError && <div className="od__bank-error" id="bank-selection-error" role="alert">Выберите банк для подключения</div>}</div>
+      <div className="od__bank-cells" role="radiogroup" aria-label="Выберите банк" aria-invalid={bankError} aria-describedby={bankError ? 'bank-selection-error' : undefined}>{BANKS.map((name, index) => connectedBanks.some((item) => item.name === name) ? null : <div className="od__bank-cell" key={name}><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={name} leftAccessory={<img src={publicAsset(`/onboarding/${BANK_ICONS[index]}.svg`)} alt="" width="44" height="44" />} rightAccessory={<CellRightAccessory kind="Radio" checked={bank === name} ariaLabel={name} onCheckedChange={() => setBank(name)} />} /></div>)}{bankError && <div className="od__bank-error" id="bank-selection-error" role="alert">Выберите банк для подключения</div>}</div>
       <div className="od__bank-consent" role="group" aria-invalid={consentError} aria-describedby={consentError ? 'bank-consent-error' : undefined}><Cell textScale="M" verticalSpacing="none" edgePadding="off" title={<><span className="od__bank-consent-link">Соглашаюсь</span> на передачу данных, составляющих банковскую тайну</>} description="Согласие нужно нам для работы с вашими данными. Они не выйдут за пределы Точки." rightAccessory={<CellRightAccessory kind="Checkbox" checked={consent} ariaLabel="Согласие на передачу данных" onCheckedChange={setConsent} />} />{consentError && <div className="od__bank-error" id="bank-consent-error" role="alert">Необходимо подтвердить согласие</div>}</div>
       <div className="od__page-footer"><button className="od__screen-cta" type="button" onClick={connectBank}>Подключить</button></div>
     </div>}
@@ -206,7 +207,7 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
     <Drawer open={signatureDrawerOpen} onClose={() => setSignatureDrawerOpen(false)} side="right" className="od__drawer" aria-label="Выпуск доверенности для ФНС">
       <DrawerHeader onClose={() => setSignatureDrawerOpen(false)} />
       <div className="od__body od__signature">
-        <img src="/onboarding/hand-heart.png" alt="" width="120" height="120" />
+        <img src={publicAsset('/onboarding/hand-heart.png')} alt="" width="120" height="120" />
         <h2>Отправка документов с любых гаджетов в налоговую</h2>
         <p>Достаточно выпустить доверенность на АО «Точка». Новые возможности:</p>
         <ul><li>Подписывайте декларацию и уведомления по ЕНП, документы и письма в налоговую смс-кодом — всё без электронной подписи.</li><li>По вашему желанию возьмём всё на себя: будем отправлять декларацию по УСН, уведомление по ЕНП в налоговую.</li></ul>
@@ -218,7 +219,7 @@ export default function OnboardingDemo({ withVat, page, onPageChange }: {
     <Drawer open={sfrDrawerOpen} onClose={() => setSfrDrawerOpen(false)} side="right" className="od__drawer" aria-label="Выпуск доверенности в СФР">
       <DrawerHeader onClose={() => setSfrDrawerOpen(false)} />
       <div className="od__body od__signature">
-        <img src="/onboarding/hand-heart.png" alt="" width="120" height="120" />
+        <img src={publicAsset('/onboarding/hand-heart.png')} alt="" width="120" height="120" />
         <h2>Отправка документов с любых гаджетов в Социальный фонд</h2>
         <p>Достаточно выпустить доверенность на АО «Точка».</p>
         <p>Подписывайте кадровые отчёты в Социальный фонд смс-кодом — всё без электронной подписи.</p>

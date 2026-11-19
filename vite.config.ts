@@ -9,6 +9,7 @@ import { defineConfig } from 'vite'
 const DS = path.resolve(__dirname, './design-system')
 
 export default defineConfig({
+  base: process.env.GITHUB_PAGES === 'true' ? '/Outsourcing/' : '/',
   plugins: [react()],
   resolve: {
     alias: {

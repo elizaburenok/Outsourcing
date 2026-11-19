@@ -1,3 +1,4 @@
+import { publicAsset } from '@/lib/publicAsset'
 import { useEffect, useRef, useState } from 'react'
 import { Clock } from 'lucide-react'
 import { TextField } from '@ds/components/TextField'
@@ -38,7 +39,7 @@ export default function WildberriesConnection({ onStart, onDone, initialToken = 
           <p>В личном кабинете продавца Wildberries откройте «Настройки» → «Доступ к API». Создайте токен с доступом к категориям «Статистика», «Финансы» и «Документы», скопируйте его и вставьте в поле выше.</p>
         </details>
       </div>
-      {!details && <ContextualNotification className="wb__notice" icon={<img src="/onboarding/information-filled.svg" alt="" width="20" height="20" />} action={{ label: editingDate ? 'Скрыть дату' : 'Изменить дату', onClick: () => setEditingDate((value) => !value) }}>
+      {!details && <ContextualNotification className="wb__notice" icon={<img src={publicAsset('/onboarding/information-filled.svg')} alt="" width="20" height="20" />} action={{ label: editingDate ? 'Скрыть дату' : 'Изменить дату', onClick: () => setEditingDate((value) => !value) }}>
         <p>Пересчитаем все операции от маркетплейса с {formattedDate}, чтобы корректно учесть в расчётах. Если первые продажи случились позже, ничего делать не нужно. А если хотите отчитаться за прошлый год или добавляли комиссию вручную — отредактируйте дату.</p>
       </ContextualNotification>}
       {!details && editingDate && <TextField className="wb__date" label="Начало расчёта" type="date" value={date} errorMessage={attempted && !date ? 'Укажите дату начала расчёта' : undefined} required onChange={(event) => setDate(event.target.value)} />}
