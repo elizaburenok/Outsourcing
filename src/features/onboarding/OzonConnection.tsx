@@ -1,3 +1,4 @@
+import { publicAsset } from '@/lib/publicAsset'
 import { useEffect, useRef, useState } from 'react'
 import { CirclePlus, Clock, Trash2 } from 'lucide-react'
 import { TextField } from '@ds/components/TextField'
@@ -49,7 +50,7 @@ export default function OzonConnection({ onStart, onDone, initialStores, details
         <div className="wb__token"><TextField className="wb__field" label="API Key" placeholder="Вставьте токен" name={`apiKey-${store.id}`} value={store.apiKey} onChange={(event) => updateStore(store.id, 'apiKey', event.target.value)} errorMessage={attempted && !store.apiKey.trim() ? 'Укажите API Key' : undefined} required autoComplete="off" spellCheck={false} /></div>
       </div>)}
       <button className="ozon__add-store" type="button" onClick={() => { setStores((current) => [...current, { id: nextId, name: '', clientId: '', apiKey: '' }]); setNextId((id) => id + 1) }}><CirclePlus size={24} strokeWidth={2} /> Добавить ещё один магазин</button>
-      {!details && <ContextualNotification className="wb__notice" icon={<img src="/onboarding/information-filled.svg" alt="" width="20" height="20" />} action={{ label: editingDate ? 'Скрыть дату' : 'Изменить дату', onClick: () => setEditingDate((value) => !value) }}>
+      {!details && <ContextualNotification className="wb__notice" icon={<img src={publicAsset('/onboarding/information-filled.svg')} alt="" width="20" height="20" />} action={{ label: editingDate ? 'Скрыть дату' : 'Изменить дату', onClick: () => setEditingDate((value) => !value) }}>
         <p>Пересчитаем все операции от маркетплейса с {date ? date.split('-').reverse().join('.') : '…'}, чтобы корректно учесть в расчётах. Если первые продажи случились позже, ничего делать не нужно. А если хотите отчитаться за прошлый год или добавляли комиссию вручную — отредактируйте дату.</p>
       </ContextualNotification>}
       {!details && editingDate && <div className="wb__token"><TextField className="wb__field" label="Начало расчёта" name="startDate" type="date" value={date} errorMessage={attempted && !date ? 'Укажите дату начала расчёта' : undefined} required onChange={(event) => setDate(event.target.value)} /></div>}

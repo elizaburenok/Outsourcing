@@ -1,3 +1,4 @@
+import { publicAsset } from '@/lib/publicAsset'
 import { useNavigate, useParams } from 'react-router-dom'
 import { FileArchive, FileImage, FileText, FileSpreadsheet } from 'lucide-react'
 import { Cell } from '@ds/components/Cell'
@@ -34,7 +35,7 @@ function attachmentIcon(name: string) {
   if (['png', 'jpg', 'jpeg', 'gif', 'webp', 'heic'].includes(extension ?? '')) return <FileImage size={24} aria-hidden />
   if (['xls', 'xlsx', 'csv'].includes(extension ?? '')) return <FileSpreadsheet size={24} aria-hidden />
   if (['zip', 'rar', '7z'].includes(extension ?? '')) return <FileArchive size={24} aria-hidden />
-  if (extension === 'pdf') return <img src="/images/figma/upload/file-pdf.svg" alt="" />
+  if (extension === 'pdf') return <img src={publicAsset('/images/figma/upload/file-pdf.svg')} alt="" />
   return <FileText size={24} aria-hidden />
 }
 

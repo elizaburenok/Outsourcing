@@ -1,3 +1,4 @@
+import { publicAsset } from '@/lib/publicAsset'
 import { useRef, useState, type ChangeEvent, type DragEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, FileArchive, FileImage, FileText, FileSpreadsheet } from 'lucide-react'
@@ -24,7 +25,7 @@ function fileDetails(file: File) {
 
 function fileIcon(file: File) {
   const extension = file.name.split('.').pop()?.toLowerCase()
-  if (extension === 'pdf') return <img src="/images/figma/upload/file-pdf.svg" alt="" />
+  if (extension === 'pdf') return <img src={publicAsset('/images/figma/upload/file-pdf.svg')} alt="" />
   if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'heic'].includes(extension ?? '')) return <FileImage size={24} aria-hidden />
   if (['xls', 'xlsx', 'csv'].includes(extension ?? '')) return <FileSpreadsheet size={24} aria-hidden />
   if (['zip', 'rar', '7z'].includes(extension ?? '')) return <FileArchive size={24} aria-hidden />
@@ -185,13 +186,13 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, onFinish, de
             onDragLeave={(event) => { event.preventDefault(); if (!event.currentTarget.contains(event.relatedTarget as Node)) setDragging(false) }}
             onDrop={onDrop}>
             <button type="button" className="ctd__add-file" onClick={() => fileInput.current?.click()}>
-              <span className="ctd__file-icon"><img src="/images/figma/upload/plus.svg" alt="" /></span>
+              <span className="ctd__file-icon"><img src={publicAsset('/images/figma/upload/plus.svg')} alt="" /></span>
               <span className="ctd__file-copy"><span className="ctd__add-title">Загрузить файлы</span><span className="ctd__file-meta">Изображения, документы или архивы, до 30 МБ</span></span>
             </button>
             {files.length > 0 && <ul className="ctd__file-list">{files.map((entry) => <li key={entry.id} className={entry.status === 'error' ? 'ctd__file-row--error' : ''}>
-              <span className="ctd__file-icon">{entry.status === 'adding' ? <img className="ctd__progress" src="/images/figma/upload/progress.svg" alt="" /> : fileIcon(entry.file)}</span>
+              <span className="ctd__file-icon">{entry.status === 'adding' ? <img className="ctd__progress" src={publicAsset('/images/figma/upload/progress.svg')} alt="" /> : fileIcon(entry.file)}</span>
               <span className="ctd__file-copy"><span className="ctd__file-title" title={entry.file.name}>{entry.file.name}</span><span className="ctd__file-meta">{entry.error ?? (entry.status === 'adding' ? 'Добавляется…' : fileDetails(entry.file))}</span></span>
-              <button type="button" className="ctd__remove-file" aria-label={`Удалить файл ${entry.file.name}`} onClick={() => removeFile(entry.id)}><img src="/images/figma/upload/trash.svg" alt="" /></button>
+              <button type="button" className="ctd__remove-file" aria-label={`Удалить файл ${entry.file.name}`} onClick={() => removeFile(entry.id)}><img src={publicAsset('/images/figma/upload/trash.svg')} alt="" /></button>
             </li>)}</ul>}
           </div>
           {fileError && <span className="ctd__files-error" role="alert">{fileError}</span>}
@@ -200,7 +201,7 @@ export default function CreateTaskDrawer({ open, onClose, onCreate, onFinish, de
       <DrawerFooter className="ctd__footer" type="1 Button" primaryAction={{ label: 'Создать задачу', onClick: submit, disabled: files.some((item) => item.status === 'adding') }} />
     </>}
   </Drawer>
-    {showResult && <FlowResultModal tone="success" icon={<img src="/images/figma/result/success.svg" alt="" />} title="Задача создана" primaryLabel="Готово" onPrimary={finish} secondaryLabel="Создать ещё одну задачу" onSecondary={createAnother}>
+    {showResult && <FlowResultModal tone="success" icon={<img src={publicAsset('/images/figma/result/success.svg')} alt="" />} title="Задача создана" primaryLabel="Готово" onPrimary={finish} secondaryLabel="Создать ещё одну задачу" onSecondary={createAnother}>
       <p>Мы отправили задачу бухгалтеру. Она появится в разделе «Задачи».</p>
     </FlowResultModal>}
   </>
