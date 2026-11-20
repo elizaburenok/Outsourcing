@@ -5,11 +5,12 @@ html,body,#dc-root,.sc-host,.prototype-viewport,.pr {
 }
 .pr { transform:none!important; }
 .pr>.panel {
-  left:auto!important; right:4px; top:0!important;
+  left:auto!important; right:4px; top:auto!important; bottom:84px;
   max-width:calc(100% - 8px); height:min(750px,calc(100% - 84px))!important;
+  box-shadow:none!important;
 }
 .pr .chat-content { flex:1 1 auto!important; min-width:0; }
-.pr>.fab { left:auto!important; top:auto!important; right:4px; bottom:4px; isolation:isolate; }
+.pr>.fab { left:auto!important; top:auto!important; right:4px; bottom:4px; isolation:isolate; filter:none!important; }
 .pr>.fab:hover {opacity:1}
 .pr>.fab>.fab-underlay {pointer-events:none}
 .pr>.fab>.fab-underlay path {fill:#F9F9F9}
