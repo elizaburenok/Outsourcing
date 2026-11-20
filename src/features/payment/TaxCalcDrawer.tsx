@@ -6,7 +6,7 @@ import { AccordeonCell } from '@ds/components/AccordeonCell'
 import { formatMoney } from '@/lib/format'
 import { USN_CALC, getCalcBreakdown, type Payable, type CalcBreakdown } from '@/data/payment'
 import type { PayCategory } from '@/data/august'
-import { pluralOps } from '@/lib/plural'
+import { pluralOps, pluralContractors } from '@/lib/plural'
 import { getVatCalculation } from '@/data/vat'
 import { VatCategoryDetails } from './VatContractorDetails'
 import backIcon from './assets/figma-arrow-left.svg'
@@ -103,31 +103,62 @@ function VatCalc({ vat, payable, expandedKind, onExpand, onSelectContractor }: {
   onExpand: (kind: 'sale' | 'purchase' | null) => void
   onSelectContractor: (kind: 'sale' | 'purchase', name: string) => void
 }) {
-  const [sales, advances, offsets, purchases] = vat.sections
+  const [sales, advances, offsets, purchases, purchaseAdvances, purchaseOffsets] = vat.sections
   const salesVat = Math.round((sales.vat + advances.vat - offsets.vat) * 100) / 100
+  const purchasesVat = Math.round((purchases.vat + purchaseAdvances.vat - purchaseOffsets.vat) * 100) / 100
   const categories = [
-    { kind: 'sale' as const, title: 'Продажи', amount: salesVat },
-    { kind: 'purchase' as const, title: 'Покупки', amount: purchases.vat },
-  ]
+    { kind: 'sale' as const, title: 'Продажи', amount: salesVat,
+      hasDocuments: [sales, advances, offsets].some((section) => section.documents.length > 0) },
+    { kind: 'purchase' as const, title: 'Покупки', amount: purchasesVat,
+      hasDocuments: [purchases, purchaseAdvances, purchaseOffsets].some((section) => section.documents.length > 0) },
+  ].filter(({ hasDocuments }) => hasDocuments)
+  const simpleRateDemo = payable.id.endsWith('c2-nds-q3-1') && vat.rate === 5
   return <>
-    <div className="tcd__heading">
+    {!simpleRateDemo && <div className="tcd__heading">
       <h2 className="tcd__heading-title">НДС за {vat.quarter} квартал 2026</h2>
-    </div>
+    </div>}
     <div className="tcd__summary tcd__summary--vat-design">
-      <p className="tcd__hint">Бухгалтер посчитал налог к уплате</p>
-      <div className="tcd__line">
-        <p className="tcd__line-label">НДС за квартал{vat.rate === 22 ? ': из НДС с продаж вычитаем НДС с покупок' : ''}</p>
-        <p className="tcd__line-value">{vat.rate === 22 ? <>{formatMoney(salesVat)} − {formatMoney(purchases.vat)} = </> : null}{formatMoney(vat.tax)}</p>
-      </div>
-      {vat.rate !== 22 && <p className="tcd__vat-context">При ставке {vat.rate}% входной НДС с покупок не принимается к вычету.</p>}
-      <div className="tcd__line">
-        <p className="tcd__line-label">НДС за текущий квартал платится в следующем квартале: ежемесячно, тремя частями. {payable.subtitle || 'Текущий платёж'}{payable.dueLabel ? ` — до ${payable.dueLabel}` : ''}</p>
-        <p className="tcd__line-value">{formatMoney(payable.amount)}</p>
-      </div>
+      {simpleRateDemo
+        ? <p className="tcd__hint">Бухгалтер посчитал НДС по закрывающим документам и авансовым платежам.</p>
+        : <p className="tcd__hint">{vat.penalty !== undefined ? 'Бухгалтер уточнил расчёт НДС к доплате' : 'Бухгалтер посчитал налог к уплате'}</p>}
+      {simpleRateDemo && <div className="tcd__line">
+        <p className="tcd__line-label">НДС за текущий квартал платится в следующем квартале: ежемесячно, равными частями</p>
+        <p className="tcd__line-value">{formatMoney(vat.tax)} / 3 = {formatMoney(vat.installments[0])}</p>
+      </div>}
+      {purchaseAdvances.documents.length > 0 && <div className="tcd__line">
+        <p className="tcd__line-label">НДС с покупок: по счетам-фактурам + с предоплаты − зачёт предоплаты</p>
+        <p className="tcd__line-value">{formatMoney(purchases.vat)} + {formatMoney(purchaseAdvances.vat)} − {formatMoney(purchaseOffsets.vat)} = {formatMoney(purchasesVat)}</p>
+      </div>}
+      {!simpleRateDemo && <div className="tcd__line">
+        <p className="tcd__line-label">{vat.penalty !== undefined ? 'НДС к доплате' : 'НДС за квартал'}{vat.rate === 22 ? ': из НДС с продаж вычитаем НДС с покупок' : ''}</p>
+        <p className="tcd__line-value">{vat.rate === 22 ? <>{formatMoney(salesVat)} − {formatMoney(purchasesVat)} = </> : null}{formatMoney(vat.tax)}</p>
+      </div>}
+      {vat.rate === 7 && <p className="tcd__vat-context">При ставке {vat.rate}% входной НДС с покупок не принимается к вычету.</p>}
+      {vat.tax === 0 && <p className="tcd__vat-context">Налог к уплате за квартал — 0 ₽: входной НДС {formatMoney(vat.deductionsVat)} переносится на следующий период (ст. 171 НК РФ).</p>}
+      {!simpleRateDemo && <div className="tcd__line">
+        <p className="tcd__line-label">{vat.penalty !== undefined ? 'Пени за просрочку' : vat.tax === 0
+          ? 'Платёж по НДС за этот квартал формироваться не будет.'
+          : <>НДС за текущий квартал платится в следующем квартале: ежемесячно, тремя частями. {payable.subtitle || 'Текущий платёж'}{payable.dueLabel ? ` — до ${payable.dueLabel}` : ''}</>}</p>
+        <p className="tcd__line-value">{formatMoney(vat.penalty ?? vat.installments[0])}</p>
+      </div>}
+      {vat.penalty !== undefined && <div className="tcd__line">
+        <p className="tcd__line-label">Всего к уплате</p>
+        <p className="tcd__line-value">{formatMoney(vat.tax + vat.penalty)}</p>
+      </div>}
     </div>
-    <div className="tcd__income-head"><h3 className="tcd__income-title">НДС с операций</h3></div>
+    <div className="tcd__income-head">
+      <div>
+        <h3 className="tcd__income-title">{simpleRateDemo ? `НДС за ${vat.quarter} квартал` : 'НДС с операций'}</h3>
+        {simpleRateDemo && <p className="tcd__income-desc">{pluralContractors(vat.contractors.length)}</p>}
+      </div>
+      {simpleRateDemo && <span className="tcd__head-totals">
+        <span className="tcd__head-total">{formatMoney(salesVat)}</span>
+        <small>Доход {formatMoney(sales.gross + advances.gross - offsets.gross)}</small>
+      </span>}
+    </div>
     <div className="tcd__list tcd__category-list">
-      {categories.map(({ kind, title, amount }) => <section className="tcd__accordion-section" key={kind}>
+      {simpleRateDemo && <VatCategoryDetails kind="sale" vat={vat} selectedName={null} onSelect={(name) => onSelectContractor('sale', name)} showTotal={false} />}
+      {!simpleRateDemo && categories.map(({ kind, title, amount }) => <section className="tcd__accordion-section" key={kind}>
         <button type="button" className="tcd__contractor-button" onClick={() => onExpand(expandedKind === kind ? null : kind)}
           aria-expanded={expandedKind === kind} aria-controls={expandedKind === kind ? `vat-${kind}-contractors` : undefined}>
           <AccordeonCell title={title} description={formatMoney(amount)} expanded={expandedKind === kind} />

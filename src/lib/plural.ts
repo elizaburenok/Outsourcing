@@ -21,3 +21,15 @@ export function pluralDocuments(n: number): string {
   }
   return `${n} ${word}`
 }
+
+/** Русское склонение «контрагент/контрагента/контрагентов». */
+export function pluralContractors(n: number): string {
+  const mod100 = n % 100
+  const mod10 = n % 10
+  let word = 'контрагентов'
+  if (mod100 < 11 || mod100 > 14) {
+    if (mod10 === 1) word = 'контрагент'
+    else if (mod10 >= 2 && mod10 <= 4) word = 'контрагента'
+  }
+  return `${n} ${word}`
+}

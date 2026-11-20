@@ -58,7 +58,7 @@ const ALL_PAID: AugustPayment[] = AUGUST_PAYMENTS.map((p) =>
 export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
   onboarding: { id: 'onboarding', label: 'Онбординг', payments: [], usn: null },
   onboarding_vat: { id: 'onboarding_vat', label: 'Онбординг · НДС', payments: [], usn: null },
-  // Дефолт прототипа — сценарий «24 августа»: накопились просроченные платежи.
+  // Сценарий с просрочкой остаётся доступным для проверки состояний.
   overdue: {
     id: 'overdue',
     label: 'Есть просрочка',
@@ -100,4 +100,4 @@ export const HOME_SCENARIOS: Record<ScenarioId, HomeScenario> = {
 export const SCENARIO_ORDER: ScenarioId[] = ['case2_pending', 'case2', 'case2_overdue', 'ip', 'ip_december', 'onboarding', 'onboarding_vat']
 
 /** Дефолтный сценарий — состояние, в которое возвращает кнопка сброса. */
-export const DEFAULT_SCENARIO: ScenarioId = 'onboarding'
+export const DEFAULT_SCENARIO: ScenarioId = 'case2'

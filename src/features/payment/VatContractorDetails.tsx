@@ -1,12 +1,13 @@
 import { useState } from 'react'
 import { Cell } from '@ds/components/Cell'
+import { TimelineEvent } from '@ds/components/TimelineEvent'
 import { Chip } from '@ds/components/Chip'
 import { formatMoney } from '@/lib/format'
 import { pluralDocuments } from '@/lib/plural'
-import { vatForDocument, vatIncludedInGross, type VatDocument, type VatKind, type VatRate, type VatSection } from '@/data/vat'
+import { vatForDocument, type VatDocument, type VatKind, type VatRate, type VatSection } from '@/data/vat'
 
 type Category = 'sale' | 'purchase'
-type Filter = 'all' | 'sale' | 'advance'
+type Filter = 'all' | 'sale' | 'advance' | 'advanceOffset' | 'purchase' | 'purchaseAdvance' | 'purchaseAdvanceOffset'
 
 const colors = [
   'var(--color-category-indigo)', 'var(--color-category-orchid)',
@@ -14,8 +15,16 @@ const colors = [
 ] as const
 const summaryLabels: Record<VatKind, string> = {
   sale: 'НДС с продаж', purchase: 'НДС с покупок',
-  advance: 'НДС с предоплаты', advanceOffset: 'НДС с зачтённой предоплаты',
+  advance: 'НДС с предоплат', advanceOffset: 'Вычет НДС с предоплат',
+  purchaseAdvance: 'НДС с предоплат', purchaseAdvanceOffset: 'Зачёт предоплат',
 }
+/** Фильтры-чипы детализации по макету «Детализация покупателя». */
+const SALE_FILTERS: [Exclude<Filter, 'all'>, string][] = [
+  ['sale', 'НДС с продаж'], ['advance', 'НДС с предоплат'], ['advanceOffset', 'Вычет НДС с предоплат'],
+]
+const PURCHASE_FILTERS: [Exclude<Filter, 'all'>, string][] = [
+  ['purchase', 'НДС с покупок'], ['purchaseAdvance', 'НДС с предоплат'], ['purchaseAdvanceOffset', 'Зачёт предоплат'],
+]
 function dateKey(title: string) {
   const date = title.match(/(\d{2})\.(\d{2})\.(\d{4})/)
   return date ? `${date[3]}-${date[2]}-${date[1]}` : ''
@@ -29,6 +38,14 @@ function sumVat(documents: VatDocument[], rate: VatRate) {
 function sumGross(documents: VatDocument[]) {
   return Math.round(documents.reduce((sum, document) => sum + document.gross, 0) * 100) / 100
 }
+const isOffset = (document: VatDocument) => document.kind === 'advanceOffset' || document.kind === 'purchaseAdvanceOffset'
+/** Подпись статуса в таймлайне (макет «Детализация покупателя»: «НДС начислен»). */
+function timelineStatus(kind: VatKind): string {
+  if (kind === 'sale' || kind === 'advance') return 'НДС начислен'
+  if (kind === 'advanceOffset') return 'НДС зачтён'
+  if (kind === 'purchase' || kind === 'purchaseAdvance') return 'НДС к вычету'
+  return 'НДС восстановлен'
+}
 export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTotal = true }: {
   kind: Category
   vat: { rate: VatRate; sections: VatSection[] }
@@ -38,7 +55,9 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
 }) {
   const [filter, setFilter] = useState<Filter>('all')
   const sections = vat.sections.filter((section) => kind === 'purchase'
-    ? section.kind === 'purchase' : section.kind !== 'purchase')
+    ? section.kind.startsWith('purchase') : !section.kind.startsWith('purchase'))
+  /** На пониженных ставках (5%) доход УСН считается с учётом НДС — показываем сумму с налогом. */
+  const saleIncomeAsGross = kind === 'sale' && vat.rate === 5
   const byContractor = new Map<string, VatDocument[]>()
   for (const document of sections.flatMap((section) => section.documents)) {
     const items = byContractor.get(document.contractor) ?? []
@@ -46,18 +65,35 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
     byContractor.set(document.contractor, items)
   }
   const groups = [...byContractor].map(([name, items]) => {
-    const offsetItems = items.filter((item) => item.kind === 'advanceOffset')
-    const otherItems = items.filter((item) => item.kind !== 'advanceOffset')
+    const offsetItems = items.filter(isOffset)
+    const otherItems = items.filter((item) => !isOffset(item))
     const offsets = sumVat(offsetItems, vat.rate)
     const total = Math.round((sumVat(otherItems, vat.rate) - offsets) * 100) / 100
     const gross = Math.round((sumGross(otherItems) - sumGross(offsetItems)) * 100) / 100
     const net = Math.round((gross - total) * 100) / 100
-    return { name, items, total, net }
+    const documentCount = otherItems.length
+    return { name, items, total, gross, net, documentCount }
   }).sort((a, b) => b.total - a.total || a.name.localeCompare(b.name, 'ru'))
   const selected = groups.find((group) => group.name === selectedName)
-  const documents = selected?.items.filter((document) => filter === 'all' || document.kind === filter
-    || (filter === 'advance' && document.kind === 'advanceOffset'))
-    .sort((a, b) => dateKey(b.title).localeCompare(dateKey(a.title))) ?? []
+  const present = (filterId: Exclude<Filter, 'all'>) =>
+    selected?.items.some((document) => document.kind === filterId) ?? false
+  const filterOptions = (kind === 'sale' ? SALE_FILTERS : PURCHASE_FILTERS).filter(([id]) => present(id))
+  const showFilters = filterOptions.length > 1
+  const activeFilter = showFilters && filterOptions.some(([id]) => id === filter) ? filter : 'all'
+  const selectedItems = selected?.items ?? []
+  const linkedAdvanceIds = new Set(selectedItems.filter((document) => document.kind === activeFilter)
+    .map((document) => document.advanceId))
+  const documents = selectedItems.filter((document) => {
+    // Зачёт участвует в сводке, а в таймлайне макета показан исходный счёт-фактура.
+    if (isOffset(document)) return false
+    if (activeFilter === 'all') return true
+    if (activeFilter === 'advanceOffset' || activeFilter === 'purchaseAdvanceOffset') {
+      return linkedAdvanceIds.has(document.id)
+    }
+    return document.kind === activeFilter
+  }).sort((a, b) => dateKey(b.title).localeCompare(dateKey(a.title)))
+
+  if (!groups.length) return <p className="tcd__vat-context">{kind === 'purchase' ? 'В этом квартале покупок не было.' : 'В этом квартале продаж не было.'}</p>
 
   if (!selected) return <>
     {showTotal && <div className="tcd__category-intro">
@@ -69,45 +105,54 @@ export function VatCategoryDetails({ kind, vat, selectedName, onSelect, showTota
           aria-label={`Документы: ${group.name}`}>
           <Cell textScale="M" edgePadding="off" verticalSpacing="none"
             leftAccessory={<span className="tcd__avatar" style={{ background: colors[index % colors.length] }} aria-hidden>{initials(group.name)}</span>}
-            title={group.name} description={pluralDocuments(group.items.length)}
+            title={group.name} description={pluralDocuments(group.documentCount)}
             rightAccessory={<span className="tcd__contractor-amount">{formatMoney(group.total)}
-              <small>Доход {formatMoney(group.net)}</small></span>} />
+              <small>{kind === 'purchase' ? 'Расход' : 'Доход'} {formatMoney(saleIncomeAsGross ? group.gross : group.net)}</small></span>} />
         </button>
       </li>)}
     </ul>
   </>
 
   return <>
-    {kind === 'sale' && <div className="tcd__filters" role="group" aria-label="Тип операции">
-      {([['all', 'Все'], ['sale', 'Продажи'], ['advance', 'Авансы']] as const).map(([id, label]) =>
+    {showFilters && <div className="tcd__filters" role="group" aria-label="Тип операции">
+      <Chip chipType="Tab" isSelected={activeFilter === 'all'} aria-pressed={activeFilter === 'all'}
+        onClick={() => setFilter('all')}>Все</Chip>
+      {filterOptions.map(([id, label]) =>
         <Chip key={id} chipType="Tab" isSelected={filter === id} aria-pressed={filter === id}
           onClick={() => setFilter(id)}>{label}</Chip>)}
     </div>}
     <section className="tcd__detail-summary" aria-label={`Сводка: ${selected.name}`}>
       <div className="tcd__detail-summary-row">
-        <span>Доход</span>
-        <strong>{formatMoney(selected.net)}</strong>
+        <span>НДС</span>
+        <strong>{formatMoney(selected.total)}</strong>
       </div>
-      {sections.filter((section) => section.kind !== 'advanceOffset' && section.documents.some((document) => document.contractor === selected.name)).map((section) =>
+      <div className="tcd__detail-summary-row">
+        <span>{kind === 'purchase' ? 'Расход' : 'Доход'}</span>
+        <strong>{formatMoney(saleIncomeAsGross ? selected.gross : selected.net)}</strong>
+      </div>
+      {sections.filter((section) => section.documents.some((document) => document.contractor === selected.name)).map((section) =>
         <div className="tcd__detail-summary-row" key={section.kind}>
           <span>{summaryLabels[section.kind]}</span>
-          <strong>{formatMoney(sumVat(section.documents.filter((document) => document.contractor === selected.name), vat.rate))}</strong>
+          <strong>{section.kind === 'advanceOffset' || section.kind === 'purchaseAdvanceOffset' ? '−' : ''}{formatMoney(sumVat(section.documents.filter((document) => document.contractor === selected.name), vat.rate))}</strong>
         </div>)}
     </section>
     {documents.length ? <ul className="tcd__timeline" aria-label="Документы контрагента">
       {documents.map((document) => {
-        const documentVat = document.kind === 'purchase'
-          ? document.vat ?? vatIncludedInGross(document.gross, 22)
-          : vatForDocument(document, vat.rate)
+        const documentVat = vatForDocument(document, vat.rate)
         const documentNet = Math.round((document.gross - documentVat) * 100) / 100
+        const offset = isOffset(document)
+        const fallbackDescription = offset
+          ? `${document.kind === 'advanceOffset' ? 'Зачтён аванс' : 'Зачтённая предоплата'} ${formatMoney(document.gross)}`
+          : document.kind === 'purchaseAdvance' ? `Предоплата ${formatMoney(document.gross)}`
+            : `${kind === 'purchase' ? 'Расход' : 'Доход'} ${formatMoney(saleIncomeAsGross ? document.gross : documentNet)}`
         return <li key={document.id}>
-          <Cell textScale="M" edgePadding="off" verticalSpacing="none"
+          <TimelineEvent
+            amount={`${offset ? '−' : '+'} ${formatMoney(documentVat)}`}
+            positive={!offset}
+            status={timelineStatus(document.kind)}
             title={document.title.replace(` от ${document.contractor}`, '')}
-            description={`НДС ${vat.rate}%`}
-            rightAccessory={<span className="tcd__contractor-amount tcd__document-amount">
-              {formatMoney(documentVat)}
-              <small>Доход {formatMoney(documentNet)}</small>
-            </span>} />
+            description={document.description ?? fallbackDescription}
+          />
         </li>
       })}
     </ul> : <p className="tcd__vat-context" role="status">В этом квартале операций этого типа нет.</p>}
