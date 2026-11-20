@@ -40,6 +40,7 @@ function EcosystemHeader({ onHome }: { onHome: () => void }) {
   const isCase2 = isCaseScenario(scenario) || scenario === 'onboarding' || scenario === 'onboarding_vat'
   return (
     <MainPageNavigationBar
+      className="app__ecosystem"
       navItems={[
         { id: 'home', label: 'Главная', active: true, onClick: onHome },
         { id: 'payments', label: 'Платежи' },

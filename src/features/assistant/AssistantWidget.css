@@ -673,3 +673,23 @@
   font-size: var(--font-size-m);
   line-height: var(--line-height-m);
 }
+
+@media (max-width: 600px) {
+  .aw__fab {
+    position: static;
+    align-self: flex-end;
+    width: var(--space-14x);
+    height: var(--space-14x);
+    margin: 0 var(--space-5x) var(--space-8x);
+    border-radius: var(--radius-4x);
+  }
+
+  .aw__window {
+    inset: 0;
+    width: 100vw;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    border-radius: 0;
+  }
+}
