@@ -28,8 +28,15 @@ export default function PrototypeChatWidget() {
           panel = current
         }
         // Separate closed paths leave the bank page clickable between the two controls.
-        const paths = Array.from(doc.querySelectorAll('.pr > .fab, .pr > .panel'), el => {
-          const box = el.getBoundingClientRect()
+        const paths = Array.from(doc.querySelectorAll<HTMLElement>('.pr > .fab, .pr > .panel'), el => {
+          // Opening transforms change getBoundingClientRect during the animation.
+          // Layout coordinates keep the visible region aligned with the final surface.
+          const box = {
+            left: el.offsetLeft,
+            top: el.offsetTop,
+            right: el.offsetLeft + el.offsetWidth,
+            bottom: el.offsetTop + el.offsetHeight,
+          }
           const pad = el.classList.contains('fab') ? 4 : 0
           return 'M ' + (box.left - pad) + ' ' + (box.top - pad) +
             ' H ' + (box.right + pad) + ' V ' + (box.bottom + pad) + ' H ' + (box.left - pad) + ' Z'

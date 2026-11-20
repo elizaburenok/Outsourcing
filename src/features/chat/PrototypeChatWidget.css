@@ -1,7 +1,7 @@
 .support-chat-layer {
   position: fixed;
   z-index: 85;
-  top: 30px;
+  top: 94px;
   right: 36px;
   bottom: 36px;
   width: min(528px, calc(100% - 48px));
@@ -15,5 +15,5 @@
   pointer-events: auto;
 }
 @media (max-width: 600px) {
-  .support-chat-layer { inset: 8px; width: auto; }
+  .support-chat-layer { inset: 16px 8px 8px; width: auto; }
 }
