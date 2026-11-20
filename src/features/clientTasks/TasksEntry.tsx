@@ -5,8 +5,8 @@ import { useClientTasks } from '@/state/ClientTasksProvider'
 import { pluralTasks } from '@/data/accountant'
 import './ClientTasks.css'
 
-export function CreateTaskButton({ onClick }: { onClick: () => void }) {
-  return <div className="client-tasks__create" data-coach="add-task"><HeaderButton visualVariant="Secondary" icon={<img src={publicAsset('/images/figma/tasks/plus-circle.svg')} width="24" height="24" alt="" />} onClick={onClick}>Создать задачу</HeaderButton></div>
+export function CreateTaskButton({ onClick, mobileLabel }: { onClick: () => void; mobileLabel?: string }) {
+  return <div className="client-tasks__create" data-coach="add-task"><HeaderButton visualVariant="Secondary" icon={<img src={publicAsset('/images/figma/tasks/plus-circle.svg')} width="24" height="24" alt="" />} onClick={onClick}><span className={mobileLabel ? 'client-tasks__create-desktop-label' : undefined}>Создать задачу</span>{mobileLabel && <span className="client-tasks__create-mobile-label">{mobileLabel}</span>}</HeaderButton></div>
 }
 
 export function TasksEntry({ onClick }: { onClick: () => void }) {

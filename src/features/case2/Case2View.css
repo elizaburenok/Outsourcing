@@ -13,3 +13,26 @@
   width: var(--space-8x);
   height: var(--space-8x);
 }
+
+@media (max-width: 600px) {
+  .case2 { gap: var(--space-4x); }
+  .case2 > .client-tasks__create { display: none; }
+  .case2 > [data-coach='pay'] { order: 1; }
+  .case2 > .client-tasks__entry { order: 2; }
+  .case2 > .av__links { order: 3; margin-top: var(--space-4x); gap: var(--space-8x); }
+
+  .case2 .av__pay-head {
+    padding-top: var(--space-5x);
+    padding-bottom: var(--space-3x);
+  }
+
+  .case2 .av__pay-title {
+    font-size: var(--font-size-title-l);
+    line-height: var(--line-height-title-l);
+  }
+
+  .case2 .av__list { padding-bottom: var(--space-3x); }
+  .case2 .av__row .pay-logo { width: var(--space-8x); height: var(--space-8x); }
+  .case2 .av__row .pay-amount { font-weight: var(--font-weight-medium); }
+  .case2 .av__links .page-action { min-height: var(--space-10x); }
+}

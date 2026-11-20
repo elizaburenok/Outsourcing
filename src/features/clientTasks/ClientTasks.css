@@ -13,6 +13,29 @@
 .client-tasks-page__row:focus-visible { outline:2px solid var(--color-primitive-brand); outline-offset:3px; border-radius:var(--radius-2x); }
 .client-tasks-page__empty { padding:var(--space-8x) 0; color:var(--color-primitive-secondary); font-size:var(--font-size-s); }
 .client-tasks-page__tabs { width:100%; }
+.client-tasks-page__cell > div:first-child { padding-right:0; }
+.client-tasks__create-mobile-label { display:none; }
+.client-tasks-page__mobile-icon { display:none; }
+
+@media (max-width: 600px) {
+  .client-tasks__create-desktop-label { display:none; }
+  .client-tasks__create-mobile-label { display:inline; }
+  .client-tasks-page { gap:var(--space-8x); }
+  .client-tasks-page__list { gap:var(--space-6x); }
+  .client-tasks-page__mobile-icon {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    width:var(--space-10x);
+    height:var(--space-10x);
+    flex:none;
+    margin-right:var(--space-4x);
+    color:var(--color-primitive-primary);
+  }
+  .client-tasks-page__mobile-icon .pay-logo { width:var(--space-10x); height:var(--space-10x); }
+  .client-tasks-page__pin { display:none; }
+  .client-tasks-page__tabs [role='tab'] { font-size:var(--font-size-l); line-height:var(--line-height-l); }
+}
 
 .client-task-detail { display:flex; flex-direction:column; gap:var(--space-8x); }
 .client-task-detail__header { display:flex; flex-direction:column; gap:var(--space-2-5x); }

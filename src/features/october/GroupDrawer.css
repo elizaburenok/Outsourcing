@@ -81,3 +81,39 @@
 .gd__row .pay-row-btn:hover {
   opacity: 0.5;
 }
+
+.gd__tab-mobile { display: none; }
+.gd__mobile-copy { display: none; }
+
+@media (max-width: 600px) {
+  .drawer.gd__panel {
+    width: 100vw;
+    max-width: 100vw;
+    height: 100dvh;
+    box-shadow: none;
+  }
+
+  .gd__total {
+    padding: var(--space-8x) var(--space-5x) 0;
+    gap: var(--space-4x);
+  }
+
+  .gd__total-amount {
+    font-size: var(--font-size-4xl);
+    line-height: var(--line-height-4xl);
+  }
+
+  .gd__total-label {
+    font-size: var(--font-size-m);
+    line-height: var(--line-height-m);
+    color: var(--color-primitive-primary);
+  }
+
+  .gd__tabs { padding: var(--space-8x) var(--space-5x); }
+  .gd__body { padding: 0 var(--space-5x) var(--space-6x); }
+  .gd__list { gap: var(--space-6x); }
+  .gd__tab-desktop { display: none; }
+  .gd__tab-mobile { display: inline; }
+  .gd__desktop-copy { display: none; }
+  .gd__mobile-copy { display: inline; }
+}

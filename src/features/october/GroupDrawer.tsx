@@ -195,7 +195,7 @@ export default function GroupDrawer({
           <div className="gd__total">
             <span className="gd__total-amount">{uncalculated ? 'В расчёте' : formatMoney(total)}</span>
             <span className="gd__total-label">
-              {uncalculated ? 'Бухгалтер рассчитывает платежи' : notReady ? 'Пока рано платить. Расчёт предварительный.' : 'Осталось уплатить'}
+              {uncalculated ? 'Бухгалтер рассчитывает платежи' : notReady ? <><span className="gd__desktop-copy">Пока рано платить. Расчёт предварительный.</span><span className="gd__mobile-copy">Сумма примерная. Расчёт ещё не готов.</span></> : 'Осталось уплатить'}
             </span>
           </div>
         )}
@@ -203,7 +203,7 @@ export default function GroupDrawer({
         <div className="gd__tabs">
           <Tabs
             items={[
-              { id: 'topay', label: 'К уплате' },
+              { id: 'topay', label: <><span className="gd__tab-desktop">К уплате</span><span className="gd__tab-mobile">В процессе</span></> },
               { id: 'done', label: 'Выполнено' },
             ]}
             value={tab}

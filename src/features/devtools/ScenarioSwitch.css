@@ -73,3 +73,13 @@
   flex-wrap: wrap;
   gap: var(--spacing-1x);
 }
+
+@media (max-width: 600px) {
+  .scn {
+    position: static;
+    width: auto;
+    max-width: none;
+    max-height: none;
+    margin: var(--space-8x) var(--space-5x);
+  }
+}

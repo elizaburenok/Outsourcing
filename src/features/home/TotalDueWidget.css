@@ -24,3 +24,20 @@
   letter-spacing: var(--text-m-tracking);
   color: var(--color-primitive-secondary);
 }
+
+@media (max-width: 600px) {
+  .total-due-widget {
+    gap: var(--space-4x);
+    padding: var(--space-5x);
+    border: 0;
+    border-radius: var(--radius-3x);
+    background: var(--color-container-default);
+    box-shadow: var(--shadow-card);
+  }
+
+  .total-due-widget__amount {
+    font-size: var(--font-size-title-l);
+    line-height: var(--line-height-title-l);
+    font-weight: var(--font-weight-demi-bold);
+  }
+}
