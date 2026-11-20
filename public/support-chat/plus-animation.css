@@ -1,0 +1,12 @@
+/* Two gentle surface pulses in each 8-second cycle, then a quiet pause.
+   Never animate the label or icon: no scaling or rasterization jitter. */
+@keyframes tochkaPlusSoftPulse{
+  0%,12%,24%,100%{background-color:#E2DDF6;box-shadow:0 0 0 0 rgba(131,93,225,0)}
+  6%,18%{background-color:#D6CEF1;box-shadow:0 0 0 3px rgba(131,93,225,.08)}
+}
+.pr button.tplusb{
+  animation:tochkaPlusSoftPulse 8s cubic-bezier(.45,0,.55,1) 1s infinite;
+  transform:none;
+  transition:opacity .15s;
+}
+@media(prefers-reduced-motion:reduce){.pr button.tplusb{animation:none}}

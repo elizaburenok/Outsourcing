@@ -1,0 +1,25 @@
+/* Shared user-supplied fonts: TT Norms Tochka Extended and Tochka Script. */
+@font-face{font-family:'Tochka Script';src:url(./assets/fonts/tochka-script.woff) format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-thin.woff) format('woff');font-weight:100;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-thin-italic.woff) format('woff');font-weight:100;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-extralight.woff) format('woff');font-weight:200;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-extralight-italic.woff) format('woff');font-weight:200;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-light.woff) format('woff');font-weight:300;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-light-italic.woff) format('woff');font-weight:300;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-regular.woff) format('woff');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-italic.woff) format('woff');font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-normal.woff) format('woff');font-weight:450;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-normal-italic.woff) format('woff');font-weight:450;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-medium.woff) format('woff');font-weight:500;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-medium-italic.woff) format('woff');font-weight:500;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-demibold.woff) format('woff');font-weight:600;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-demibold-italic.woff) format('woff');font-weight:600;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-bold.woff) format('woff');font-weight:700;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-bold-italic.woff) format('woff');font-weight:700;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-extrabold.woff) format('woff');font-weight:800;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-extrabold-italic.woff) format('woff');font-weight:800;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-black.woff) format('woff');font-weight:900;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-black-italic.woff) format('woff');font-weight:900;font-style:italic;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-extrablack.woff) format('woff');font-weight:950;font-style:normal;font-display:swap}
+@font-face{font-family:'TT Norms Tochka Extended';src:url(./assets/fonts/ttnorms-extrablack-italic.woff) format('woff');font-weight:950;font-style:italic;font-display:swap}
+html,body,button,input,textarea,select{font-family:'TT Norms Tochka Extended'}

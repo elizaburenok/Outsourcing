@@ -1,0 +1,37 @@
+/* The host positions the frame; the panel and launcher share its right edge. */
+html,body,#dc-root,.sc-host,.prototype-viewport,.pr {
+  margin:0; width:100%!important; height:100%!important; overflow:hidden;
+  background:transparent!important;
+}
+.pr { transform:none!important; }
+.pr>.panel {
+  left:auto!important; right:4px; top:0!important;
+  max-width:calc(100% - 8px); height:min(750px,calc(100% - 84px))!important;
+}
+.pr .chat-content { flex:1 1 auto!important; min-width:0; }
+.pr>.fab { left:auto!important; top:auto!important; right:4px; bottom:4px; isolation:isolate; }
+.pr>.fab:hover {opacity:1}
+.pr>.fab>.fab-underlay {pointer-events:none}
+.pr>.fab>.fab-underlay path {fill:#F9F9F9}
+.pr>.fab>.fab-foreground {
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  transition:opacity .15s; pointer-events:none;
+}
+.pr>.fab:hover>.fab-foreground {opacity:.5}
+.pr [role="dialog"][aria-label="Чаты по темам"]>div:nth-child(2) {
+  overflow-x:hidden; overscroll-behavior:contain;
+}
+.pr [role="dialog"][aria-label="Чаты по темам"]>div:nth-child(2)>div { flex-shrink:0; }
+@media(max-width:440px) { .pr .rail-in {width:52px!important} }
+@media(prefers-reduced-motion:reduce){.pr *{animation:none!important;transition:none!important}}
+
+/* Keep the section labels and 40px rows at their original positions.
+   Scroll the conversation list under its fixed collapse control on short screens. */
+.pr .rail-open:has([aria-label="Свернуть список бесед"]) {
+  display:flex; flex-direction:column;
+}
+.pr .rail-open:has([aria-label="Свернуть список бесед"]) > :first-child { flex:none; }
+.pr .rail-open:has([aria-label="Свернуть список бесед"]) > :last-child {
+  min-height:0; overflow-y:auto; overscroll-behavior:contain; scrollbar-width:none;
+}
+.pr .rail-open:has([aria-label="Свернуть список бесед"]) > :last-child > * { flex-shrink:0; }

@@ -8,19 +8,15 @@ import { ScenarioProvider, useScenario } from '@/state/ScenarioProvider'
 import { OnboardingProvider } from '@/state/OnboardingProvider'
 import { ClientTasksProvider } from '@/state/ClientTasksProvider'
 import ScenarioSwitch from '@/features/devtools/ScenarioSwitch'
-import AssistantWidget from '@/features/assistant/AssistantWidget'
+import PrototypeChatWidget from '@/features/chat/PrototypeChatWidget'
 // import OnboardingLayer from '@/features/onboarding/OnboardingLayer' // временно скрыт, см. ниже
 import './RootLayout.css'
 
-/**
- * Чат поддержки + AI-Ассистент (макет «ОБ · Аутсорс», страница «🚧 НДС») —
- * сценарий «Готовые платежи». Живёт в корневом лейауте, а не на Главной:
- * кнопка и открытое окно не пропадают при переходе по страницам, состояние
- * чата (лента, непрочитанные) сохраняется.
- */
-function AssistantMount() {
-  const { scenario } = useScenario()
-  return scenario === 'case2' ? <AssistantWidget /> : null
+/** Shared chat stays mounted across app pages so its history survives navigation. */
+function ChatMount() {
+  const { pathname } = useLocation()
+  // The onboarding demo has its own full-page chat screen.
+  return pathname === ROUTES.chat ? null : <PrototypeChatWidget />
 }
 
 function ScrollToTop() {
@@ -72,7 +68,7 @@ export default function RootLayout() {
                 <OnboardingLayer /> */}
             {/* Служебный тумблер сценариев прототипа (не элемент продукта) */}
             <ScenarioSwitch />
-            <AssistantMount />
+            <ChatMount />
           </div>
           </ClientTasksProvider>
         </OnboardingProvider>
