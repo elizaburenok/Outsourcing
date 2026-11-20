@@ -61,7 +61,7 @@ export default function TaxPaymentPage() {
   // Неизвестный платёж — возвращаемся на Главную.
   useEffect(() => {
     if (!payable) navigate(ROUTES.home, { replace: true })
-  }, [payable, navigate])
+  }, [id, payable, navigate])
 
   // Автоскрытие тоста.
   useEffect(() => {
@@ -73,6 +73,7 @@ export default function TaxPaymentPage() {
   if (!payable) return null
   const vat = getVatCalculation(payable)
   const paid = isPaid(payable.id)
+  const amount = payable.amount
 
   function goHome() {
     navigate(ROUTES.home)
@@ -100,8 +101,8 @@ export default function TaxPaymentPage() {
     >
       <div className="tpp">
         <header className="tpp__header">
-          <p className="tpp__amount">{formatMoney(payable.amount)}</p>
-          {payable.dueLabel && <p className="tpp__due">{vat && paid ? 'Уплачено' : `До ${payable.dueLabel}`}</p>}
+          <p className="tpp__amount">{formatMoney(amount)}</p>
+          {payable.dueLabel && <p className="tpp__due">{vat && paid ? 'Уплачено' : vat?.penalty ? `Срок уплаты истёк ${payable.dueLabel}` : `До ${payable.dueLabel}`}</p>}
         </header>
 
         {!vat && <HeaderButton
@@ -116,12 +117,26 @@ export default function TaxPaymentPage() {
         {vat && (
           <div className="tpp__vat-summary">
             <div className="tpp__vat-copy">
-              <p>Вы можете изменить сумму и уплатить весь НДС сразу — налоговая будет ежемесячно списывать с ЕНС по 1/3 от общей суммы налога.</p>
-              <p>Предлагаем распределить налоговую нагрузку и платить частями строго в нужные сроки: {formatMoney(vat.installments[0])} до 28 {vat.months[0]}, {formatMoney(vat.installments[1])} до 28 {vat.months[1]} и {formatMoney(vat.installments[2])} до 28 {vat.months[2]}.</p>
+              {vat.penalty !== undefined ? (
+                <>
+                  <p>При сверке мы нашли продажи и покупку за III квартал, которые пропустили в расчёте. Мы учли документы и пересчитали НДС.</p>
+                  <p>К доплате {formatMoney(vat.tax)}. За просрочку начислены пени {formatMoney(vat.penalty)}.</p>
+                </>
+              ) : vat.tax === 0 ? (
+                <>
+                  <p>В этом квартале исчисленный НДС отсутствует: налог к уплате — 0 ₽, платёж формироваться не будет.</p>
+                  <p>Входной НДС {formatMoney(vat.deductionsVat)} по покупкам принят к вычету и переносится на следующий квартал (ст. 171 НК РФ).</p>
+                </>
+              ) : (
+                <>
+                  <p>Вы можете изменить сумму и уплатить весь НДС сразу — налоговая будет ежемесячно списывать с ЕНС по 1/3 от общей суммы налога.</p>
+                  <p>Предлагаем распределить налоговую нагрузку и платить частями строго в нужные сроки: {formatMoney(vat.installments[0])} до 28 {vat.months[0]}, {formatMoney(vat.installments[1])} до 28 {vat.months[1]} и {formatMoney(vat.installments[2])} до 28 {vat.months[2]}.</p>
+                </>
+              )}
             </div>
             <div className="tpp__vat-total">
-              <span>Всего НДС за {vat.quarter} квартал</span>
-              <strong>{formatMoney(vat.tax)}</strong>
+              <span>{vat.penalty !== undefined ? 'Всего с пенями' : `Всего НДС за ${vat.quarter} квартал`}</span>
+              <strong>{formatMoney(vat.tax + (vat.penalty ?? 0))}</strong>
             </div>
           </div>
         )}
@@ -129,7 +144,7 @@ export default function TaxPaymentPage() {
         <div className="tpp__navigators">
           {payable.hasCalc && (
             <NavTile
-              title="Расчёт налогов"
+              title={vat ? 'Расчёт налога' : 'Расчёт налогов'}
               description="Почему такая сумма?"
               icon={<Calculator size={22} strokeWidth={1.75} />}
               onClick={() => setShowCalc(true)}
@@ -170,12 +185,16 @@ export default function TaxPaymentPage() {
       </div>
 
       {payable.hasCalc && (
-        <TaxCalcDrawer payable={payable} open={showCalc} onClose={() => setShowCalc(false)} />
+        <TaxCalcDrawer
+          payable={payable}
+          open={showCalc}
+          onClose={() => setShowCalc(false)}
+        />
       )}
 
       {showResult && (
         <PaymentResultModal title={payable.paidTitle} onDone={goHome}>
-          <p>Отправили платёж {formatMoney(payable.amount)}.</p>
+          <p>Отправили платёж {formatMoney(amount)}.</p>
           <p>Информация по платежу появится в ленте событий в течение 5 минут.</p>
         </PaymentResultModal>
       )}

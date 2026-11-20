@@ -43,6 +43,7 @@ export default function ScenarioSwitch() {
               onClick={() => {
                 if (scenario !== id) setScenario(id)
                 navigate(ROUTES.home)
+                setCollapsed(true)
               }}
             >
               {label}

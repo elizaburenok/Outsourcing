@@ -45,7 +45,7 @@ export default function HomePage() {
           hasBackButton
           hasTextBlock
           title={isOnboarding ? onboardingTitles[onboardingPage] : 'Онлайн-бухгалтерия'}
-          subtitle={isOnboarding ? (onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'Ozon' : 'Wildberries') : onboardingPage === 'home' ? (scenario === 'onboarding_vat' ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'ООО · УСН «Доходы» 6%') : onboardingPage === 'signature' || onboardingPage === 'sfr' ? 'На АО «Точка»' : undefined) : caseData.taxpayer === 'ip' ? 'ИП · УСН «Доходы» 6% + НДС 5%' : isOb ? 'ООО · УСН «Доходы» 6% + НДС 22%' : 'УСН «Доходы» + НДС 5%'}
+          subtitle={isOnboarding ? (onboardingPage.endsWith('-reports') ? (onboardingPage.startsWith('ozon') ? 'Ozon' : 'Wildberries') : onboardingPage === 'home' ? (scenario === 'onboarding_vat' ? 'ООО · УСН «Доходы» 6% + НДС 5%' : 'ООО · УСН «Доходы» 6%') : onboardingPage === 'signature' || onboardingPage === 'sfr' ? 'На АО «Точка»' : undefined) : caseData.taxpayer === 'ip' ? 'ИП · УСН «Доходы» 6% + НДС 5%' : isOb ? `ООО · УСН «Доходы» 6% + НДС ${caseData.nds[0]?.vatRate ?? 22}%` : 'УСН «Доходы» + НДС 5%'}
           hasRootLink={isOnboarding && onboardingPage !== 'home'}
           rootLinkText="Онлайн-бухгалтерия"
           onRootLinkClick={() => setOnboardingPage('home')}

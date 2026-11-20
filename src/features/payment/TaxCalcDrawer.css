@@ -111,6 +111,13 @@
   margin-top: var(--space-4x);
 }
 
+.tcd__income-desc {
+  margin: 0;
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
+}
+
 .tcd__category-intro {
   display: flex;
   flex-direction: column;
@@ -131,6 +138,28 @@
   font-weight: var(--font-weight-demi-bold);
   color: var(--color-primitive-primary);
   white-space: nowrap;
+}
+
+/* Сводка у заголовка «НДС с операций» в кейсе 5%: НДС + совокупный доход. */
+.tcd__head-totals {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-0-5x);
+  white-space: nowrap;
+}
+
+.tcd__head-total {
+  font-size: var(--font-size-m);
+  line-height: var(--line-height-m);
+  font-weight: var(--font-weight-demi-bold);
+  color: var(--color-primitive-primary);
+}
+
+.tcd__head-totals small {
+  font-size: var(--font-size-s);
+  line-height: var(--line-height-s);
+  color: var(--color-primitive-secondary);
 }
 
 .tcd__list {
@@ -286,7 +315,7 @@
 }
 
 .tcd__contractor-button:hover {
-  background: var(--color-container-transparent-1);
+  opacity: 0.5;
 }
 
 .tcd__contractor-button:focus-visible {

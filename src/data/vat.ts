@@ -1,7 +1,8 @@
 import type { Payable } from './payment'
 
 export type VatRate = 5 | 7 | 22
-export type VatKind = 'sale' | 'advance' | 'advanceOffset' | 'purchase'
+export type VatKind = 'sale' | 'advance' | 'advanceOffset' | 'purchase' | 'purchaseAdvance' | 'purchaseAdvanceOffset'
+
 export type VatDocument = {
   id: string
   title: string
@@ -10,8 +11,12 @@ export type VatDocument = {
   gross: number
   /** НДС по счёту-фактуре; для покупки нужен подтверждённый вычет. */
   vat?: number
-  /** Связь зачёта с ранее начисленным авансом. */
+  /** Связь зачёта с исходным авансом или предоплатой поставщику. */
   advanceId?: string
+  /** Покупка, в оплату которой зачтена предоплата поставщику. */
+  purchaseId?: string
+  /** Пояснение операции для таймлайна детализации контрагента (как в макете). */
+  description?: string
 }
 
 export type VatSection = {
@@ -44,8 +49,10 @@ const SECTION_META: Record<VatKind, Pick<VatSection, 'title' | 'description' | '
   advance: { title: 'Полученные авансы', description: 'НДС при получении предоплаты', sign: 1 },
   advanceOffset: { title: 'Зачтённые авансы', description: 'Вычет ранее начисленного НДС', sign: -1 },
   purchase: { title: 'Покупки', description: 'Вычет входного НДС по документам', sign: -1 },
+  purchaseAdvance: { title: 'Предоплаты поставщикам', description: 'Вычет НДС с перечисленной предоплаты', sign: -1 },
+  purchaseAdvanceOffset: { title: 'Зачёт предоплат', description: 'Восстановление ранее принятого к вычету НДС', sign: 1 },
 }
-const KINDS: VatKind[] = ['sale', 'advance', 'advanceOffset', 'purchase']
+const KINDS: VatKind[] = ['sale', 'advance', 'advanceOffset', 'purchase', 'purchaseAdvance', 'purchaseAdvanceOffset']
 const roundKopecks = (value: number) => Math.round(value * 100) / 100
 
 /** Расчётная ставка для суммы, в которую уже включён НДС. */
@@ -58,7 +65,7 @@ export function vatOnNet(net: number, rate: VatRate): number {
 }
 
 export function vatForDocument(document: VatDocument, rate: VatRate): number {
-  if (document.kind === 'purchase' && rate !== 22) return 0
+  if (document.kind.startsWith('purchase') && rate !== 22) return 0
   return document.vat ?? vatIncludedInGross(document.gross, rate)
 }
 
@@ -67,12 +74,24 @@ export function vatForDocument(document: VatDocument, rate: VatRate): number {
  * Продажа и связанный с ней аванс могут относиться к одной оплате покупателя.
  */
 export function calculateVat(documents: VatDocument[], rate: VatRate, priorAdvanceVat: Record<string, number> = {}) {
-  const advances = new Map(documents.filter((d) => d.kind === 'advance').map((d) => [d.id, vatForDocument(d, rate)]))
+  const advances = new Map(documents.filter((d) => d.kind === 'advance' || d.kind === 'purchaseAdvance')
+    .map((d) => [d.id, d]))
   const offsets = new Map<string, number>()
-  for (const document of documents.filter((d) => d.kind === 'advanceOffset')) {
+  for (const document of documents.filter((d) => d.kind === 'advanceOffset' || d.kind === 'purchaseAdvanceOffset')) {
     if (!document.advanceId) throw new Error('Зачёт аванса не связан с исходным документом')
+    const advance = advances.get(document.advanceId)
+    const expectedKind = document.kind === 'advanceOffset' ? 'advance' : 'purchaseAdvance'
+    if (advance && (advance.kind !== expectedKind || advance.contractor !== document.contractor)) {
+      throw new Error('Зачёт аванса не соответствует предоплате контрагента')
+    }
+    if (document.kind === 'purchaseAdvanceOffset') {
+      const purchase = documents.find((item) => item.id === document.purchaseId)
+      if (!purchase || purchase.kind !== 'purchase' || purchase.contractor !== document.contractor || document.gross > purchase.gross) {
+        throw new Error('Зачёт предоплаты не соответствует покупке поставщика')
+      }
+    }
     const total = roundKopecks((offsets.get(document.advanceId) ?? 0) + vatForDocument(document, rate))
-    if (total > (advances.get(document.advanceId) ?? priorAdvanceVat[document.advanceId] ?? 0)) throw new Error('Зачёт превышает НДС с аванса')
+    if (total > (advance ? vatForDocument(advance, rate) : priorAdvanceVat[document.advanceId] ?? 0)) throw new Error('Зачёт превышает НДС с аванса')
     offsets.set(document.advanceId, total)
   }
   const sections: VatSection[] = KINDS.map((kind) => {
@@ -87,7 +106,7 @@ export function calculateVat(documents: VatDocument[], rate: VatRate, priorAdvan
   })
   const exactTax = roundKopecks(sections.reduce((sum, section) => sum + section.sign * section.vat, 0))
   const accruedVat = roundKopecks(sections[0].vat + sections[1].vat)
-  const deductionsVat = roundKopecks(sections[2].vat + sections[3].vat)
+  const deductionsVat = roundKopecks(sections[2].vat + sections[3].vat + sections[4].vat - sections[5].vat)
   const byContractor = new Map<string, VatDocument[]>()
   for (const document of documents) {
     const items = byContractor.get(document.contractor) ?? []
@@ -106,7 +125,7 @@ export function calculateVat(documents: VatDocument[], rate: VatRate, priorAdvan
       purchaseCount: ofKind('purchase').length,
       saleVat: sumVat('sale'),
       saleSideVat: roundKopecks(sumVat('sale') + sumVat('advance') - sumVat('advanceOffset')),
-      purchaseVat: sumVat('purchase'),
+      purchaseVat: roundKopecks(sumVat('purchase') + sumVat('purchaseAdvance') - sumVat('purchaseAdvanceOffset')),
     }
   }).sort((a, b) => (b.saleSideVat + b.purchaseVat) - (a.saleSideVat + a.purchaseVat))
   const tax = Math.max(0, exactTax)
@@ -149,14 +168,74 @@ const Q2_DOCUMENTS: VatDocument[] = [
   { id: 'q2-advance', title: 'Счёт-фактура на аванс № 92 от 27.06.2026', contractor: 'Розничные покупатели', kind: 'advance', gross: 966_000 },
 ]
 
-export function getVatCalculation(payable: Payable) {
+/**
+ * Детализация Денисова в базовом сценарии: 37 438 ₽ НДС
+ * (27 438 с продаж + 13 000 с предоплат − 3 000 зачёт аванса)
+ * и доход 786 197 ₽.
+ */
+const DENISOV_DOCUMENTS: VatDocument[] = [
+  { id: 'retail-sale-1', title: 'Счёт-фактура № 3 от 28.07.2026', contractor: 'Денисов Б.М., ИП', kind: 'sale', gross: 252_000,
+    description: 'Отгрузка товара на сумму 252 000 ₽' },
+  { id: 'retail-sale-2', title: 'Счёт-фактура № 2 от 20.07.2026', contractor: 'Денисов Б.М., ИП', kind: 'sale', gross: 210_000,
+    description: 'Отгрузка товара на 210 000 ₽ в счёт предоплаты по счёту-фактуре № 1. НДС с предоплаты 3 000 ₽ принят к вычету.' },
+  { id: 'retail-sale-3', title: 'Счёт-фактура № 4 от 01.08.2026', contractor: 'Денисов Б.М., ИП', kind: 'sale', gross: 105_000,
+    description: 'Оказание услуг на 105 000 ₽' },
+  { id: 'retail-sale-4', title: 'Счёт-фактура № 6 от 16.09.2026', contractor: 'Денисов Б.М., ИП', kind: 'sale', gross: 9_197, vat: 438,
+    description: 'Оказание услуг на 9 197 ₽' },
+  { id: 'retail-advance-1', title: 'Счёт-фактура на предоплату № 1 от 07.07.2026', contractor: 'Денисов Б.М., ИП', kind: 'advance', gross: 63_000,
+    description: 'Получена предоплата 63 000 ₽ по договору на сумму 210 000 ₽' },
+  { id: 'retail-advance-2', title: 'Счёт-фактура на предоплату № 5 от 09.09.2026', contractor: 'Денисов Б.М., ИП', kind: 'advance', gross: 210_000,
+    description: 'Получена предоплата 210 000 ₽ по договору на сумму 210 000 ₽' },
+  // Зачёт аванса — не документ, а операция: она даёт строку «−3 000 ₽» в сводке.
+  { id: 'retail-offset-1', title: 'Зачёт аванса по счёту-фактуре от 20.07.2026', contractor: 'Денисов Б.М., ИП', kind: 'advanceOffset', gross: 63_000,
+    advanceId: 'retail-advance-1' },
+]
+
+/**
+ * Демо-строки исходной книги укрупнены до сумм по контрагентам. Для детализации
+ * разворачиваем их в число счетов-фактур из макета, сохраняя суммы до копейки.
+ */
+function splitCase2Document(document: VatDocument, count: number): VatDocument[] {
+  if (count === 1) return [document]
+  const grossCents = Math.round(document.gross * 100)
+  const vatCents = Math.round(vatForDocument(document, 5) * 100)
+  const invoice = document.title.match(/№ (\d+)/)?.[1] ?? document.id
+  return Array.from({ length: count }, (_, index) => {
+    const gross = Math.floor(grossCents / count) + (index < grossCents % count ? 1 : 0)
+    const vat = Math.floor(vatCents / count) + (index < vatCents % count ? 1 : 0)
+    const month = String(7 + Math.floor(index / 5)).padStart(2, '0')
+    const day = String(3 + index % 5 * 5).padStart(2, '0')
+    return { ...document, id: `${document.id}-${index + 1}`,
+      title: `Счёт-фактура № ${invoice}-${index + 1} от ${day}.${month}.2026`,
+      gross: gross / 100, vat: vat / 100 }
+  })
+}
+
+/** Книга продаж для базового сценария: 5% НДС за III квартал, 12 контрагентов. */
+const CASE2_Q3_DOCUMENTS: VatDocument[] = [
+  ...splitCase2Document({ id: 'c2-ozon', title: 'Счёт-фактура № 91 от 25.09.2026', contractor: 'ИНТЕРНЕТ РЕШЕНИЯ, ООО', kind: 'sale', gross: 3_974_981, vat: 189_284.77 }, 13),
+  ...splitCase2Document({ id: 'c2-rwb', title: 'Счёт-фактура № 92 от 25.09.2026', contractor: 'РВБ, ООО', kind: 'sale', gross: 2_510_000 }, 12),
+  ...splitCase2Document({ id: 'c2-market', title: 'Счёт-фактура № 93 от 25.09.2026', contractor: 'Розничные покупатели', kind: 'sale', gross: 1_962_411 }, 10),
+  ...DENISOV_DOCUMENTS,
+  { id: 'c2-socks', title: 'Счёт-фактура № 94 от 25.09.2026', contractor: 'Самые лучшие носки для коней, ООО', kind: 'sale', gross: 300_000 },
+  { id: 'c2-alexandrov', title: 'Счёт-фактура № 95 от 25.09.2026', contractor: 'Александров Б.Ю., ИП', kind: 'sale', gross: 200_000 },
+  { id: 'c2-kamenev', title: 'Счёт-фактура № 96 от 25.09.2026', contractor: 'Каменев В.П., ИП', kind: 'sale', gross: 200_000 },
+  ...splitCase2Document({ id: 'c2-sapogov', title: 'Счёт-фактура № 97 от 25.09.2026', contractor: 'Сапогов Р.П., ИП', kind: 'sale', gross: 100_000 }, 2),
+  ...splitCase2Document({ id: 'c2-utyugov', title: 'Счёт-фактура № 98 от 25.09.2026', contractor: 'Утюгов Б.П., ИП', kind: 'sale', gross: 66_400 }, 3),
+  ...splitCase2Document({ id: 'c2-bogomolov', title: 'Счёт-фактура № 99 от 25.09.2026', contractor: 'Богомолов Б.И., ИП', kind: 'sale', gross: 62_358 }, 3),
+  ...splitCase2Document({ id: 'c2-sobolev', title: 'Счёт-фактура № 100 от 25.09.2026', contractor: 'Соболев А.Ф., ИП', kind: 'sale', gross: 57_890 }, 13),
+  { id: 'c2-anufriev', title: 'Счёт-фактура № 101 от 25.09.2026', contractor: 'Ануфриев А.А., ИП', kind: 'sale', gross: 55_000 },
+]
+
+export function getVatCalculation(payable: Pick<Payable, 'category' | 'id' | 'vatRate'>) {
   if (payable.category !== 'nds' || !/q[23]/.test(payable.id)) return undefined
   const isQ3 = payable.id.includes('q3')
   if (isQ3 && !/(?:c2|c3)-nds-q3/.test(payable.id)) return undefined
   const rate = payable.vatRate ?? (isQ3 ? 22 : 5)
-  const result = calculateVat(isQ3 ? Q3_DOCUMENTS : Q2_DOCUMENTS, rate)
+  const documents = payable.id.endsWith('c2-nds-q3-1') ? CASE2_Q3_DOCUMENTS : isQ3 ? Q3_DOCUMENTS : Q2_DOCUMENTS
+  const result = calculateVat(documents, rate)
   return {
-    ...result,
+    ...result, penalty: undefined,
     quarter: isQ3 ? 'III' : 'II',
     months: isQ3 ? ['октября', 'ноября', 'декабря'] : ['июля', 'августа', 'сентября'],
   }
